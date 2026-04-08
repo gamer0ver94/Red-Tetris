@@ -3,6 +3,9 @@ import cors from '@fastify/cors';
 import secureSession from '@fastify/secure-session';
 import swagger from '@fastify/swagger';
 import swaggerUI from '@fastify/swagger-ui';
+import fastifyStatic from '@fastify/static';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 
 import { register_routes } from './register_routes.ts';
 import { register_sockets } from './register_sockets.ts';
@@ -22,7 +25,10 @@ export const build_server = async () => {
   await init_cache_memory(fastify);
 
   //Swagger init for clear API docs
-  await init_swagger(fastify)
+  await init_swagger(fastify);
+
+  //AsyncApi init for clear socket docs
+  await init_async_api(fastify);
 
   //HTTP routes init
   await register_routes(fastify);
@@ -90,11 +96,23 @@ async function init_swagger(fastify: FastifyInstance){
     },
   });
   await fastify.register(swaggerUI, {
-    routePrefix: '/docs',
+    routePrefix: '/docs/routes',
     staticCSP: true,
     uiConfig: {
       docExpansion: 'list',
       deepLinking: false,
     },
+  });
+}
+
+async function init_async_api(fastify: FastifyInstance){
+  
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename); 
+
+  await fastify.register(fastifyStatic, {
+    root: join(__dirname, '../../../docs/asyncapi-site'),
+    prefix: '/docs/sockets/',
+    decorateReply: false,
   });
 }

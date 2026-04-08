@@ -16,8 +16,7 @@ export async function find_me(sid: string, player_store: PlayerStore){
             player_id:player.get_player_id(),
             username:player.get_username(),
             state:player.get_state(),
-            sid: player.get_sid(),
-            socket: player.get_socket(),
+            socket_id: player.get_socket(),
             csrf_token: player.get_csrf_token(),
         }
     return {is_known: false}
@@ -56,7 +55,7 @@ export async function register(
         player_id:player.get_player_id(),
         username:player.get_username(),
         state:player.get_state(),
-        socket: player.get_socket(),
+        socket_id: player.get_socket(),
         csrf_token: player.get_csrf_token(),
     }
     

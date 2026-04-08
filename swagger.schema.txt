@@ -1,0 +1,14 @@
+{
+    schema: {
+      tags: [''],
+      summary:'',
+      response: {
+        200: {
+          type:'',
+          properties:{
+
+          },
+        },
+      },
+    },
+  },

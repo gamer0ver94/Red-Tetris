@@ -9,7 +9,7 @@ services:
     volumes:
       - ./:/app
       - /app/node_modules
-    command: sh -lc "npm run dev"
+    command: sh -lc "npm run docs:asyncapi:build && npm run dev"
     ports:
       - "1800:1800"
     healthcheck:

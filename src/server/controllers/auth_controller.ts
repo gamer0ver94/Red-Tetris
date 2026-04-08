@@ -13,8 +13,8 @@ export async function get_me(
 ){
     
     //Shall be a secret cookies instead
-    const sid_header = auth_services.read_sid_from_cookie(request)
-    const sid = sid_header.sid!
+    const sid_cookie = auth_services.read_sid_from_cookie(request)
+    const sid = sid_cookie.sid!
 
     if (!sid)
         return reply.code(200).send({is_known: false});
