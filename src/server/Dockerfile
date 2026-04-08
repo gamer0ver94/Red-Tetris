@@ -1,3 +1,11 @@
-FROM node:18-alpine AS builder-back
+FROM node:22
 
-WORKDIR /app/server
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 1800
+CMD ["npm", "run", "dev"]
