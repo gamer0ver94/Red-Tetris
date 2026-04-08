@@ -1,0 +1,6 @@
+div:has(input + button) {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: green;
+}
