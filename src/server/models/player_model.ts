@@ -1,7 +1,7 @@
 export class Player {
     private player_id: string
     private username: string
-    private state: string
+    private player_status: string
     private sid: string
     private socket_id: string
     private created_at: string
@@ -10,7 +10,7 @@ export class Player {
     constructor(
         player_id: string,
         username: string,
-        state: string,
+        player_status: string,
         sid: string,
         socket_id: string,
         created_at: string,
@@ -18,7 +18,7 @@ export class Player {
     ) {
         this.player_id = player_id
         this.username = username
-        this.state = state
+        this.player_status = player_status
         this.sid = sid
         this.socket_id = socket_id
         this.created_at = created_at
@@ -33,8 +33,8 @@ export class Player {
         return this.username
     }
 
-    public get_state (): string {
-        return this.state
+    public get_player_status (): string {
+        return this.player_status
     }
 
     public get_sid(): string {
@@ -49,11 +49,11 @@ export class Player {
         return this.csrf_token
     }
 
-    public set_state(newState: string): void {
-        this.state = newState
+    public set_player_status(new_status: string): void {
+        this.player_status = new_status
     }
 
-    public set_socket(newSocket: string): void {
-        this.socket_id = newSocket
+    public set_socket(new_socket: string): void {
+        this.socket_id = new_socket
     }
 }

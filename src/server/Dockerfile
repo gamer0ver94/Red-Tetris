@@ -9,6 +9,3 @@ COPY . .
 
 EXPOSE 1800
 
-CMD ["npm", "run", "docs:asyncapi:build"]
-
-CMD ["npm", "run", "dev"]

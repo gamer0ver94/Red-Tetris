@@ -1,5 +1,5 @@
-import { Player } from "../models/player_model";
-import { PlayerStore } from "../stores/players_store";
+import { Player } from "../models/player_model.ts";
+import { PlayerStore } from "../stores/players_store.ts";
 import type { FastifyRequest } from 'fastify';
 
 import { randomBytes, randomUUID } from 'node:crypto'
@@ -15,7 +15,7 @@ export async function find_me(sid: string, player_store: PlayerStore){
             is_known:true,
             player_id:player.get_player_id(),
             username:player.get_username(),
-            state:player.get_state(),
+            player_status:player.get_player_status(),
             socket_id: player.get_socket(),
             csrf_token: player.get_csrf_token(),
         }
@@ -54,7 +54,7 @@ export async function register(
         success:true,
         player_id:player.get_player_id(),
         username:player.get_username(),
-        state:player.get_state(),
+        player_status:player.get_player_status(),
         socket_id: player.get_socket(),
         csrf_token: player.get_csrf_token(),
     }

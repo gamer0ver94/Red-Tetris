@@ -10,6 +10,7 @@ import { dirname, join } from 'node:path';
 import { register_routes } from './register_routes.ts';
 import { register_sockets } from './register_sockets.ts';
 import { PlayerStore } from '../stores/players_store.ts';
+import { GameStore } from '../stores/games_store.ts';
 
 
 //Bootstrap for server
@@ -37,6 +38,7 @@ export const build_server = async () => {
   const io = register_sockets(
       fastify.server,
       fastify.player_store,
+      fastify.game_store,
       (cookieValue) => fastify.decodeSecureSession(cookieValue),
       clientOrigin,
     );
@@ -70,10 +72,12 @@ async function init_cors_and_cookies(fastify: FastifyInstance, clientOrigin: str
 async function init_cache_memory(fastify: FastifyInstance){
   
   //User data
-  const player_store = new PlayerStore()
+  const player_store = new PlayerStore();
   fastify.decorate('player_store', player_store);
 
-  //Game data ...
+  //Game data
+  const game_store = new GameStore();
+  fastify.decorate('game_store', game_store);
 }
 
 async function init_swagger(fastify: FastifyInstance){

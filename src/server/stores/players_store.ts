@@ -38,10 +38,10 @@ export class PlayerStore{
         return 'success';
     }
 
-    public async set_state_by_sid(sid:string, state:string) : Promise<string>{
+    public async set_player_status_by_sid(sid:string, player_status:string) : Promise<string>{
         const player = await this.is_known(sid);
         if(!player) return 'Unknown sid';
-        player.set_state(state);
+        player.set_player_status(player_status);
         return 'success';
     }
 

@@ -3,20 +3,21 @@
 player{
 
     player_id:
-    state:
+    player_status:
     username:
     socket_id:
     csrf_token:
 }
 
-room{
-    room_id:
-    state:
-    board_ids:
-}
-
 game{
     game_id:
+    type:
+    mode:
+    player_ids:
+    game_status:
+}
+
+boards{
     player_id:
-    ghost_rows:
+    gosth_rows:
 }

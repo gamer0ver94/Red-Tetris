@@ -12,7 +12,6 @@ export async function get_me(
     reply: FastifyReply
 ){
     
-    //Shall be a secret cookies instead
     const sid_cookie = auth_services.read_sid_from_cookie(request)
     const sid = sid_cookie.sid!
 
@@ -43,7 +42,7 @@ export async function post_register(
         request.body.username,
         request
     );
-    if(!response || response.success === false)
+    if(!response || response.success == false)
         return reply.code(409).send(response ?? { success: false, reason: 'register failed' })
 
     return reply.code(201).send(response)
