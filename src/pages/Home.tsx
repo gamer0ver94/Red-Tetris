@@ -11,7 +11,10 @@ export default function Home (){
                 <Form/>
             </div>
             <div>
-                <h1>AboutUs</h1>
+                <h1>About Us</h1>
+            </div>
+            <div>
+                <h1>About Project</h1>
             </div>
         </div>
     )
