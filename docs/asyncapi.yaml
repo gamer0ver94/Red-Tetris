@@ -1,0 +1,74 @@
+asyncapi: 3.1.0
+id: 'urn:red-tetris:socket-api'
+defaultContentType: application/json
+
+info:
+  title: Red Tetris Socket API
+  version: 0.1.0
+  contact:
+    name: Red Tetris Team
+    email: team@example.com
+  license:
+    name: MIT
+  tags:
+    - name: sockets
+
+servers:
+  local:
+    host: localhost:1800
+    protocol: socket.io
+    security:
+      - $ref: '#/components/securitySchemes/sessionCookie'
+
+channels:
+  messageChannel:
+    address: message
+    messages:
+      ChangeState:
+        $ref: '#/components/messages/ChangeState'
+  connectErrorChannel:
+    address: connect_error
+    messages:
+      ConnectError:
+        $ref: '#/components/messages/ConnectError'
+
+operations:
+  onMessage:
+    action: receive
+    channel:
+      $ref: '#/channels/messageChannel'
+    messages:
+      - $ref: '#/channels/messageChannel/messages/ChangeState'
+  onConnectError:
+    action: receive
+    channel:
+      $ref: '#/channels/connectErrorChannel'
+    messages:
+      - $ref: '#/channels/connectErrorChannel/messages/ConnectError'
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: httpApiKey
+      name: rt.sid
+      in: cookie
+
+  messages:
+    ChangeState:
+      name: ChangeState
+      payload:
+        type: object
+        required: [action, state]
+        properties:
+          action: { type: string, enum: [change_state] }
+          state: { type: string, enum: [connected] }
+
+    ConnectError:
+      name: ConnectError
+      payload:
+        type: object
+        required: [message]
+        properties:
+          message:
+            type: string
+            enum: [missing csrf token, missing session, invalid session, forbidden, process error]

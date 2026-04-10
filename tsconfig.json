@@ -1,7 +1,23 @@
 {
+<<<<<<< HEAD
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ]
+=======
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "dist",
+    "rootDir": "."
+  },
+  "include": ["src/server/**/*.ts"],
+  "exclude": ["node_modules", "src/client/dist"]
+>>>>>>> origin/back_End
 }

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Red Tetris - Auth + Socket Test</title>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+
+      body {
+        margin: 0;
+        padding: 24px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(180deg, #f7f9fc 0%, #edf2f7 100%);
+        color: #1f2937;
+      }
+
+      .app {
+        max-width: 760px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      }
+
+      h1 {
+        margin-top: 0;
+        font-size: 1.45rem;
+      }
+
+      .row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+      }
+
+      input,
+      button {
+        font: inherit;
+        padding: 8px 10px;
+        border-radius: 8px;
+      }
+
+      input {
+        border: 1px solid #d1d5db;
+        min-width: 220px;
+      }
+
+      button {
+        border: 1px solid #cbd5e1;
+        background: #f8fafc;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #eef2ff;
+      }
+
+      #socket-banner {
+        margin: 10px 0 14px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        background: #f3f4f6;
+        font-weight: 700;
+      }
+
+      pre {
+        margin: 0;
+        padding: 12px;
+        border-radius: 10px;
+        min-height: 180px;
+        background: #0b1020;
+        color: #a6e3ff;
+        overflow: auto;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <h1>Red Tetris Local Flow Test</h1>
+
+      <div class="row">
+        <input id="username" placeholder="username" />
+        <button id="register-btn">POST /auth/register</button>
+        <button id="me-btn">GET /auth/me</button>
+        <button id="socket-btn">Connect socket</button>
+      </div>
+
+      <div id="socket-banner">SOCKET OFF</div>
+      <pre id="logs"></pre>
+    </main>
+
+    <script src="http://localhost:1800/socket.io/socket.io.js"></script>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: src/server/Dockerfile
+    container_name: red_tetris_server
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    command: sh -lc "npm run docs:asyncapi:build && npm run dev"
+    ports:
+      - "1800:1800"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:1800/auth/me >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  client:
+    build:
+      context: ./src/client
+      dockerfile: Dockerfile
+    container_name: red_tetris_client
+    depends_on:
+      server:
+        condition: service_healthy
+    ports:
+      - "1700:80"
