@@ -1,0 +1,23 @@
+
+.board{
+    display: flex;
+    flex-direction: column;
+    justify-self: center; 
+    background-color: #150101;
+    height: fit-content;
+    width: fit-content;
+}
+.cell{
+    border: 1px solid #ffffff;
+    width: 30px;
+    height: 100%;
+}
+.a{
+    border: 1px solid #11be1a;
+    width: 30px;
+    height: 100%;
+    background: rgb(1, 100, 1);
+}
+.row{
+    display: flex; height: 30px;
+}

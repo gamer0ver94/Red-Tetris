@@ -8,6 +8,7 @@ export default function Home (){
                 <Logo text="" imagePath="/src/assets/tetris_logo.png"/>
             </div>
             <div>
+               {/*Component*/}
                 <Form/>
             </div>
             <div>
