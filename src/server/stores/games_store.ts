@@ -1,4 +1,5 @@
 import { Game } from '../models/game_model.ts'
+import { Player } from './players_store.ts';
 
 //class use to keep memory of all running games
 
@@ -42,7 +43,7 @@ export class GameStore{
     }
 
     //Methods
-    public async add_player_by_id(player_id: string, game: Game){
+    public async add_player_by_id(player_id: string, game: Game): Promise<string>{
         
         const ids = await this.get_all_ids();
         if (ids.has(player_id))
@@ -57,5 +58,25 @@ export class GameStore{
         //USER JUST JOIN 
         this.id_to_game_map.get(game.get_game_id())?.add_player(player_id);
         return "success"
+    }
+
+    public async remove_player_by_id(player_id:string, game_id:string): Promise<string>{
+        
+        const game = await this.get_game_by_id(game_id);
+
+        if(!game)
+            return "game not found"
+
+        game.remove_player(player_id)
+        return "success"
+    }
+
+    public async remove_game_by_id(game_id:string): Promise<string>{
+
+        const game = this.get_game_by_id(game_id);
+        if(!game)
+            return "game not found";
+        this.id_to_game_map.delete(game_id);
+        return "success";
     }
 }

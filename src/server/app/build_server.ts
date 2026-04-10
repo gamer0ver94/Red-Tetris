@@ -11,6 +11,8 @@ import { register_routes } from './register_routes.ts';
 import { register_sockets } from './register_sockets.ts';
 import { PlayerStore } from '../stores/players_store.ts';
 import { GameStore } from '../stores/games_store.ts';
+import { Store } from '../stores/store.ts';
+
 
 
 //Bootstrap for server
@@ -37,8 +39,7 @@ export const build_server = async () => {
   //Sockets init
   const io = register_sockets(
       fastify.server,
-      fastify.player_store,
-      fastify.game_store,
+      fastify.store,
       (cookieValue) => fastify.decodeSecureSession(cookieValue),
       clientOrigin,
     );
@@ -73,11 +74,12 @@ async function init_cache_memory(fastify: FastifyInstance){
   
   //User data
   const player_store = new PlayerStore();
-  fastify.decorate('player_store', player_store);
-
   //Game data
   const game_store = new GameStore();
-  fastify.decorate('game_store', game_store);
+
+  const store = new Store(game_store, player_store);
+  fastify.decorate('store', store)
+
 }
 
 async function init_swagger(fastify: FastifyInstance){
@@ -115,7 +117,7 @@ async function init_async_api(fastify: FastifyInstance){
   const __dirname = dirname(__filename); 
 
   await fastify.register(fastifyStatic, {
-    root: join(__dirname, '../../../docs/asyncapi-site'),
+    root: join(__dirname, '../docs/asyncapi-site'),
     prefix: '/docs/sockets/',
     decorateReply: false,
   });

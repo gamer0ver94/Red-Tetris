@@ -28,7 +28,7 @@ session-key:
 	@echo "SESSION_KEY_BASE64=$$(openssl rand -base64 32)"
 
 up:
-	$(COMPOSE) up --build
+	$(COMPOSE) up
 
 down:
 	$(COMPOSE) down

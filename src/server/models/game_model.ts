@@ -47,6 +47,7 @@ export class Game{
         return this.game_status
     }
 
+
     //Setters
     public set_game_status(game_status: string) {
         this.game_status = game_status

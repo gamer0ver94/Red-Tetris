@@ -60,5 +60,5 @@ export const game_routes = async (fastify: FastifyInstance) => {
     }
     }, game_controller.post_create);
 
-    fastify.get('/join/:?id', {}, game_controller.get_join);
+    fastify.get('/join/:id', {}, game_controller.get_join);
 }

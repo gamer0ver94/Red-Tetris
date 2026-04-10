@@ -3,7 +3,6 @@
 + join game (GET /game/join:game_id)
 + reset game render (GET game/:game_id)
 
-
 # EVENT SOCKET BACK 2 FRONT
 
 + misc 
@@ -15,6 +14,7 @@
     + user leaves a lobby {lobby:left, username:..., new_owner_name?:...}
     + owner started the game {lobby:started}
 
+//NOT IMPLEMENTED YET
 + game 
     + render {game:render ....}
     + end_game {game:end, winner_name: , is_self: true|false, was_kick: true|false}
@@ -35,12 +35,15 @@
     + user exit before the end { game:exit }
 
 
+### ALL TO DO BEFORE MERGE : 
++ finish lobby socket
++ 1 to 5 
 
-### MAKE store class (inherit all stores )
-### ADD docs for socket
-### SEND player data instead off raw sid in services
+###  1 MAKE store class (inherit all stores )
+###  2 ADD docs for socket
+### 3 SEND player data instead off raw sid in services
 
 
-### controllers/ sockets handlers -> sanitze data -> call services 
+###  4 controllers/ sockets handlers -> sanitze data -> call services 
 
-### services -> never touches sid,io,raw_data, only obj or struct
+### 5 ervices -> never touches sid,io,raw_data, only obj or struct

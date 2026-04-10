@@ -1,7 +1,7 @@
 import type { Server as HttpServer } from 'node:http';
 import { Server } from 'socket.io';
 import type { PlayerStore } from '../stores/players_store.ts';
-import type { GameStore } from '../stores/games_store.ts';
+import type { Store } from '../stores/store.ts';
 import * as auth_services from '../services/auth_services.ts';
 import {socket_game_lobby} from '../sockets/game_lobby_sockets.ts'
 import * as helpers from '../sockets/misc_sockets.ts'
@@ -10,8 +10,7 @@ import * as helpers from '../sockets/misc_sockets.ts'
 
 export const register_sockets = (
   httpServer: HttpServer,
-  player_store:PlayerStore,
-  game_store:GameStore,
+  store:Store,
   decodeSecureSession,
   allowedOrigin,
 ) => {
@@ -21,15 +20,15 @@ export const register_sockets = (
     cors: { origin: allowedOrigin, credentials: true }
   });
 
-  socket_middleware(io, player_store, decodeSecureSession);
+  socket_middleware(io, store.get_player_store(), decodeSecureSession);
 
   // Acutal connection
-  socket_connection(io, player_store, game_store);
+  socket_connection(io, store);
 
   return io;
 };
 
-function socket_connection(io:Server, player_store:PlayerStore, game_store:GameStore){
+function socket_connection(io:Server, store:Store){
   
   io.on('connection', async (socket) => {
     
@@ -37,16 +36,16 @@ function socket_connection(io:Server, player_store:PlayerStore, game_store:GameS
     if(!sid) return socket.disconnect(true);
 
     //store socket_id in cache memory
-    await player_store.set_socket_by_sid(sid, socket.id);
+    await store.get_player_store().set_socket_by_sid(sid, socket.id);
 
     //register events
     socket.on('disconnect', async() => {
-      await helpers.change_player_status(io, 'disconnected', sid, player_store);
-      await player_store.set_socket_by_sid(sid, `pending:reconnect:${Date.now()}`);
+      await helpers.change_player_status(io, 'disconnected', sid, store.get_player_store());
+      await store.get_player_store().set_socket_by_sid(sid, `pending:reconnect:${Date.now()}`);
     });
-    socket_game_lobby(io, socket, sid,player_store, game_store);
+    socket_game_lobby(io, socket, sid, store);
 
-    await helpers.change_player_status(io, 'connected', sid, player_store);
+    await helpers.change_player_status(io, 'connected', sid, store.get_player_store());
   });
 }
 

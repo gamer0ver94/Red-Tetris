@@ -1,16 +1,15 @@
-FROM node:22-alpine AS builder
-
+FROM node:24-alpine AS build
 WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
 COPY . .
+RUN npm run build
 
-RUN npm install -g typescript@5 \
-  && tsc -p tsconfig.json \
-  && cp index.html dist/index.html
+FROM nginx:stable-alpine AS runtime
+COPY --from=build /app/dist /usr/share/nginx/html
 
-FROM nginx:1.27-alpine
-
-WORKDIR /usr/share/nginx/html
-COPY --from=builder /app/dist ./
-
-EXPOSE 80
+EXPOSE 1700
 CMD ["nginx", "-g", "daemon off;"]
+

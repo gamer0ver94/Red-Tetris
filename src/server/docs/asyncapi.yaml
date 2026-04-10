@@ -61,7 +61,7 @@ components:
         required: [action, state]
         properties:
           action: { type: string, enum: [change_state] }
-          state: { type: string, enum: [connected] }
+          state: { type: string, enum: [connected, waiting, disconnected, playing] }
 
     ConnectError:
       name: ConnectError

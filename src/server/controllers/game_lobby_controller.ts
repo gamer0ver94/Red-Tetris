@@ -1,7 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import * as game_services from '../services/game_lobby_services.ts';
-import { GameStore } from '../stores/games_store.ts';
 import { read_sid_from_cookie, find_me } from '../services/auth_services.ts';
 import * as helpers from '../sockets/misc_sockets.ts'
 
@@ -26,8 +25,7 @@ export async function post_create(
         return reply.code(403).send({success: false, reason:'Token manipulation'})
 
     const response = await game_services.create_game(
-        request.server.game_store,
-        request.server.player_store,
+        request.server.store,
         sid,
         request.body.game_type,
         request.body.game_mode,
@@ -47,8 +45,7 @@ export async function post_create(
         response.game_id!,
         'waiting',
         sids_set,
-        request.server.game_store,
-        request.player_store,
+        request.server.store
     )
     return reply.code(201).send({
         success: response.success,

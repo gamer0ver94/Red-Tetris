@@ -81,4 +81,14 @@ export class PlayerStore{
         }
         return undefined
     }
+
+    public async is_known_by_id(player_id:string): Promise<Player | undefined>{
+    
+        for (const value of this.sid_to_player_map.values()){
+            if (value.get_player_id() == player_id)
+                return value;
+        }
+        return undefined;
+        
+    }
 }

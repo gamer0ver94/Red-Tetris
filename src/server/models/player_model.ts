@@ -56,4 +56,5 @@ export class Player {
     public set_socket(new_socket: string): void {
         this.socket_id = new_socket
     }
+
 }
