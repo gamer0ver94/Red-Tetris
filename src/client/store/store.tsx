@@ -61,7 +61,7 @@ const gameSlice = createSlice({
  if (state.position.y > 18) {
   state.currentPiece = state.nextPiece
   state.nextPiece = getRandomPiece()
-  state.position = { x: 4, y: 0 }
+  state.position = { x: 4, y: 0 }   
 }
 }
   }
