@@ -5,7 +5,7 @@ export default function Home (){
     return (
         <div className="home">
             <div>
-                <Logo text="" imagePath="/src/assets/tetris_logo.png"/>
+                <Logo text = ""imagePath="/src/assets/tetris_logo.png"/>
             </div>
             <div>
                 <Form/>

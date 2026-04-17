@@ -1,13 +1,13 @@
-FROM node:24
+FROM node:24-slim
 
-WORKDIR /app/src/server
+WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install && npm cache clean --force
+RUN npm install
 
 COPY . .
 
-RUN npm run docs:asyncapi:build
-
 EXPOSE 1800
+
+CMD ["npm", "run", "dev"]

@@ -17,13 +17,18 @@
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "dev": "tsx watch index.ts",
-    "docs:asyncapi:build": "asyncapi generate fromTemplate docs/asyncapi.yaml @asyncapi/html-template -o docs/asyncapi-site --force-write"
+    "docs:asyncapi:build": "asyncapi generate fromTemplate docs/asyncapi.yaml @asyncapi/html-template -o docs/asyncapi-site --force-write",
+    "test": "vitest run --config vitest.config.ts",
+    "test:watch": "vitest --config vitest.config.ts",
+    "test:coverage": "vitest run --config vitest.config.ts --coverage"
   },
 
   "devDependencies": {
     "@types/node": "^24.12.2",
     "tsx": "^4.0.0",
     "typescript": "~6.0.2",
-    "@asyncapi/cli": "^6.0.0"
+    "@asyncapi/cli": "^6.0.0",
+    "vitest": "^1.6.1",
+    "@vitest/coverage-v8": "^1.6.1"
   }
 }

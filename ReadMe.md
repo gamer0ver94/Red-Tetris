@@ -13,3 +13,27 @@
 ### AsyncAPI (swagger for sockets)
 
 + http:localhost:1800/docs/sockets/
+
+
+
+class Board {
+    keeps tracks of pieces
+}
+
+class Piece{
+    each piece has X block
+    Rotate and move
+} 
+
+class block {
+    core object
+    used to check colisions, full rows, ...
+}
+
+class GameCore?{
+    subclass?: 
+        Win_condition:
+        Score:
+        SpawnPieces:
+        GameType:("single | multi")
+}

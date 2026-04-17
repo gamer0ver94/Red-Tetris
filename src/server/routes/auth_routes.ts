@@ -67,4 +67,7 @@ export const auth_routes = async (fastify: FastifyInstance) => {
       },
     },
   }, auth_controller.post_register);
+
+  // /auth/health to have a healthcheck endpoint
+  fastify.get('/health', async () => ({ok: true}))
 };

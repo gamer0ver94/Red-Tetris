@@ -4,22 +4,23 @@ services:
       context: ./src/server
       dockerfile: Dockerfile
     container_name: red_tetris_server
-    working_dir: /app/src/server
+    working_dir: /app
     env_file:
       - .env
     volumes:
-      - ./:/app
-      - /app/src/server/node_modules
+      - ./src/server:/app
+      - server_node_modules:/app/node_modules
     command: sh -lc "npm run dev"
     ports:
       - "1800:1800"
     # healthcheck:
-    #   test: ["CMD-SHELL", "wget -qO- http://localhost:1800/auth/me >/dev/null 2>&1 || exit 1"]
+    #   test: ["CMD-SHELL", "wget -qO- http://localhost:1700/auth/health >/dev/null 2>&1 || exit 1"]
     #   interval: 5s
     #   timeout: 3s
     #   retries: 10
    
   docs-builder:
+    profiles: ["docs"]
     build:
       context: ./src/server
       dockerfile: Dockerfile.docs
@@ -31,10 +32,9 @@ services:
       context: ./src/client
       dockerfile: Dockerfile
     container_name: red_tetris_client
-    # depends_on:
-    #   server:
-    #     condition: service_healthy
+
     ports:
       - "1700:80"
 volumes:
-  asyncapi_site:
+  server_node_modules: {}
+  asyncapi_site: {}

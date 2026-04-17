@@ -14,7 +14,6 @@ import { GameStore } from '../stores/games_store.ts';
 import { Store } from '../stores/store.ts';
 
 
-
 //Bootstrap for server
 export const build_server = async () => {
   
@@ -82,10 +81,14 @@ async function init_cache_memory(fastify: FastifyInstance){
 
 }
 
-async function init_swagger(fastify: FastifyInstance){
+export async function init_swagger(fastify: FastifyInstance):
+Promise<{open_api_version:string, route_prefix:string}>{
+  
+  const open_api_version = '3.0.3';
+  const route_prefix = '/docs/routes';
   await fastify.register(swagger, {
     openapi: {
-      openapi: '3.0.3',
+      openapi: open_api_version,
       info: {
         title: 'Red Tetris API',
         version: '0.1.0',
@@ -102,23 +105,30 @@ async function init_swagger(fastify: FastifyInstance){
     },
   });
   await fastify.register(swaggerUI, {
-    routePrefix: '/docs/routes',
+    routePrefix: route_prefix,
     staticCSP: true,
     uiConfig: {
       docExpansion: 'list',
       deepLinking: false,
     },
   });
+  return {open_api_version, route_prefix}
 }
 
-async function init_async_api(fastify: FastifyInstance){
+export async function init_async_api(fastify: FastifyInstance) : 
+  Promise<{root:string, prefix:string, registered:boolean}>{
   
   const __filename = fileURLToPath(import.meta.url);
-  const __dirname = dirname(__filename); 
+  const __dirname = dirname(__filename);
+
+  const root = join(__dirname, '../docs/asyncapi-site');
+  const prefix = '/docs/sockets'
 
   await fastify.register(fastifyStatic, {
-    root: join(__dirname, '../docs/asyncapi-site'),
-    prefix: '/docs/sockets/',
+    root:root,
+    prefix: prefix,
     decorateReply: false,
   });
+
+  return {root, prefix, registered:true};
 }

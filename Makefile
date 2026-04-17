@@ -22,13 +22,35 @@
 SHELL := /bin/bash
 COMPOSE := docker compose
 
-.PHONY: up down logs clean re session-key client-build client-clean
+.PHONY: up \
+		build \
+		deploy \
+		asyncapi \
+		down \
+		logs \
+		clean \
+		re \
+		session-key \
+		client-build \
+		client-clean \
+		test-server \
+		test-server-watch \
+		test-server-coverage \
 
 session-key:
 	@echo "SESSION_KEY_BASE64=$$(openssl rand -base64 32)"
 
 up:
-	$(COMPOSE) up
+	$(COMPOSE) up server client
+
+build:
+	$(COMPOSE) build server client
+
+deploy:
+	$(COMPOSE) up --build server client
+
+asyncapi:
+	$(COMPOSE) --profile docs run --rm docs-builder
 
 down:
 	$(COMPOSE) down
@@ -38,11 +60,22 @@ logs:
 
 clean:
 	$(COMPOSE) down -v --remove-orphans
+	docker builder prune -f
 
-re: clean up
+re: clean deploy
 
 client-build:
 	npm run build:client
 
 client-clean:
 	rm -rf src/client/dist
+
+test-server:
+	docker compose run --rm server sh -lc "npm run test"
+
+test-server-watch:
+	docker compose run --rm server sh -lc "npm run test:watch"
+
+test-server-coverage:
+	docker compose run --rm server sh -lc "npm run test:coverage"
+
