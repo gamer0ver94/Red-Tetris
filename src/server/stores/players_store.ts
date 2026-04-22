@@ -4,9 +4,13 @@ import { Player } from '../models/player_model.ts'
 // Class used to keep memory cache of player data
 export class PlayerStore{
     private sid_to_player_map: Map<string, Player>
+    private socket_id_to_sid_map : Map<string, string>
+    private u_name_to_sid_map : Map<string, string>
 
     constructor(){
         this.sid_to_player_map = new Map<string, Player>();
+        this.socket_id_to_sid_map = new Map<string, string>();
+        this.u_name_to_sid_map = new Map<string, string>();
     }
     
     // GETTERS
@@ -29,17 +33,50 @@ export class PlayerStore{
         return ids;
     }
 
+    public async get_player_by_socket_id(socket_id: string): Promise<Player | undefined>{
+        const sid = this.socket_id_to_sid_map.get(socket_id);
+        const player = this.sid_to_player_map.get(sid!);
+        return (player)
+    }
+
+    public async get_player_by_username(username:string): Promise<Player | undefined>{
+        const sid = this.u_name_to_sid_map.get(username);
+        const player = this.sid_to_player_map.get(sid!);
+        return (player)
+    }
+
+    public async get_player_by_sid(sid:string):Promise<Player | undefined>{
+        return(this.sid_to_player_map.get(sid))
+    }
+
+    public async get_player_by_id(player_id:string):Promise<Player | undefined>{
+        
+        for(const val of this.sid_to_player_map.values()){
+            if(val.get_player_id() == player_id)
+                return val;
+        }
+        return undefined;
+    }
 
     // SETTERS
     public async set_socket_by_sid(sid:string, socket_id:string) : Promise<string>{
-        const player = await this.is_known(sid);
-        if(!player) return 'Unknown sid';
+        
+        const player = await this.get_player_by_sid(sid);
+        if(!player)
+            return 'Unknown sid';
+        
+        //remove old socket from map
+        this.socket_id_to_sid_map.delete(player.get_socket());
+        
         player.set_socket(socket_id);
+
+        //set new socket to map
+        this.socket_id_to_sid_map.set(player.get_socket(), sid);
         return 'success';
     }
 
     public async set_player_status_by_sid(sid:string, player_status:string) : Promise<string>{
-        const player = await this.is_known(sid);
+        const player = await this.get_player_by_sid(sid);
         if(!player) return 'Unknown sid';
         player.set_player_status(player_status);
         return 'success';
@@ -63,7 +100,9 @@ export class PlayerStore{
         }
 
         try{
-            this.sid_to_player_map.set(sid, player)
+            this.sid_to_player_map.set(sid, player);
+            this.socket_id_to_sid_map.set(player.get_socket(), sid);
+            this.u_name_to_sid_map.set(player.get_username(), sid);
         }
         catch (error){
             return error instanceof Error? error.message : 'Unknow Error'
@@ -71,24 +110,16 @@ export class PlayerStore{
         return 'success'
     }
 
-    //Looks by secret ID if user exist
-    public async is_known(sid:string) :Promise< Player | undefined >{
-        if(this.sid_to_player_map.has(sid)){
-            const player = this.sid_to_player_map.get(sid);
-            if(! player)
-                return undefined
-            return player
-        }
-        return undefined
-    }
-
-    public async is_known_by_id(player_id:string): Promise<Player | undefined>{
-    
-        for (const value of this.sid_to_player_map.values()){
-            if (value.get_player_id() == player_id)
-                return value;
-        }
-        return undefined;
+    //remove user and all related data
+    public async remove_player(player:Player):Promise<string>{
         
-    }
+        const sid = player.get_sid();
+        const existing = this.sid_to_player_map.get(sid);
+        if (!existing)
+            return 'Unknown sid';
+        this.sid_to_player_map.delete(sid);
+        this.u_name_to_sid_map.delete(existing.get_username());
+        this.socket_id_to_sid_map.delete(existing.get_socket());
+        return 'success';
+    } 
 }

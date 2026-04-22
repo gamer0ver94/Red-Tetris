@@ -15,13 +15,13 @@ export async function post_create(
     const sid_cookie = read_sid_from_cookie(request)
     const sid = sid_cookie.sid!
     if (!sid)
-        return reply.code(403).send({reason:'Missing sid'});
+        return reply.code(403).send({success:false, reason:'Missing sid'});
     
-    const player_data = await find_me(sid, request.server.player_store);
+    const player_data = await find_me(sid, request.server.store.get_player_store());
     if (!player_data || player_data.is_known == false)
         return reply.code(403).send({success: false, reason:'No player found'});
 
-    if(player_data.csrf_token !== request.body.csrf_token)
+    if(player_data.csrf_token !== request.headers['x-csrf-token'])
         return reply.code(403).send({success: false, reason:'Token manipulation'})
 
     const response = await game_services.create_game(
@@ -37,19 +37,21 @@ export async function post_create(
         request.server.io,
         'waiting',
         sid,
-        request.server.player_store);
+        request.server.store.get_player_store());
     const sids_set = new Set<string>();
     sids_set.add(sid);
     await helpers.change_game_status(
         request.server.io,
-        response.game_id!,
         'waiting',
+        response.game_id!,
         sids_set,
         request.server.store
     )
     return reply.code(201).send({
         success: response.success,
-        game_id: response.game_id
+        game_id: response.game_id,
+        game_type: request.body.game_type,
+        game_mode: request.body.game_mode,
     });
 }
 

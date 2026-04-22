@@ -11,7 +11,6 @@ export const game_routes = async (fastify: FastifyInstance) => {
 
         headers: {
         type: 'object',
-        required: ['x-csrf-token'],
         properties: {
             'x-csrf-token': { type: 'string', minLength: 32, maxLength: 128 }
         },
@@ -32,13 +31,12 @@ export const game_routes = async (fastify: FastifyInstance) => {
         201: {
             type: 'object',
             additionalProperties: false,
-            required: ['success', 'game_id', 'game_type', 'game_mode', 'game_status'],
+            required: ['success', 'game_id', 'game_type', 'game_mode'],
             properties: {
             success: { type: 'boolean', const: true },
             game_id: { type: 'string' },
             game_type: { type: 'string', enum: ['single_player', 'multi_player'] },
             game_mode: { type: 'string' },
-            game_status: { type: 'string', enum: ['waiting', 'started', 'finished'] }
             }
         },
         400: {

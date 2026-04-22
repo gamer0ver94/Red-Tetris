@@ -1,14 +1,18 @@
 import { Game } from '../models/game_model.ts'
-import { Player } from './players_store.ts';
+
 
 //class use to keep memory of all running games
 
 export class GameStore{
 
     private id_to_game_map: Map<string, Game>;
+    private game_id_to_ids_map: Map<string, Set<string>>;
+    private player_id_to_game_id_map: Map<string, string>;
 
     constructor(){
         this.id_to_game_map = new Map<string, Game>();
+        this.game_id_to_ids_map = new Map<string, Set<string>>();
+        this.player_id_to_game_id_map = new Map<string, string>();
     }
 
     //Getters
@@ -16,7 +20,7 @@ export class GameStore{
         
         const open_games = new Set<Game>;
         for(const game of this.id_to_game_map.values()){
-            if (game.get_game_status() === 'waiting' && game.get_game_type() === 'multiplayer')
+            if (game.get_game_status() === 'waiting' && game.get_game_type() === 'multi_player')
                 open_games.add(game);
         }
         return open_games;
@@ -42,6 +46,10 @@ export class GameStore{
         return undefined;
     }
 
+    public async get_game_by_player_id(player_id:string): Promise<Game | undefined>{
+        return await this.get_game_by_id(this.player_id_to_game_id_map.get(player_id)!);
+    }
+
     //Methods
     public async add_player_by_id(player_id: string, game: Game): Promise<string>{
         
@@ -49,15 +57,21 @@ export class GameStore{
         if (ids.has(player_id))
             return "You are already in a game";
 
+        this.player_id_to_game_id_map.set(player_id, game.get_game_id());
+
         //GAME WAS JUST CREATED
         if(await this.get_game_by_id(game.get_game_id()) == undefined){
-            this.id_to_game_map.set(game.get_game_id(), game)
-            return "success"
+            this.id_to_game_map.set(game.get_game_id(), game);
+            const ids = new Set<string>();
+            ids.add(player_id)
+            this.game_id_to_ids_map.set(game.get_game_id(), ids);
+            return "success";
         }
         
         //USER JUST JOIN 
         this.id_to_game_map.get(game.get_game_id())?.add_player(player_id);
-        return "success"
+        this.game_id_to_ids_map.get(game.get_game_id())!.add(player_id);
+        return "success";
     }
 
     public async remove_player_by_id(player_id:string, game_id:string): Promise<string>{
@@ -65,18 +79,18 @@ export class GameStore{
         const game = await this.get_game_by_id(game_id);
 
         if(!game)
-            return "game not found"
-
-        game.remove_player(player_id)
-        return "success"
-    }
-
-    public async remove_game_by_id(game_id:string): Promise<string>{
-
-        const game = this.get_game_by_id(game_id);
-        if(!game)
             return "game not found";
-        this.id_to_game_map.delete(game_id);
+
+        game.remove_player(player_id);
+        this.game_id_to_ids_map.get(game.get_game_id())!.delete(player_id);
+        this.player_id_to_game_id_map.delete(player_id);
+
+        if (game.get_player_ids()!.size === 0){
+            this.game_id_to_ids_map.get(game.get_game_id())!.clear();
+            this.id_to_game_map.delete(game_id);
+            return "game deleted";
+        }
+
         return "success";
     }
 }

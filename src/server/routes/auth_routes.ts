@@ -35,7 +35,7 @@ export const auth_routes = async (fastify: FastifyInstance) => {
         type:'object',
         required: ['username'],
         properties: {
-          username: {type: 'string', minLength:1, description:'unique player username'},
+          username: {type: 'string', description:'unique player username'},
         },
       },
       response: {
@@ -53,7 +53,7 @@ export const auth_routes = async (fastify: FastifyInstance) => {
         400:{
           type:'object',
           properties:{
-            sucess: {type: 'boolean'},
+            success: {type: 'boolean'},
             reason: {type: 'string'},
           },
         },

@@ -47,3 +47,13 @@
 ###  4 controllers/ sockets handlers -> sanitze data -> call services 
 
 ### 5 ervices -> never touches sid,io,raw_data, only obj or struct
+
+
+
+
+
+
+
+Create StatusTypes 
+route get join
+Add clean deletion of users(sids and playerStore/Player classes)

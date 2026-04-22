@@ -18,7 +18,7 @@ export async function get_me(
     if (!sid)
         return reply.code(200).send({is_known: false});
 
-    const response =  await auth_services.find_me(sid, request.server.player_store);
+    const response =  await auth_services.find_me(sid, request.server.store.get_player_store());
     
     return reply.code(200).send(response);
 }
@@ -38,7 +38,7 @@ export async function post_register(
         });
 
     const response = await auth_services.register(
-        request.server.player_store,
+        request.server.store.get_player_store(),
         request.body.username,
         request
     );

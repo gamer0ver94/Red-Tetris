@@ -8,7 +8,7 @@ import { randomBytes, randomUUID } from 'node:crypto'
 // Looks if user is in memory by secret id
 export async function find_me(sid: string, player_store: PlayerStore){
 
-    const player = await player_store.is_known(sid)
+    const player = await player_store.get_player_by_sid(sid)
     
     if (player !== undefined)
         return {
@@ -29,6 +29,12 @@ export async function register(
     request:FastifyRequest,
 ){
 
+    const sidInSession = request.session.get('sid');
+    if (sidInSession) {
+    const known = await player_store.get_player_by_sid(sidInSession);
+    if (known) return { success: false, reason: 'You are already logged in' };
+    }
+
     const sid = await make_new_sid(player_store);
     const id = await make_new_id(await player_store.get_all_ids());
     const csrf_token = randomBytes(24).toString('hex');
@@ -44,12 +50,12 @@ export async function register(
         csrf_token
     );
     
-    request.session.set('sid', sid);
-
     const response = await player_store.add_player(player);
 
     if (response !== "success")
         return {success: false, reason: response};
+    
+    request.session.set('sid', sid);
     return {
         success:true,
         player_id:player.get_player_id(),
@@ -70,7 +76,7 @@ export function read_sid_from_cookie(request: FastifyRequest) : {sid?: string} {
 async function make_new_sid(player_store: PlayerStore): Promise<string>{
     while (true){
         const sid = randomBytes(24).toString('hex');
-        const known = await player_store.is_known(sid);
+        const known = await player_store.get_player_by_sid(sid);
         if(!known) return sid;
     }
 }
