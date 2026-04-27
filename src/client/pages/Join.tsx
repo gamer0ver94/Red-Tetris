@@ -1,15 +1,16 @@
 import { useNavigate } from "react-router-dom"
-
+import { useAppSelector } from "../hooks/reduxHooks"
+import { io } from "socket.io-client"
 export default function Join() {
     const goTo = useNavigate()
-    
+    const username = useAppSelector((state) => state.user.username)
     function confirm(route:string) {
         goTo(route)
     }
     return (
         <div>
             <div>
-                <h1>Player Name</h1>
+                <h1>{username ? username : "No Player"}</h1>
             </div>
             <div>
                 <h1>Mode</h1>

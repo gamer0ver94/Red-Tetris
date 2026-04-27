@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 
 export default function Lobby() {
@@ -6,6 +7,10 @@ export default function Lobby() {
     function confirm(route:string) {
         goTo(route)
     }
+
+    useEffect(()=>{
+        
+    },[])
     return (
         <div>
             <div>
