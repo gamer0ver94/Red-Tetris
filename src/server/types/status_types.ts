@@ -1,16 +1,19 @@
-export type gameStatusType = {
+export const gameStatusType = {
 
     created:'created',
     waiting:'waiting',
-    playing:'playing',
+    started:'started',
     finish:'finish',
 
-}
+} as const;
+export type GameStatus = typeof gameStatusType[keyof typeof gameStatusType ];
 
-export type playerStatusType = {
+export const playerStatusType = {
     
     disconnected:'disconnected',
     connected:'connected',
     waiting_socket: 'waiting_socket',
-    waiting_game: 'waiting_game',
-}
+    waiting: 'waiting',
+    playing:'playing',
+}as const;
+export type PlayerStatus = typeof playerStatusType[keyof typeof playerStatusType];

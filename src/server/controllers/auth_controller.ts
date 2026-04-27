@@ -43,7 +43,7 @@ export async function post_register(
         request
     );
     if(!response || response.success == false)
-        return reply.code(409).send(response ?? { success: false, reason: 'register failed' })
+        return reply.code(409).send(response)
 
     return reply.code(201).send(response)
 }

@@ -1,4 +1,5 @@
 import { Game } from '../models/game_model.ts'
+import { gameStatusType } from '../types/status_types.js';
 
 
 //class use to keep memory of all running games
@@ -20,7 +21,7 @@ export class GameStore{
         
         const open_games = new Set<Game>;
         for(const game of this.id_to_game_map.values()){
-            if (game.get_game_status() === 'waiting' && game.get_game_type() === 'multi_player')
+            if (game.get_game_status() === gameStatusType.waiting && game.get_game_type() === 'multi_player')
                 open_games.add(game);
         }
         return open_games;

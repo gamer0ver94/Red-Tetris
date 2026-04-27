@@ -1,13 +1,8 @@
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import { expect } from 'vitest';
 
+import type { TestAuthUser } from '../test_types.ts';
 
-export type TestAuthUser = {
-  username: string;
-  cookie: string;
-  csrfToken: string;
-  playerId: string;
-};
 
 let index = 0
 export function unique_username(prefix = 'test') : string{
@@ -38,8 +33,8 @@ export async function register_user(
     return{
         username,
         cookie: get_session_cookie(res.headers['set-cookie']),
-        csrfToken: body.csrf_token,
-        playerId: body.player_id,
+        csrf_token: body.csrf_token,
+        player_id: body.player_id,
     };
 }
 
@@ -56,7 +51,7 @@ export async function register_users(
 }
 
 export function auth_headers(user: TestAuthUser): Record<string, string> {
-  return { cookie: user.cookie, 'x-csrf-token': user.csrfToken };
+  return { cookie: user.cookie, 'x-csrf-token': user.csrf_token };
 }
 
 export async function inject_as(

@@ -1,4 +1,5 @@
 import { Player } from '../models/player_model.ts'
+import { PlayerStatus } from '../types/status_types.ts';
 
 
 // Class used to keep memory cache of player data
@@ -75,7 +76,7 @@ export class PlayerStore{
         return 'success';
     }
 
-    public async set_player_status_by_sid(sid:string, player_status:string) : Promise<string>{
+    public async set_player_status_by_sid(sid:string, player_status:PlayerStatus) : Promise<string>{
         const player = await this.get_player_by_sid(sid);
         if(!player) return 'Unknown sid';
         player.set_player_status(player_status);

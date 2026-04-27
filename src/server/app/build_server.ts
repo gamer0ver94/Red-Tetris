@@ -1,4 +1,4 @@
-import Fastify, { FastifyInstance } from 'fastify';
+import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
 import cors from '@fastify/cors';
 import secureSession from '@fastify/secure-session';
 import swagger from '@fastify/swagger';
@@ -6,6 +6,7 @@ import swaggerUI from '@fastify/swagger-ui';
 import fastifyStatic from '@fastify/static';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { existsSync } from 'node:fs';
 
 import { register_routes } from './register_routes.ts';
 import { register_sockets } from './register_sockets.ts';
@@ -124,11 +125,19 @@ export async function init_async_api(fastify: FastifyInstance) :
   const root = join(__dirname, '../docs/asyncapi-site');
   const prefix = '/docs/sockets'
 
-  await fastify.register(fastifyStatic, {
-    root:root,
-    prefix: prefix,
-    decorateReply: false,
-  });
+  if (existsSync(root)) {
+    await fastify.register(fastifyStatic, {
+      root:root,
+      prefix: prefix,
+      decorateReply: false,
+    });
+  } else {
+    const asyncApiFallback = async (_request: FastifyRequest, reply: FastifyReply) => {
+      return reply.type('text/html').send('<!doctype html><title>AsyncAPI docs not built</title>');
+    };
+    fastify.get(prefix, asyncApiFallback);
+    fastify.get(`${prefix}/`, asyncApiFallback);
+  }
 
   return {root, prefix, registered:true};
 }

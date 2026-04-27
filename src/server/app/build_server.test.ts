@@ -1,10 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import Fastify from 'fastify';
+import type { FastifyInstance } from 'fastify';
+
 import * as BUILD from './build_server.ts';
 
 describe('build_server', () => {
 
-  let app;
+  let app: FastifyInstance;
 
   beforeAll(async() => {
     process.env.SESSION_KEY_BASE64 = Buffer.alloc(32, 1).toString('base64');

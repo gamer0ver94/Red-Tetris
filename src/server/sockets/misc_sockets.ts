@@ -1,12 +1,12 @@
 import { PlayerStore } from "../stores/players_store.ts";
-import { GameStore } from "../stores/games_store.ts";
 import { Store } from "../stores/store.ts"
-import type { Server as HttpServer } from 'node:http';
-import { find_me } from "../services/auth_services.js";
+import { find_me } from "../services/auth_services.ts";
+import { GameStatus, PlayerStatus } from "../types/status_types.ts";
+import type { TypedIoServer } from '../types/socket_event_types.ts';
 
 export async function change_player_status(
-    io: Server,
-    new_status:string,
+    io: TypedIoServer,
+    new_status:PlayerStatus,
     sid:string,
     player_store:PlayerStore,
 ){
@@ -17,8 +17,8 @@ export async function change_player_status(
 }
 
 export async function change_game_status(
-    io: Server,
-    new_status:string,
+    io: TypedIoServer,
+    new_status:GameStatus,
     game_id:string,
     sids:Set<string>,
     store:Store,

@@ -3,7 +3,7 @@ import type { FastifyInstance } from 'fastify';
 
 import { register_user, unique_username, inject_as } from '../test/helpers/auth_helpers_test.ts';
 import { build_server } from '../app/build_server.ts';
-import { TestAuthUser } from '../test/helpers/auth_helpers_test.ts';
+import type { TestAuthUser } from '../test/test_types.ts';
 
 describe('controller: lobby', () => {
     
@@ -48,14 +48,14 @@ describe('controller: lobby', () => {
             //Check in game memory
             const game = await app.store.get_game_store().get_game_by_id(body.game_id);
             expect(game).toBeDefined();
-            expect(game?.get_owner_id()).toBe(tester_create.playerId);
+            expect(game?.get_owner_id()).toBe(tester_create.player_id);
             expect(game?.get_game_type()).toBe('multi_player');
             expect(game?.get_game_mode()).toBe('classic');
             expect(game?.get_game_status()).toBe('waiting');
-            expect(game?.get_player_ids().has(tester_create.playerId)).toBe(true);
+            expect(game?.get_player_ids().has(tester_create.player_id)).toBe(true);
             
             //Check in players memory
-            const player = await app.store.get_player_store().get_player_by_id(tester_create.playerId);
+            const player = await app.store.get_player_store().get_player_by_id(tester_create.player_id);
             expect(player).toBeDefined();
             expect(player?.get_player_status()).toBe('waiting');
         });

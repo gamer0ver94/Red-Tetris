@@ -1,7 +1,9 @@
+import { PlayerStatus } from "../types/status_types.ts"
+
 export class Player {
     private player_id: string
     private username: string
-    private player_status: string
+    private player_status: PlayerStatus
     private sid: string
     private socket_id: string
     private created_at: string
@@ -10,7 +12,7 @@ export class Player {
     constructor(
         player_id: string,
         username: string,
-        player_status: string,
+        player_status: PlayerStatus,
         sid: string,
         socket_id: string,
         created_at: string,
@@ -33,7 +35,7 @@ export class Player {
         return this.username
     }
 
-    public get_player_status (): string {
+    public get_player_status (): PlayerStatus {
         return this.player_status
     }
 

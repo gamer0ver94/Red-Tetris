@@ -3,6 +3,7 @@ import { Player } from '../models/player_model.ts'
 import { GameStore } from '../stores/games_store.ts'
 import { PlayerStore } from '../stores/players_store.ts'
 import { Store } from '../stores/store.ts'
+import { gameStatusType } from '../types/status_types.ts'
 import { find_me } from './auth_services.ts'
 
 
@@ -57,7 +58,7 @@ export async function start_game(sid:string, store:Store){
         return {success:false, reason:`you can't start this game`};
 
     //Extract  by game_id   
-    const game_response = {game_id:game.get_game_id() ,type:game.get_game_type(), mode:game.get_game_mode(), status:'started'};
+    const game_response = {game_id:game.get_game_id() ,type:game.get_game_type(), mode:game.get_game_mode(), status:gameStatusType.started};
     
     const socket_ids = await store.get_all_sockets_by_game_id(game.get_game_id());
     
@@ -110,7 +111,7 @@ export async function leave_game(
     switch(game.get_game_status()){
         // case 'playing':
         //     break;
-        case 'waiting':
+        case gameStatusType.waiting:
             const res = await leave_game_waiting(player, game, store);
             return {success:true, res};
         // case 'finish':

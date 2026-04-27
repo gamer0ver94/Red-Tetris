@@ -3,6 +3,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import * as game_services from '../services/game_lobby_services.ts';
 import { read_sid_from_cookie, find_me } from '../services/auth_services.ts';
 import * as helpers from '../sockets/misc_sockets.ts'
+import { gameStatusType, playerStatusType } from '../types/status_types.ts';
 
 export async function post_create(
     request:FastifyRequest <{Body : {
@@ -31,18 +32,18 @@ export async function post_create(
         request.body.game_mode,
         );
     if (!response || response.success == false)
-        return reply.code(409).send(response ?? {success: false, reason:'creation failed'});
+        return reply.code(409).send(response);
     
     await helpers.change_player_status(
         request.server.io,
-        'waiting',
+        playerStatusType.waiting,
         sid,
         request.server.store.get_player_store());
     const sids_set = new Set<string>();
     sids_set.add(sid);
     await helpers.change_game_status(
         request.server.io,
-        'waiting',
+        gameStatusType.waiting,
         response.game_id!,
         sids_set,
         request.server.store

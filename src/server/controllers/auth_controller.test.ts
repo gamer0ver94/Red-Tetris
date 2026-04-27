@@ -3,6 +3,7 @@ import type { FastifyInstance } from 'fastify';
 import { build_server } from '../app/build_server.ts';
 import { register_user, unique_username, inject_as } from '../test/helpers/auth_helpers_test.ts';
 
+
 describe('controller: auth', () =>{
 
     let app: FastifyInstance;
@@ -85,7 +86,7 @@ describe('controller: auth', () =>{
             expect(res.statusCode).toBe(201);
             expect(body.success).toBe(true);
             expect(body.username).toBe('test_valid');
-            expect(body.player_status).toBe('waiting socket');
+            expect(body.player_status).toBe('waiting_socket');
             expect(body.player_id, body.socket_id, body.csrf_token).toBeDefined();
         });
 

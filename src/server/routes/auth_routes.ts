@@ -1,5 +1,9 @@
 import type { FastifyInstance } from 'fastify';
 import * as auth_controller from '../controllers/auth_controller.ts';
+import { playerStatusType } from '../types/status_types.ts';
+
+const PLAYER_STATUS_ENUM = Object.values(playerStatusType);
+
 
 // only related to auth
 export const auth_routes = async (fastify: FastifyInstance) => {
@@ -16,7 +20,7 @@ export const auth_routes = async (fastify: FastifyInstance) => {
             is_known: { type: 'boolean' },
             player_id: { type: 'string' },
             username: { type: 'string' },
-            player_status: { type: 'string' },
+            player_status: { type: 'string', enum:PLAYER_STATUS_ENUM },
             socket_id: { type: 'string' },
             csrf_token: { type: 'string' },
           },
@@ -45,7 +49,7 @@ export const auth_routes = async (fastify: FastifyInstance) => {
             success: {type: 'boolean'},
             player_id: {type: 'string'},
             username: {type: 'string'},
-            player_status: {type: 'string'},
+            player_status: {type: 'string', enum:PLAYER_STATUS_ENUM},
             socket_id: {type: 'string'},
             csrf_token: {type: 'string'},
           },

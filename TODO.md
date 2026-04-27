@@ -35,25 +35,61 @@
     + user exit before the end { game:exit }
 
 
-### ALL TO DO BEFORE MERGE : 
-+ finish lobby socket
-+ 1 to 5 
+### ALL TO DO BEFORE GAME core : 
 
-###  1 MAKE store class (inherit all stores )
-###  2 ADD docs for socket
-### 3 SEND player data instead off raw sid in services
+socket_tests
+route get join + test
+Add clean deletion of users(sids and playerStore/Player classes) + test
 
+game_types:
 
-###  4 controllers/ sockets handlers -> sanitze data -> call services 
+board{
 
-### 5 ervices -> never touches sid,io,raw_data, only obj or struct
+    game_id:
+    player_id:
+    socket_id:
+    items[]:
+}
 
+item{
+    pos:
+    is_current:
+    type:
+}
 
+items_types{
+    I {
+        [., ., ., .]
+        [X, X, X, X]
+    }
 
+    J{
+        [X, ., ., .]
+        [X, X, X, .]
+    }
 
+    L{
+        [., ., X, .]
+        [X, X, X, .]
+    }
 
+    S{
+        [., X, X, .]
+        [X, X, ., .]
+    }
 
+    T{
+        [., X, ., .]
+        [X, X, X, .]
+    }
 
-Create StatusTypes 
-route get join
-Add clean deletion of users(sids and playerStore/Player classes)
+    Z{
+        [X, X, ., .]
+        [., X, X, .]
+    }
+}
+
+game class ->  send socket, create boards based on type and mode game 
+board class -> keep tracks of personal "map", and tracks of blocks
+pieces class -> only the current movable one, can move and rotate, soft/hard drop, check colision within board
+

@@ -1,3 +1,5 @@
+import { GameStatus, gameStatusType } from "../types/status_types.ts";
+
 export class Game{
 
     private game_id: string;
@@ -5,7 +7,7 @@ export class Game{
     private player_ids: Set<string>;
     private game_type: 'single_player'| 'multi_player';
     private game_mode: string;
-    private game_status: string;
+    private game_status: GameStatus;
 
     constructor(
         game_id: string,
@@ -19,7 +21,7 @@ export class Game{
         this.player_ids.add(owner_id);
         this.game_type = game_type;
         this.game_mode = game_mode;
-        this.game_status = 'created';
+        this.game_status = gameStatusType.created;
     }
 
     // Getters
@@ -43,13 +45,13 @@ export class Game{
         return this.game_mode
     }
 
-    public get_game_status(): string {
+    public get_game_status(): GameStatus {
         return this.game_status
     }
 
 
     //Setters
-    public set_game_status(game_status: string) {
+    public set_game_status(game_status: GameStatus) {
         this.game_status = game_status
     }
 

@@ -43,7 +43,7 @@ export async function register(
     const player = new Player(
         id,
         username,
-        'waiting socket',
+        'waiting_socket',
         sid,
         mock_sock,
         created_at,

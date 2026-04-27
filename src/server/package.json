@@ -29,6 +29,7 @@
     "typescript": "~6.0.2",
     "@asyncapi/cli": "^6.0.0",
     "vitest": "^1.6.1",
-    "@vitest/coverage-v8": "^1.6.1"
+    "@vitest/coverage-v8": "^1.6.1",
+    "socket.io-client": "^4.8.3"
   }
 }
