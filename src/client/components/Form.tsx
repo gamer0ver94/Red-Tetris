@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./Form.css";
 
-import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
-import { setUsername } from "../store/userSlice";
+import { useAppDispatch } from "../hooks/reduxHooks";
+import { setUsername, setCsrfToken } from "../store/userSlice";
 import { fetchData } from "./fetch/fetch";
-import { socket } from "../socket/socket";
 
 export default function Form() {
   const goTo = useNavigate();
@@ -19,15 +18,12 @@ export default function Form() {
     }
     const data = await fetchData("http://localhost:1800/auth/register", payload, "POST");
     console.log(data);
-    dispatch(setUsername(input));
     if (data.username) {
+      dispatch(setUsername(data.username));
+      dispatch(setCsrfToken(data.csrf_token));
       goTo("/join");
     }
   }
-
-  useEffect(() => {
-    socket.connect();
-  },[]);
 
   return (
     <div>
@@ -42,3 +38,4 @@ export default function Form() {
     </div>
   );
 }
+
