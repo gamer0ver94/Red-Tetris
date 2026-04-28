@@ -3,7 +3,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 import * as game_services from '../services/game_lobby_services.ts';
 import { read_sid_from_cookie, find_me } from '../services/auth_services.ts';
 import * as helpers from '../sockets/misc_sockets.ts'
-import { gameStatusType, playerStatusType } from '../types/status_types.ts';
+import { gameStatusType, playerStatusType } from '../types/status_types.ts';import { join_lobby_event} from '../sockets/game_lobby_sockets.ts'
 
 export async function post_create(
     request:FastifyRequest <{Body : {
@@ -56,9 +56,34 @@ export async function post_create(
     });
 }
 
-export async function get_join() {
-    
-    //Create player obj with name guest_n
-    //Add player to game_id from request
-    //return player + game data, then server expect socket connection from front  
+export async function get_join(request:FastifyRequest<{Params: {game_id:string, username:string}}>, reply:FastifyReply) {
+    const { game_id, username } = request.params;
+
+    const sid = read_sid_from_cookie(request).sid;
+    if (!sid)
+        return reply.code(403).send({ success: false, reason: 'Missing sid' });
+
+    const user_data = await find_me(sid, request.server.store.get_player_store());
+    if (!user_data.is_known)
+        return reply.code(404).send({ success: false, reason: 'No player found' });
+
+    if (user_data.username !== username)
+        return reply.code(403).send({ success: false, reason: 'Wrong username' });
+
+    const game = await request.server.store.get_game_store().get_game_by_id(game_id);
+    if (!game)
+        return reply.code(404).send({ success: false, reason: 'game not found' });
+
+    if (game.get_game_status() !== gameStatusType.waiting)
+        return reply.code(409).send({ success: false, reason: 'game already started' });
+
+    return reply.code(200).send({
+        success: true,
+        game_id,
+        player_id: user_data.player_id,
+        username: user_data.username,
+        csrf_token: user_data.csrf_token,
+        game_status: game.get_game_status(),
+        is_host: game.get_owner_id() === user_data.player_id,
+    });
 }

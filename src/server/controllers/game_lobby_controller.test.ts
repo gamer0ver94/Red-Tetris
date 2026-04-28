@@ -135,4 +135,98 @@ describe('controller: lobby', () => {
             expect(body.reason).toBe('Token manipulation')
         });
     });
+
+    describe('controller: lobby: join', async () => {
+        
+        it('returns 403 if no sid', async () => {
+            
+            const res = await app.inject({
+                method: 'GET',
+                url: '/game/join/fake_game/someone',
+            });
+
+            expect(res.statusCode).toBe(403);
+            const body = res.json();
+            expect(body.success).toBe(false);
+            expect(body.reason).toBe('Missing sid');
+        });
+
+        it('returns 404 if no player found', async () => {
+            const ghost = await register_user(app, unique_username('ghost_join'));
+            await app.store.get_player_store().remove_player(
+                (await app.store.get_player_store().get_player_by_id(ghost.player_id))!
+            );
+
+            const res = await app.inject({
+                method:'GET',
+                url:`/game/join/fake_game/${ghost.username}`,
+                headers: {cookie: ghost.cookie}
+            });
+
+            expect(res.statusCode).toBe(404);
+            const body = res.json();
+            expect(body.success).toBe(false);
+            expect(body.reason).toBe('No player found');
+        });
+
+        it(`returns 403 if username don't match`, async () => {
+            const user = await register_user(app, unique_username('wrong_name'));
+
+            const res = await app.inject({
+                method:'GET',
+                url:'/game/join/'
+            });
+
+            expect(res.statusCode).toBe(403);
+            const body = res.json();
+            expect(body.success).toBe(false);
+            expect(body.reason).toBe('Wrong username')
+        });
+
+        it('returns 404 when no game found', async () => {
+            const user = await register_user(app, unique_username('join_no_game'));
+
+            const res = await app.inject({
+                method: 'GET',
+                url: `/game/join/fake_game/${user.username}`,
+                headers: { cookie: user.cookie },
+            });
+            
+            expect(res.statusCode).toBe(404);
+            const body = res.json();
+            expect(body.success).toBe(false);
+            expect(body.reason).toBe('game not found');
+        });
+
+        it('returns 409 if game started', async() => {
+            const owner = await register_user(app, unique_username('join_started_owner'));
+
+            const createRes = await inject_as(app, owner, {
+                method: 'POST',
+                url: '/game/create',
+                payload: {
+                game_type: 'multi_player',
+                game_mode: 'classic',
+                },
+            });
+            expect(createRes.statusCode).toBe(201);
+            const gameId = createRes.json().game_id as string;
+
+            const game = await app.store.get_game_store().get_game_by_id(gameId);
+            game?.set_game_status('started');
+
+            const joiner = await register_user(app, unique_username('join_started_user'));
+
+            const res = await app.inject({
+                method: 'GET',
+                url: `/game/join/${gameId}/${joiner.username}`,
+                headers: { cookie: joiner.cookie },
+            });
+
+            expect(res.statusCode).toBe(409);
+            const body = res.json();
+            expect(body.success).toBe(false);
+            expect(body.reason).toBe('game already started');
+        });
+    });
 });

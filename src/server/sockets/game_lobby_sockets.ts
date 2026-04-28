@@ -25,7 +25,7 @@ export async function socket_game_lobby(
 }
 
 
-async function join_lobby_event(
+export async function join_lobby_event(
     io:TypedIoServer,
     socket:TypedSocket,
     sid:string,
@@ -89,7 +89,9 @@ async function leave_lobby_event(
     //send lobby:leave:success to socket + change status(go back to connected)
     const leaver_name = response!.res!.leaver_name;
     for( const socket_id of response.res!.socket_ids!)
-        await io.to(socket_id).emit('lobby:leave:update', {message:`${leaver_name} just left the game`});
+        await io.to(socket_id).emit('lobby:leave:update', {
+            message:`${leaver_name} just left the game`
+        });
     await socket.emit('lobby:leave:success');
     await helpers.change_player_status(io, playerStatusType.connected, sid, store.get_player_store())
 }
