@@ -2,14 +2,16 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 
 import { build_server } from "./build_server.ts";
-import { register_user, unique_username } from '../test/helpers/auth_helpers_test.ts';
+import { inject_as, register_user, unique_username } from '../test/helpers/auth_helpers_test.ts';
 import {
   close_socket_client,
   close_socket_server,
   receive_connect_error,
+  receive_socket_as,
   register_socket_client,
   start_socket_server,
 } from '../test/helpers/socket_helpers_test.ts';
+import { gameStatusType, playerStatusType } from '../types/status_types.js';
 
 
 describe('register_sockets', () => {
@@ -82,6 +84,97 @@ describe('register_sockets', () => {
         }
         finally{
             close_socket_client(socket);
+        }
+    });
+
+    it('marks player as disconnected on socket disconnect', async() => {
+        const user = await register_user(app, unique_username('disconnect_socket'));
+        const socket = await register_socket_client(baseUrl, user);
+        close_socket_client(socket);
+
+        await expect.poll(async () => {
+            const player = await app.store.get_player_store().get_player_by_id(user.player_id);
+            return player?.get_player_status();
+        }).toBe(playerStatusType.disconnected);
+    });
+
+    it('removes player after timeout', async() => {
+        const user = await register_user(app, unique_username('disconnect_timeout_socket'));
+        const socket = await register_socket_client(baseUrl, user);
+        close_socket_client(socket);
+        
+        await new Promise(resolve => setTimeout(resolve, 31000));
+        const player = await app.store.get_player_store().get_player_by_id(user.player_id);
+        expect(player).toBeUndefined();
+    }, 35000);
+
+    
+    it('restores player before timeout', async () => {
+        const user = await register_user(app, unique_username('reconnect_socket'));
+        const socket = await register_socket_client(baseUrl, user);
+
+        close_socket_client(socket);
+
+        await expect.poll(async () => {
+            const player = await app.store.get_player_store().get_player_by_id(user.player_id);
+            return player?.get_player_status();
+        }).toBe(playerStatusType.disconnected);
+
+        const socket2 = await register_socket_client(baseUrl, user, {
+            wait_for_connect: false,
+        });
+
+        try {
+            const resumePromise = receive_socket_as(socket2, 'session:resume', 3000);
+            const payload = await resumePromise;
+
+            expect(payload.player.username).toBe(user.username);
+            expect(payload.player.player_id).toBe(user.player_id);
+            expect(payload.player.csrf_token).toBe(user.csrf_token);
+            expect(payload.reconnected).toBe(true);
+        } finally {
+            close_socket_client(socket2);
+        }
+    });
+
+
+    it('restore game lobby on reconnect', async () => {
+        const user = await register_user(app, unique_username('reconnect_lobby_socket'));
+        const socket = await register_socket_client(baseUrl, user);
+
+        const game_res = await inject_as(app, user, {
+        method: 'POST',
+        url: '/game/create',
+        payload: {
+            game_type: 'multi_player',
+            game_mode: 'ranked',
+        }
+        });
+        const game_id = game_res.json().game_id;
+
+        close_socket_client(socket);
+
+        await expect.poll(async () => {
+            const player = await app.store.get_player_store().get_player_by_id(user.player_id);
+            return player?.get_player_status();
+        }).toBe(playerStatusType.disconnected);
+
+        const socket2 = await register_socket_client(baseUrl, user, {
+            wait_for_connect: false,
+        });
+
+        try {
+            const payload = await receive_socket_as(socket2, 'session:resume', 3000);
+
+            expect(payload.player.username).toBe(user.username);
+            expect(payload.player.player_id).toBe(user.player_id);
+            expect(payload.player.csrf_token).toBe(user.csrf_token);
+            expect(payload.player.player_status).toBe(playerStatusType.waiting);
+            expect(payload.reconnected).toBe(true);
+            expect(payload.game?.game_id).toBe(game_id);
+            expect(payload.game?.players_ids).toContain(user.player_id);
+        } finally {
+        close_socket_client(socket2);
         }
     });
 });

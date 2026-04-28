@@ -47,3 +47,21 @@ export async function post_register(
 
     return reply.code(201).send(response)
 }
+
+export async function logout(
+    request: FastifyRequest,
+    reply: FastifyReply
+){
+    const sid_cookie = auth_services.read_sid_from_cookie(request)
+    const sid = sid_cookie.sid!
+
+    if (!sid)
+        return reply.code(403).send({success: false, reason:'Missing sid'});
+
+    const response = await auth_services.logout(sid, request.server.store, request.server.io);
+    
+    if(response.success == false)
+        return reply.code(403).send(response);
+    
+    return reply.code(200).send({success: true});
+}

@@ -35,11 +35,12 @@
     + user exit before the end { game:exit }
 
 
-### ALL TO DO BEFORE GAME core : 
+### ALL TO MODIFY AT SOME POINT : 
+    access trough https:k1r1p1:1700
+    Add logout while playing
+    Add clear comment 
+    Rename some functions (eg :: socket_disconnect != disconnectsocket ...)
 
-socket_tests
-route get join + test
-Add clean deletion of users(sids and playerStore/Player classes) + test
 
 game_types:
 

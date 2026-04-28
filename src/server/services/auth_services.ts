@@ -1,8 +1,12 @@
 import { Player } from "../models/player_model.ts";
 import { PlayerStore } from "../stores/players_store.ts";
+import { Store } from "../stores/store.ts";
+import type { TypedIoServer } from "../types/socket_event_types.ts";
 import type { FastifyRequest } from 'fastify';
 
 import { randomBytes, randomUUID } from 'node:crypto'
+import { playerStatusType } from "../types/status_types.js";
+import { leave_game } from "./game_lobby_services.js";
 
 
 // Looks if user is in memory by secret id
@@ -65,6 +69,33 @@ export async function register(
         csrf_token: player.get_csrf_token(),
     }
     
+}
+
+export async function logout(
+    sid:string,
+    store:Store,
+    io:TypedIoServer,
+    delete_user: boolean = true
+){
+    const player = await store.get_player_store().get_player_by_sid(sid);
+    if (!player)
+        return {success: false, reason: 'Player not found'};
+
+    if(await store.get_game_store().get_game_by_player_id(player.get_player_id())){
+            const res = await leave_game(player.get_sid(), store);
+            if (res.success == false)
+                return {success:res.success, reason: res.reason};
+            if (res.res?.new_owner)
+                 await io.to(res!.res!.new_owner_socket).emit('lobby:new_owner');
+        for( const socket_id of res.res?.socket_ids ?? [])
+            await io.to(socket_id).emit('lobby:leave:update', {
+                message:`${res.res?.leaver_name} just left the game`
+            });
+        await io.to(player.get_socket()).emit('lobby:leave:success');
+    }
+    if(delete_user)
+        await store.get_player_store().remove_player(player);
+    return {success: true};
 }
 
 export function read_sid_from_cookie(request: FastifyRequest) : {sid?: string} {

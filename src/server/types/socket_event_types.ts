@@ -38,6 +38,8 @@ export interface ServerToClientEvents{
 
     'player_status:change': (p: {new_status: PlayerStatus}) => void;
     'game_status:change': (p: {new_status: GameStatus}) => void;
+
+    'session:resume': (p: SessionResumePayload) => void;
 }
 
 export interface SocketData {
@@ -58,3 +60,22 @@ export type TypedSocket = Socket<
 //   InterServerEvents,
   SocketData
 >;
+
+export type SessionResumePayload = {
+    reconnected: boolean;
+    player:{
+        player_id: string;
+        username: string;
+        player_status: PlayerStatus;
+        csrf_token: string;
+    };
+    game:null | {
+        game_id: string;
+        owner_id: string;
+        game_type: string;
+        game_mode: string;
+        game_status: GameStatus;
+        players_ids: string[];
+    };
+    render_state: null | unknown;
+}

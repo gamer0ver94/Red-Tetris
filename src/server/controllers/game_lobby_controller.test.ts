@@ -172,9 +172,9 @@ describe('controller: lobby', () => {
         it(`returns 403 if username don't match`, async () => {
             const user = await register_user(app, unique_username('wrong_name'));
 
-            const res = await app.inject({
+            const res = await inject_as(app, user,{
                 method:'GET',
-                url:'/game/join/'
+                url:'/game/join/fake_game/wrong_username',
             });
 
             expect(res.statusCode).toBe(403);
@@ -186,16 +186,15 @@ describe('controller: lobby', () => {
         it('returns 404 when no game found', async () => {
             const user = await register_user(app, unique_username('join_no_game'));
 
-            const res = await app.inject({
+            const res = await inject_as(app, user, {
                 method: 'GET',
                 url: `/game/join/fake_game/${user.username}`,
-                headers: { cookie: user.cookie },
             });
             
             expect(res.statusCode).toBe(404);
             const body = res.json();
             expect(body.success).toBe(false);
-            expect(body.reason).toBe('game not found');
+            expect(body.reason).toBe('Game not found');
         });
 
         it('returns 409 if game started', async() => {
@@ -217,16 +216,15 @@ describe('controller: lobby', () => {
 
             const joiner = await register_user(app, unique_username('join_started_user'));
 
-            const res = await app.inject({
+            const res = await inject_as(app, joiner, {
                 method: 'GET',
                 url: `/game/join/${gameId}/${joiner.username}`,
-                headers: { cookie: joiner.cookie },
             });
 
             expect(res.statusCode).toBe(409);
             const body = res.json();
             expect(body.success).toBe(false);
-            expect(body.reason).toBe('game already started');
+            expect(body.reason).toBe('Game already started');
         });
     });
 });
