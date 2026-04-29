@@ -5,6 +5,7 @@ import Join from './pages/Join'
 import Lobby from './pages/Lobby'
 import { socketContext } from "./socket/socketContext";
 import { socket } from "./socket/socket"
+import Game from './pages/Game'
 function App() {
   return (
     <>
@@ -14,7 +15,7 @@ function App() {
             <Route path="/" element={<Home/>}/>
             <Route path="/join" element={<Join/>}/>
             <Route path="/lobby" element={<Lobby/>}/>
-            <Route path="/game" element={<Lobby/>}/>
+            <Route path="/game" element={<Game/>}/>
           </Routes>
         </BrowserRouter>
       </socketContext.Provider>

@@ -27,6 +27,7 @@ export default function Form() {
 
   return (
     <div>
+      <h1>Username:</h1>
       <input
         type="text"
         placeholder="Username"
