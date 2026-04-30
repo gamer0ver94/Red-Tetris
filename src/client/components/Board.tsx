@@ -1,11 +1,20 @@
-export default function Board() {
-    type Cell = 0 | 1; // empty or filled
+import { useSelector } from "react-redux";
+import GameCell from "./Cell";
 
-    const createBoard = (rows: number, cols: number): Cell[][] =>
-        Array.from({ length: rows }, () => Array(cols).fill(0));
-    return (
-        <div>
-            <h1>Board</h1>
+type Cell = 0 | 1;
+
+export default function GameBoard() {
+  const board = useSelector((state: any) => state.game.board) as Cell[][];
+
+  return (
+    <div>
+      {board.map((row, rowIndex) => (
+        <div key={rowIndex} style={{ display: "flex" }}>
+          {row.map((cell, colIndex) => (
+            <GameCell key={colIndex} filled={cell === 1} />
+          ))}
         </div>
-    )
+      ))}
+    </div>
+  );
 }

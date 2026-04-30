@@ -1,7 +1,11 @@
+import GameBoard from "../components/Board";
+import { InputHandler } from "../components/InputHandler";
+
 export default function Game() {
     return (
         <div>
-            <h1>Game</h1>
+            <GameBoard />
+            <InputHandler/>
         </div>
     )
 }
