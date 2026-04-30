@@ -1,0 +1,18 @@
+import {Game} from '../models/game_model.ts';
+
+import { Board } from '../models/board_model.js';
+
+//Prepares game when lobby is ready
+
+
+export function setup_game_boards(game:Game){}
+
+export function create_board_for_player(player_id:string, game:Game){
+
+    if(!game.get_player_ids().has(player_id))
+        return {success:false, reason:'Wrong player id'}
+}
+
+export function spawn_initial_piece(game:Game){}
+
+export function create_piece_sequence(game:Game){}

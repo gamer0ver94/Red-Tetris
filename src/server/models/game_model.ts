@@ -1,4 +1,5 @@
 import { GameStatus, gameStatusType } from "../types/status_types.ts";
+import { Board } from "./board_model.ts";
 
 export class Game{
 
@@ -8,6 +9,7 @@ export class Game{
     private game_type: 'single_player'| 'multi_player';
     private game_mode: string;
     private game_status: GameStatus;
+    private ids_to_boards: Map<string, Board>;
 
     constructor(
         game_id: string,
@@ -22,6 +24,7 @@ export class Game{
         this.game_type = game_type;
         this.game_mode = game_mode;
         this.game_status = gameStatusType.created;
+        this.ids_to_boards = new Map<string, Board>();
     }
 
     // Getters
@@ -49,6 +52,10 @@ export class Game{
         return this.game_status
     }
 
+    public get_board_map(): Map<string, Board>{
+        return this.ids_to_boards;
+    }
+
 
     //Setters
     public set_game_status(game_status: GameStatus) {
@@ -65,5 +72,24 @@ export class Game{
 
     public remove_player(player: string){
         this.player_ids.delete(player)
+    }
+
+    public set_new_board(player_id:string, board:Board):boolean{
+        
+        const check = this.ids_to_boards.get(player_id);
+        if (check)
+            return false;
+        this.ids_to_boards.set(player_id, board);
+        return true;
+    }
+
+    public remove_board(player_id:string):boolean{
+        
+        const check = this.ids_to_boards.get(player_id);
+        if(check){
+            this.ids_to_boards.delete(player_id);
+            return true;
+        }
+        return false;
     }
 }
