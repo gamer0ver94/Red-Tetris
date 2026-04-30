@@ -58,14 +58,14 @@ export const game_routes = async (fastify: FastifyInstance) => {
     }
     }, game_controller.post_create);
 
-    fastify.get('/join/:game_id/:player_name', {
+    fastify.get('/join/:game_id/:username', {
         schema:{
             tags:['game'],
             summary: 'Prepare a player to join a game lobby',
             params: {
                 type: 'object',
                 additionalProperties: false,
-                required: ['game_id', 'player_name'],
+                required: ['game_id', 'username'],
                 properties: {
                     game_id: { type: 'string', minLength: 1 },
                     username: { type: 'string', minLength: 1, maxLength: 32 },

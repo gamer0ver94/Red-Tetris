@@ -67,15 +67,17 @@ export async function get_join(request:FastifyRequest<{Params: {game_id:string, 
     if (!user_data.is_known)
         return reply.code(404).send({ success: false, reason: 'No player found' });
 
-    if (user_data.username !== username)
+    if (user_data.username !== username){
+        console.log(`Username mismatch: ${user_data.username} vs ${username}`);
         return reply.code(403).send({ success: false, reason: 'Wrong username' });
+    }
 
     const game = await request.server.store.get_game_store().get_game_by_id(game_id);
     if (!game)
-        return reply.code(404).send({ success: false, reason: 'game not found' });
+        return reply.code(404).send({ success: false, reason: 'Game not found' });
 
     if (game.get_game_status() !== gameStatusType.waiting)
-        return reply.code(409).send({ success: false, reason: 'game already started' });
+        return reply.code(409).send({ success: false, reason: 'Game already started' });
 
     return reply.code(200).send({
         success: true,

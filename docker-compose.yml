@@ -25,7 +25,7 @@ services:
       context: ./src/server
       dockerfile: Dockerfile.docs
     volumes:
-      - asyncapi_site:/out
+      - ./src/server/docs/asyncapi_site:/out
   
   client:
     build:

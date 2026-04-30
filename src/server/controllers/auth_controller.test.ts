@@ -104,4 +104,68 @@ describe('controller: auth', () =>{
         });
 
     });
+
+    describe('controller: auth: logout', async() => {
+
+        it('forbid access if no sid', async() => {
+            const res = await app.inject({
+                method:'GET',
+                url: '/auth/logout',
+            });
+            expect(res.statusCode).toBe(403);
+            const body = res.json();
+            expect(body.success).toBe(false);
+            expect(body.reason).toBe('Missing sid');
+        });
+
+        it('returns 403 if sid is valid but logout fails', async() => {
+            const user = await register_user(app, unique_username('test_logout_fail'));
+            await app.store.get_player_store().remove_player(
+                (await app.store.get_player_store().get_player_by_id(user.player_id))!
+            );
+            const res = await inject_as(app, user, {
+                method:'GET',
+                url:'/auth/logout'
+            });
+            expect(res.statusCode).toBe(403);
+            const body = res.json();
+            expect(body.success).toBe(false);
+            expect(body.reason).toBe('Player not found');
+        });
+
+        it('allows logout if sid is valid', async() => {
+            const user = await register_user(app, unique_username('test_logout_success'));
+            const res = await inject_as(app, user, {
+                method:'GET',
+                url:'/auth/logout'
+            });
+            expect(res.statusCode).toBe(200);
+            const body = res.json();
+            expect(body.success).toBe(true);
+        });
+
+        it('allows logout and quit game while waiting', async() => {
+            const user = await register_user(app, unique_username('test_logout_game_waiting'));
+            const game_res = await inject_as(app, user, {
+                method:'POST',
+                url:'/game/create',
+                payload: {
+                    game_type: 'single_player',
+                    game_mode: 'classic'
+                }
+            });
+            expect(game_res.statusCode).toBe(201);
+            const game_id = game_res.json().game_id;
+
+            const res = await inject_as(app, user, {
+                method:'GET',
+                url:'/auth/logout'
+            });
+            expect(res.statusCode).toBe(200);
+            const body = res.json();
+            expect(body.success).toBe(true);
+            expect(await app.store.get_game_store().get_game_by_id(game_id)).toBeUndefined();
+            expect(await app.store.get_player_store().get_player_by_id(user.player_id)).toBeUndefined();
+        });
+    });
 });
