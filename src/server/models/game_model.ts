@@ -73,6 +73,10 @@ export class Game{
         return this.ids_to_boards;
     }
 
+    public get_board_by_player_id(player_id:string){
+        return this.ids_to_boards.get(player_id);
+    }
+
     public get_player_to_piece_map():Map<string, number>{
         return this.player_to_piece_map;
     }

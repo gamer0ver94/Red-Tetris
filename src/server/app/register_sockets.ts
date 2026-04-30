@@ -43,6 +43,16 @@ function socket_connection(io: TypedIoServer, store: Store) {
       return;
     }
 
+
+    socket.onAny((event, ...args) => {
+      console.log('[socket incoming]', {
+        event,
+        args,
+        socket_id: socket.id,
+        sid,
+      });
+    });
+
     // Mark this socket as the currently active one immediately.
     active_socket_ids.set(sid, socket.id);
 

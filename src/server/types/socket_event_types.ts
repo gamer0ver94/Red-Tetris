@@ -1,5 +1,6 @@
 import type { Server, Socket } from 'socket.io';
 import type {GameStatus, PlayerStatus} from './status_types.ts'
+import { BoardType } from './game_types.js';
 
 export type LobbyAction = 'join' | 'start' | 'leave';
 
@@ -94,10 +95,9 @@ export type SessionResumePayload = {
 
 export type RenderPayload = {
   self:{
-    current_pos:[number, number, number]; //x , y and rotation
-    current_piece_type:string;
-    board:{}
+    current_pos:null| [number|null, number|null, number|null]; //x , y and rotation
+    current_piece_type:null | string;
+    board:BoardType;
   }
-  opponents:{
-  }
+  opponents:Record<string, BoardType>;
 }

@@ -3,6 +3,8 @@ import * as helpers from '../sockets/misc_sockets.ts'
 import * as lobby_services from '../services/game_lobby_services.ts'
 import { gameStatusType, playerStatusType } from "../types/status_types.ts";
 import type { SocketData, TypedIoServer, TypedSocket } from '../types/socket_event_types.ts';
+import { start_game_loop } from "../services/game_loop_services.js";
+import { build_render_payload } from "../services/game_render_sercives.js";
 
 
 export async function socket_game_lobby(
@@ -67,6 +69,17 @@ async function start_lobby_event(
     for(const socket_id of socket_ids){
         await io.to(socket_id).emit('lobby:start:success', {data:response.game_response!});
     }
+    const loop_res = await start_game_loop(game_id, store, async(game)=>{
+        for (const sid of sids){
+            const player = await store.get_player_store().get_player_by_sid(sid);
+            if(!player)
+                continue;
+            const payload = await build_render_payload(game, player.get_player_id(), store);
+            await io.to(player.get_socket()).emit('game:render', payload);
+        }
+    });
+    if(!loop_res.success)
+        await socket.emit('lobby:start:error', {reason: loop_res.reason});              
 }
 
 async function leave_lobby_event(
@@ -76,6 +89,7 @@ async function leave_lobby_event(
     store:Store
 ){
     const response = await lobby_services.leave_game(sid, store);
+    console.log(response);
     
     if(!response.success)
         return await socket.emit('lobby:leave:error', {reason:response!.reason});

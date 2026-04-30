@@ -83,6 +83,8 @@ export class GameStore{
             return "game not found";
 
         game.remove_player(player_id);
+        game.remove_board(player_id);
+        game.remove_player_to_piece(player_id);
         this.game_id_to_ids_map.get(game.get_game_id())!.delete(player_id);
         this.player_id_to_game_id_map.delete(player_id);
 

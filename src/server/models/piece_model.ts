@@ -8,7 +8,7 @@ export class Piece{
     private shape:PieceShape;
     private rotation:number;
 
-    constructor(type:PieceType, x_pos=15, y_pos=0){
+    constructor(type:PieceType, x_pos=5, y_pos=0){
         this.type = type;
         this.x_pos = x_pos;
         this.y_pos = y_pos;

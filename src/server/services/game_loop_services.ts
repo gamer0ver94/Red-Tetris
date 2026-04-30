@@ -2,6 +2,7 @@
 
 import { Store } from "../stores/store.ts";
 import { Game } from "../models/game_model.ts";
+import { tick_board } from "./game_core_services.js";
 
 const active_loops = new Map<string, NodeJS.Timeout>();
 
@@ -55,7 +56,7 @@ export function stop_game_loop(game_id: string) {
 }
 
 export function tick_game(game: Game) {
-  for (const board of game.get_board_map().values()) {
-    board.tick_down();
+  for (const [id, board ] of game.get_board_map()) {
+    tick_board(board, id, game);
   }
 }

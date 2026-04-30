@@ -8,6 +8,8 @@ import { find_me } from './auth_services.ts'
 
 
 import {randomBytes} from 'node:crypto'
+import { setup_game_boards } from './game_setup_services.js'
+import { stop_game_loop } from './game_loop_services.js'
 
 
 
@@ -63,7 +65,10 @@ export async function start_game(sid:string, store:Store){
     const socket_ids = await store.get_all_sockets_by_game_id(game.get_game_id());
     
     const sids = await store.get_all_sid_by_game_id(game.get_game_id());
-    // IDEALY I WANT REPLY SUCH AS {game_response: {id, type, ..,...} ids{1:id_1, 2:id_2 ...}
+    
+    const board_res = setup_game_boards(game);
+    if(!board_res.success)
+        return{success:false, reason:board_res.reason, username:store.get_player_store().get_player_by_id(board_res.trigger_id!)}
     return {success:true, game_response, socket_ids, sids}    
 }
 
@@ -96,69 +101,96 @@ export async function create_game(
 
 }
 
-export async function leave_game(
-    sid:string,
-    store:Store
-){
-    //Checks the status of the game
-
+export async function leave_game(sid: string, store: Store) {
     const player = await store.get_player_store().get_player_by_sid(sid);
-    if(!player)
-        return{success:false, reason: "player not found"};
+    if (!player)
+        return { success: false, reason: 'player not found' };
+
     const game = await store.get_game_store().get_game_by_player_id(player.get_player_id());
     if (!game)
-        return {success:false, reason: "game not found"};
-    switch(game.get_game_status()){
-        // case 'playing':
-        //     break;
-        case gameStatusType.waiting:
-            const res = await leave_game_waiting(player, game, store);
-            return {success:true, res};
-        // case 'finish':
-        //     break;
-        default:
-            return {success:false, reason: "unknown game status"};
-    }
+        return { success: false, reason: 'game not found' };
+
+    const status = game.get_game_status();
+
+    if (status === gameStatusType.waiting)
+        return {
+            success: true,
+            res: await leave_game_waiting(player, game, store),
+        };
+
+    if (status === gameStatusType.started)
+        return {
+            success: true,
+            res: await leave_game_started(player, game, store),
+        };
+
+    return { success: false, reason: 'unknown game status' };
 }
 
-async function leave_game_waiting(player:Player, game:Game, store:Store){
-    
-    let was_owner = false;
+async function leave_game_waiting(player: Player, game: Game, store: Store) {
+    const was_owner = player.get_player_id() === game.get_owner_id();
+    const leaver_name = player.get_username();
 
-    if(player.get_player_id() === game.get_owner_id())
-        was_owner = true;
+    const remove_res = await store.get_game_store().remove_player_by_id(player.get_player_id(), game.get_game_id());
 
-    //leave game first
-    const res = await store.get_game_store().remove_player_by_id(
-        player.get_player_id(),
-        game.get_game_id()
-    );
-    if (res === "game deleted")
-        return {success:true, deleted:true};
+    if (remove_res === 'game deleted') {
+        return {
+            deleted: true,
+            stopped_loop: false,
+            leaver_name,
+            socket_ids: new Set<string>(),
+            new_owner: false,
+        };
+    }
+
+    let new_owner = false;
+    let new_owner_socket: string | undefined;
+
+    if (was_owner) {
+        const new_owner_id = game.get_player_ids().values().next().value;
+        game.set_owner(new_owner_id!);
+
+        const owner = await store.get_player_store().get_player_by_id(new_owner_id!);
+        new_owner = true;
+        new_owner_socket = owner?.get_socket();
+    }
 
     const socket_ids = await store.get_all_sockets_by_game_id(game.get_game_id());
 
-    if(! was_owner){
-        return {
-            success:true,
-            deleted:false,
-            new_owner:false,
-            leaver_name:player.get_username(),
-            socket_ids
-        }
-    }
-    const new_owner_id = game.get_player_ids().values().next().value;
-    game.set_owner(new_owner_id!);
-    const owner = await store.get_player_store().get_player_by_id(new_owner_id!);
     return {
-        success:true,
-        deleted:false,
-        new_owner:true,
-        new_owner_socket:owner!.get_socket(),
-        leaver_name:player.get_username(),
+        deleted: false,
+        stopped_loop: false,
+        new_owner,
+        new_owner_socket,
+        leaver_name,
         socket_ids,
     };
 }
+
+async function leave_game_started(player: Player, game: Game, store: Store) {
+    const leaver_name = player.get_username();
+    const game_id = game.get_game_id();
+
+    const remove_res = await store.get_game_store().remove_player_by_id(player.get_player_id(), game.get_game_id());
+
+    stop_game_loop(game_id);
+    game.set_game_status(gameStatusType.finish);
+
+    const socket_ids =
+        remove_res === 'game deleted'
+            ? new Set<string>()
+            : await store.get_all_sockets_by_game_id(game_id);
+
+    return {
+        deleted: remove_res === 'game deleted',
+        stopped_loop: true,
+        forfeit: true,
+        leaver_name,
+        socket_ids,
+        new_owner: false,
+    };
+}
+
 
 
 async function generate_unique_game_id(game_store: GameStore) : Promise<string>{

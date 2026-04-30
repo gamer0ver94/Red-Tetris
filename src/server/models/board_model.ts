@@ -7,7 +7,7 @@ export class Board {
     private grid:BoardType;
     private current_piece: Piece| null;
 
-    constructor(width:number=20, heigth:number=30){
+    constructor(width:number=10, heigth:number=20){
         this.grid = Array.from({length:heigth}, () =>
             Array.from({length:width}, () => '.'),);
         this.current_piece = null
