@@ -144,7 +144,6 @@ async function leave_game_waiting(player:Player, game:Game, store:Store){
             deleted:false,
             new_owner:false,
             leaver_name:player.get_username(),
-
             socket_ids
         }
     }

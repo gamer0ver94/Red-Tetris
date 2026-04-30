@@ -4,11 +4,13 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['**/*.test.ts'],
+    exclude: ['node_modules/**', 'docs/**', 'coverage/**', 'dist/**'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
       reportOnFailure: true,
-        thresholds: {
+      exclude: ['node_modules/**', 'docs/**', 'coverage/**', 'dist/**'],
+      thresholds: {
         perFile: true,
         lines: 70,
         statements: 70,
@@ -18,3 +20,4 @@ export default defineConfig({
     },
   },
 });
+

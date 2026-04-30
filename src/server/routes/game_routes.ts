@@ -58,5 +58,79 @@ export const game_routes = async (fastify: FastifyInstance) => {
     }
     }, game_controller.post_create);
 
-    fastify.get('/join/:id', {}, game_controller.get_join);
+    fastify.get('/join/:game_id/:username', {
+        schema:{
+            tags:['game'],
+            summary: 'Prepare a player to join a game lobby',
+            params: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['game_id', 'username'],
+                properties: {
+                    game_id: { type: 'string', minLength: 1 },
+                    username: { type: 'string', minLength: 1, maxLength: 32 },
+            },
+            },
+            response: {
+                200: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: [
+                    'success',
+                    'game_id',
+                    'player_id',
+                    'username',
+                    'csrf_token',
+                    'game_status',
+                    'is_host',
+                    ],
+                    properties: {
+                    success: { type: 'boolean', const: true },
+                    game_id: { type: 'string' },
+                    player_id: { type: 'string' },
+                    username: { type: 'string' },
+                    csrf_token: { type: 'string' },
+                    game_status: { type: 'string', enum: ['created', 'waiting', 'started', 'finish'] },
+                    is_host: { type: 'boolean' },
+                    },
+                },
+                400: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['success', 'reason'],
+                    properties: {
+                    success: { type: 'boolean', const: false },
+                    reason: { type: 'string' },
+                    },
+                },
+                403: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['success', 'reason'],
+                    properties: {
+                    success: { type: 'boolean', const: false },
+                    reason: { type: 'string' },
+                    },
+                },
+                404: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['success', 'reason'],
+                    properties: {
+                    success: { type: 'boolean', const: false },
+                    reason: { type: 'string' },
+                    },
+                },
+                409: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['success', 'reason'],
+                    properties: {
+                    success: { type: 'boolean', const: false },
+                    reason: { type: 'string' },
+                    },
+                },
+            },
+        },
+    }, game_controller.get_join);
 }

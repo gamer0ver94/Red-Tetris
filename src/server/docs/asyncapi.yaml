@@ -1,10 +1,14 @@
 asyncapi: 3.1.0
-id: 'urn:red-tetris:socket-api'
+id: urn:red-tetris:socket-api
 defaultContentType: application/json
 
 info:
   title: Red Tetris Socket API
   version: 0.1.0
+  description: >
+    Socket.IO protocol for lobby, connection recovery, and status updates.
+    The connection handshake requires the rt.sid cookie and an auth.csrf_token
+    value matching the registered player session.
   contact:
     name: Red Tetris Team
     email: team@example.com
@@ -12,39 +16,202 @@ info:
     name: MIT
   tags:
     - name: sockets
+    - name: lobby
+    - name: session
 
 servers:
   local:
     host: localhost:1800
     protocol: socket.io
+    description: Local development Socket.IO server.
     security:
       - $ref: '#/components/securitySchemes/sessionCookie'
 
 channels:
-  messageChannel:
-    address: message
+  lobbyJoin:
+    address: 'lobby:join'
     messages:
-      ChangeState:
-        $ref: '#/components/messages/ChangeState'
-  connectErrorChannel:
+      LobbyJoin:
+        $ref: '#/components/messages/LobbyJoin'
+  lobbyJoinError:
+    address: 'lobby:join:error'
+    messages:
+      LobbyJoinError:
+        $ref: '#/components/messages/LobbyJoinError'
+  lobbyJoinSuccess:
+    address: 'lobby:join:success'
+    messages:
+      LobbyJoinSuccess:
+        $ref: '#/components/messages/LobbyJoinSuccess'
+  lobbyJoinUpdate:
+    address: 'lobby:join:update'
+    messages:
+      LobbyJoinUpdate:
+        $ref: '#/components/messages/LobbyJoinUpdate'
+
+  lobbyStart:
+    address: 'lobby:start'
+    messages:
+      LobbyStart:
+        $ref: '#/components/messages/LobbyStart'
+  lobbyStartError:
+    address: 'lobby:start:error'
+    messages:
+      LobbyStartError:
+        $ref: '#/components/messages/LobbyStartError'
+  lobbyStartSuccess:
+    address: 'lobby:start:success'
+    messages:
+      LobbyStartSuccess:
+        $ref: '#/components/messages/LobbyStartSuccess'
+
+  lobbyLeave:
+    address: 'lobby:leave'
+    messages:
+      LobbyLeave:
+        $ref: '#/components/messages/LobbyLeave'
+  lobbyLeaveError:
+    address: 'lobby:leave:error'
+    messages:
+      LobbyLeaveError:
+        $ref: '#/components/messages/LobbyLeaveError'
+  lobbyLeaveSuccess:
+    address: 'lobby:leave:success'
+    messages:
+      LobbyLeaveSuccess:
+        $ref: '#/components/messages/LobbyLeaveSuccess'
+  lobbyLeaveUpdate:
+    address: 'lobby:leave:update'
+    messages:
+      LobbyLeaveUpdate:
+        $ref: '#/components/messages/LobbyLeaveUpdate'
+  lobbyNewOwner:
+    address: 'lobby:new_owner'
+    messages:
+      LobbyNewOwner:
+        $ref: '#/components/messages/LobbyNewOwner'
+
+  playerStatusChange:
+    address: 'player_status:change'
+    messages:
+      PlayerStatusChange:
+        $ref: '#/components/messages/PlayerStatusChange'
+  gameStatusChange:
+    address: 'game_status:change'
+    messages:
+      GameStatusChange:
+        $ref: '#/components/messages/GameStatusChange'
+  sessionResume:
+    address: 'session:resume'
+    messages:
+      SessionResume:
+        $ref: '#/components/messages/SessionResume'
+  connectError:
     address: connect_error
     messages:
       ConnectError:
         $ref: '#/components/messages/ConnectError'
 
 operations:
-  onMessage:
+  emitLobbyJoin:
+    action: send
+    channel:
+      $ref: '#/channels/lobbyJoin'
+    messages:
+      - $ref: '#/channels/lobbyJoin/messages/LobbyJoin'
+  onLobbyJoinError:
     action: receive
     channel:
-      $ref: '#/channels/messageChannel'
+      $ref: '#/channels/lobbyJoinError'
     messages:
-      - $ref: '#/channels/messageChannel/messages/ChangeState'
+      - $ref: '#/channels/lobbyJoinError/messages/LobbyJoinError'
+  onLobbyJoinSuccess:
+    action: receive
+    channel:
+      $ref: '#/channels/lobbyJoinSuccess'
+    messages:
+      - $ref: '#/channels/lobbyJoinSuccess/messages/LobbyJoinSuccess'
+  onLobbyJoinUpdate:
+    action: receive
+    channel:
+      $ref: '#/channels/lobbyJoinUpdate'
+    messages:
+      - $ref: '#/channels/lobbyJoinUpdate/messages/LobbyJoinUpdate'
+
+  emitLobbyStart:
+    action: send
+    channel:
+      $ref: '#/channels/lobbyStart'
+    messages:
+      - $ref: '#/channels/lobbyStart/messages/LobbyStart'
+  onLobbyStartError:
+    action: receive
+    channel:
+      $ref: '#/channels/lobbyStartError'
+    messages:
+      - $ref: '#/channels/lobbyStartError/messages/LobbyStartError'
+  onLobbyStartSuccess:
+    action: receive
+    channel:
+      $ref: '#/channels/lobbyStartSuccess'
+    messages:
+      - $ref: '#/channels/lobbyStartSuccess/messages/LobbyStartSuccess'
+
+  emitLobbyLeave:
+    action: send
+    channel:
+      $ref: '#/channels/lobbyLeave'
+    messages:
+      - $ref: '#/channels/lobbyLeave/messages/LobbyLeave'
+  onLobbyLeaveError:
+    action: receive
+    channel:
+      $ref: '#/channels/lobbyLeaveError'
+    messages:
+      - $ref: '#/channels/lobbyLeaveError/messages/LobbyLeaveError'
+  onLobbyLeaveSuccess:
+    action: receive
+    channel:
+      $ref: '#/channels/lobbyLeaveSuccess'
+    messages:
+      - $ref: '#/channels/lobbyLeaveSuccess/messages/LobbyLeaveSuccess'
+  onLobbyLeaveUpdate:
+    action: receive
+    channel:
+      $ref: '#/channels/lobbyLeaveUpdate'
+    messages:
+      - $ref: '#/channels/lobbyLeaveUpdate/messages/LobbyLeaveUpdate'
+  onLobbyNewOwner:
+    action: receive
+    channel:
+      $ref: '#/channels/lobbyNewOwner'
+    messages:
+      - $ref: '#/channels/lobbyNewOwner/messages/LobbyNewOwner'
+
+  onPlayerStatusChange:
+    action: receive
+    channel:
+      $ref: '#/channels/playerStatusChange'
+    messages:
+      - $ref: '#/channels/playerStatusChange/messages/PlayerStatusChange'
+  onGameStatusChange:
+    action: receive
+    channel:
+      $ref: '#/channels/gameStatusChange'
+    messages:
+      - $ref: '#/channels/gameStatusChange/messages/GameStatusChange'
+  onSessionResume:
+    action: receive
+    channel:
+      $ref: '#/channels/sessionResume'
+    messages:
+      - $ref: '#/channels/sessionResume/messages/SessionResume'
   onConnectError:
     action: receive
     channel:
-      $ref: '#/channels/connectErrorChannel'
+      $ref: '#/channels/connectError'
     messages:
-      - $ref: '#/channels/connectErrorChannel/messages/ConnectError'
+      - $ref: '#/channels/connectError/messages/ConnectError'
 
 components:
   securitySchemes:
@@ -52,23 +219,245 @@ components:
       type: httpApiKey
       name: rt.sid
       in: cookie
+      description: Secure session cookie issued by the HTTP auth routes.
 
   messages:
-    ChangeState:
-      name: ChangeState
+    LobbyJoin:
+      name: LobbyJoin
+      title: Join a lobby
+      summary: Client asks to join an existing multiplayer lobby.
       payload:
         type: object
-        required: [action, state]
+        additionalProperties: false
         properties:
-          action: { type: string, enum: [change_state] }
-          state: { type: string, enum: [connected, waiting, disconnected, playing] }
+          game_id:
+            type: string
+            description: Identifier of the lobby/game to join.
+
+    LobbyJoinError:
+      name: LobbyJoinError
+      payload:
+        $ref: '#/components/schemas/ErrorPayload'
+
+    LobbyJoinSuccess:
+      name: LobbyJoinSuccess
+      summary: Join request succeeded.
+      payload:
+        $ref: '#/components/schemas/EmptyPayload'
+
+    LobbyJoinUpdate:
+      name: LobbyJoinUpdate
+      summary: Broadcast to lobby members when a player joins.
+      payload:
+        $ref: '#/components/schemas/MessagePayload'
+
+    LobbyStart:
+      name: LobbyStart
+      title: Start a lobby
+      summary: Client asks to start the game for its current lobby.
+      payload:
+        $ref: '#/components/schemas/EmptyPayload'
+
+    LobbyStartError:
+      name: LobbyStartError
+      payload:
+        $ref: '#/components/schemas/ErrorPayload'
+
+    LobbyStartSuccess:
+      name: LobbyStartSuccess
+      payload:
+        type: object
+        additionalProperties: false
+        required: [data]
+        properties:
+          data:
+            $ref: '#/components/schemas/LobbyStartData'
+
+    LobbyLeave:
+      name: LobbyLeave
+      title: Leave a lobby
+      summary: Client asks to leave its current lobby.
+      payload:
+        $ref: '#/components/schemas/EmptyPayload'
+
+    LobbyLeaveError:
+      name: LobbyLeaveError
+      payload:
+        $ref: '#/components/schemas/ErrorPayload'
+
+    LobbyLeaveSuccess:
+      name: LobbyLeaveSuccess
+      summary: Leave request succeeded.
+      payload:
+        $ref: '#/components/schemas/EmptyPayload'
+
+    LobbyLeaveUpdate:
+      name: LobbyLeaveUpdate
+      summary: Broadcast to remaining lobby members when a player leaves.
+      payload:
+        $ref: '#/components/schemas/MessagePayload'
+
+    LobbyNewOwner:
+      name: LobbyNewOwner
+      summary: Broadcast to the player promoted as the new lobby owner.
+      payload:
+        $ref: '#/components/schemas/EmptyPayload'
+
+    PlayerStatusChange:
+      name: PlayerStatusChange
+      payload:
+        type: object
+        additionalProperties: false
+        required: [new_status]
+        properties:
+          new_status:
+            $ref: '#/components/schemas/PlayerStatus'
+
+    GameStatusChange:
+      name: GameStatusChange
+      payload:
+        type: object
+        additionalProperties: false
+        required: [new_status]
+        properties:
+          new_status:
+            $ref: '#/components/schemas/GameStatus'
+
+    SessionResume:
+      name: SessionResume
+      summary: Sent after a socket connection is initialized or recovered.
+      payload:
+        $ref: '#/components/schemas/SessionResumePayload'
 
     ConnectError:
       name: ConnectError
+      summary: Socket.IO handshake rejection reason.
       payload:
         type: object
+        additionalProperties: true
         required: [message]
         properties:
           message:
             type: string
-            enum: [missing csrf token, missing session, invalid session, forbidden, process error]
+            enum:
+              - missing csrf token
+              - missing session
+              - invalid session
+              - forbidden
+              - process error
+
+  schemas:
+    EmptyPayload:
+      type: object
+      additionalProperties: false
+
+    ErrorPayload:
+      type: object
+      additionalProperties: false
+      required: [reason]
+      properties:
+        reason:
+          type: string
+          examples:
+            - missing game id
+            - game not found
+            - the match is full
+            - you can't join a game you are in
+            - you can't start this game
+            - unknown game status
+
+    MessagePayload:
+      type: object
+      additionalProperties: false
+      required: [message]
+      properties:
+        message:
+          type: string
+
+    LobbyStartData:
+      type: object
+      additionalProperties: false
+      required: [game_id, type, mode, status]
+      properties:
+        game_id:
+          type: string
+        type:
+          type: string
+        mode:
+          type: string
+        status:
+          type: string
+          enum: [started]
+
+    SessionResumePayload:
+      type: object
+      additionalProperties: false
+      required: [reconnected, player, game, render_state]
+      properties:
+        reconnected:
+          type: boolean
+        player:
+          type: object
+          additionalProperties: false
+          required: [player_id, username, player_status, csrf_token]
+          properties:
+            player_id:
+              type: string
+            username:
+              type: string
+            player_status:
+              $ref: '#/components/schemas/PlayerStatus'
+            csrf_token:
+              type: string
+        game:
+          oneOf:
+            - type: 'null'
+            - $ref: '#/components/schemas/ResumeGame'
+        render_state:
+          oneOf:
+            - type: 'null'
+            - type: object
+              additionalProperties: true
+
+    ResumeGame:
+      type: object
+      additionalProperties: false
+      required:
+        - game_id
+        - owner_id
+        - game_type
+        - game_mode
+        - game_status
+        - players_ids
+      properties:
+        game_id:
+          type: string
+        owner_id:
+          type: string
+        game_type:
+          type: string
+        game_mode:
+          type: string
+        game_status:
+          $ref: '#/components/schemas/GameStatus'
+        players_ids:
+          type: array
+          items:
+            type: string
+
+    PlayerStatus:
+      type: string
+      enum:
+        - disconnected
+        - connected
+        - waiting_socket
+        - waiting
+        - playing
+
+    GameStatus:
+      type: string
+      enum:
+        - created
+        - waiting
+        - started
+        - finish

@@ -51,7 +51,7 @@ export class Player {
         return this.csrf_token
     }
 
-    public set_player_status(new_status: string): void {
+    public set_player_status(new_status: PlayerStatus): void {
         this.player_status = new_status
     }
 

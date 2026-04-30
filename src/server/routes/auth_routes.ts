@@ -74,4 +74,27 @@ export const auth_routes = async (fastify: FastifyInstance) => {
 
   // /auth/health to have a healthcheck endpoint
   fastify.get('/health', async () => ({ok: true}))
-};
+
+  // /auth/logout to logout a user
+    fastify.get('/logout', {
+        schema: {
+            tags:['auth'],
+            summary:'Logout current user',
+            response: {
+                200: {
+                    type:'object',
+                    properties:{
+                        success: {type: 'boolean'},
+                    },
+                },
+                403:{
+                    type:'object',
+                    properties:{
+                        success: {type: 'boolean'},
+                        reason: {type: 'string'},
+                    },
+                },
+            },
+         },
+    } , auth_controller.logout);
+}
