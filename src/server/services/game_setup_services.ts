@@ -1,36 +1,63 @@
-import {Game} from '../models/game_model.ts';
-
 import { Board } from '../models/board_model.ts';
 import { Piece } from '../models/piece_model.ts';
 
 import { spawn_piece } from './game_core_services.js';
+import { Lobby } from '../models/lobby_model.js';
+import { ActiveGame } from '../models/active_game_model.js';
+import { Store } from '../stores/store.js';
+import { GameOptions } from '../types/game_options_types.ts';
+import { PlayerInGame } from '../models/player_in_game_model.js';
+import { CodeType, ModelResult, StartGameData } from '../types/error_code_types.js';
 //Prepares game when lobby is ready
 
 
-export function setup_game_boards(game:Game){
+//No Model result here , only to add one field
+export function setup_active_game(lobby:Lobby, store:Store):ModelResult<null, CodeType>{
 
-    const ids = game.get_player_ids();
+    const ids = lobby.get_player_ids();
+    const opts = lobby.get_game_opts();
+    const active_game = new ActiveGame(lobby.get_lobby_id(), opts, ids);
+    const add_game_res = store.get_active_game_store().add_active_game(active_game);
+    if (!add_game_res.success)
+            return {success:false, code:add_game_res.code};
 
     for (const id of ids){
-        const res = create_board_for_player(id, game);
-        if(!res.success)
-            return {success:false, reason:res.reason, trigger_id:id};
-        game.set_player_piece_map(id);
-        const spwan_res = spawn_piece(game.get_board_map().get(id)!, new Piece(game.get_next_piece(id)));
-        if(!spwan_res.success)
-            return {success:false, reason:spwan_res.reason, trigger_id:id};
+        const board_res = create_board_for_player(id, lobby, opts, store);
+        if(!board_res.success)
+            return {success:false, code:board_res.code, details:{trigger_id:id}};
+        const piece_res = create_piece_for_player(active_game, board_res.data!, id);
+        if (!piece_res.success)
+            return {success:false, code:piece_res.code, details:{trigger_id:id}};
     }
-    return {success:true};
+    return {success:true, data:null};
 }
 
-export function create_board_for_player(player_id:string, game:Game){
+function create_board_for_player(player_id:string, lobby:Lobby, opts:GameOptions, store:Store):ModelResult<Board,CodeType>{
 
-    if(!game.get_player_ids().has(player_id))
-        return {success:false, reason:'Wrong player id'};
+    if(!lobby.get_player_ids().includes(player_id))
+        return {success:false, code:'PLAYER_NOT_FOUND'};
 
-    const board = new Board();
-    const success = game.set_new_board(player_id, board);
-    if(!success)
-        return {success, reason:'Duplicate Board'};
-    return {success};
+    const board = new Board(opts.grid.width, opts.grid.height);
+    const player_in_game = new PlayerInGame(board, player_id)
+    const add_player_res = store.get_active_game_store().add_player_to_active_game(
+        player_id,
+        player_in_game,
+        lobby.get_lobby_id(),
+    );
+    if(!add_player_res.success)
+        return {success:false, code:add_player_res.code};
+    return {success:true, data:board};
+}
+
+function create_piece_for_player(active_game:ActiveGame, board:Board, player_id:string):ModelResult<null, CodeType>{
+
+    const piece_res = active_game.get_next_piece_for_player(player_id);
+    if(!piece_res.success)
+        return piece_res;
+
+    const spwan_res = spawn_piece(board, new Piece(piece_res.data));
+    if(!spwan_res.success)
+        return spwan_res;
+
+    return {success:true, data:null};
 }

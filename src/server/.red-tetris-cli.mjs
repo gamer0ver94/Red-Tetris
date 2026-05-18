@@ -1,9 +1,3 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-docker compose up -d server
-
-docker compose exec -T server sh -lc 'cat > /app/.red-tetris-cli.mjs' <<'NODE'
 import { io } from "socket.io-client";
 
 const baseUrl = process.env.TETRIS_URL || "http://127.0.0.1:1800";
@@ -238,10 +232,3 @@ process.on("SIGINT", () => {
 
 await sleep(120000);
 leaveAndClose();
-NODE
-
-if [ -t 0 ]; then
-  docker compose exec server node /app/.red-tetris-cli.mjs
-else
-  docker compose exec -T server node /app/.red-tetris-cli.mjs
-fi

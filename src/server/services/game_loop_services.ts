@@ -1,62 +1,69 @@
 //Orchestrator
 
 import { Store } from "../stores/store.ts";
-import { Game } from "../models/game_model.ts";
 import { tick_board } from "./game_core_services.js";
+import { ActiveGame } from "../models/active_game_model.js";
+import { CodeType, ModelResult } from "../types/error_code_types.js";
 
 const active_loops = new Map<string, NodeJS.Timeout>();
 
-export async function start_game_loop(
-  game_id: string,
+export function start_game_loop(
+  lobby_id: string,
   store: Store,
-  on_tick: (game: Game) => void | Promise<void>,
-  tick_ms = 1000,
-) {
-  if (active_loops.has(game_id)) {
-    return { success: false, reason: 'game loop already running' };
-  }
+  on_tick: (active_game: ActiveGame) => void | Promise<void>
+) :ModelResult<null, CodeType>{
 
-  const game = await store.get_game_store().get_game_by_id(game_id);
+  if (active_loops.has(lobby_id))
+    return { success: false, code:'ACTIVE_GAME_EXIST' };
+  
+  const game_res = store.get_active_game_store().get_active_game_by_lobby_id(lobby_id);
+  if(!game_res.success)
+    return game_res;
 
-  if (!game) {
-    return { success: false, reason: 'game not found' };
-  }
+  const active_game = game_res.data;
+  const ticks_ms = active_game.get_game_opts().gravity.tickMs
 
   let is_ticking = false;
-
   const timer = setInterval(() => {
     if (is_ticking) return;
 
     is_ticking = true;
 
     void Promise.resolve()
-      .then(() => tick_game(game))
-      .then(() => on_tick(game))
+      .then(() => tick_game(active_game))
+      .then(() => on_tick(active_game))
       .finally(() => {
         is_ticking = false;
       });
-  }, tick_ms);
+  }, ticks_ms);
 
-  active_loops.set(game_id, timer);
+  active_loops.set(lobby_id, timer);
 
-  return { success: true };
+  return { success: true, data:null };
 }
 
-export function stop_game_loop(game_id: string) {
-  const timer = active_loops.get(game_id);
+export function stop_game_loop(lobby_id: string):ModelResult<null, CodeType> {
+  const timer = active_loops.get(lobby_id);
 
   if (!timer) {
-    return false;
+    return {success:false, code:'TIMER_NOT_FOUND'};
   }
 
   clearInterval(timer);
-  active_loops.delete(game_id);
+  active_loops.delete(lobby_id);
 
-  return true;
+  return {success:true, data:null};
 }
 
-export function tick_game(game: Game) {
-  for (const [id, board ] of game.get_board_map()) {
-    tick_board(board, id, game);
+export function tick_game(active_game: ActiveGame) {
+  for (const player of active_game.get_players()) {
+    if(!player.is_alive())
+      continue;
+    tick_board(
+      player.get_board(),
+      player.get_player_id(),
+      active_game,
+    );
   }
+
 }

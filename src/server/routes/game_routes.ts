@@ -2,6 +2,8 @@ import { FastifyInstance } from 'fastify'
 
 import * as game_controller from '../controllers/game_lobby_controller.ts'
 
+const GAME_MODE_ENUM = ['classic', 'hard', 'easy', 'solo', 'battle'];
+
 export const game_routes = async (fastify: FastifyInstance) => {
 
     fastify.post('/create', {schema: {
@@ -20,10 +22,9 @@ export const game_routes = async (fastify: FastifyInstance) => {
         body: {
         type: 'object',
         additionalProperties: false,
-        required: ['game_type', 'game_mode'],
+        required: ['game_mode'],
         properties: {
-            game_type: { type: 'string', enum: ['single_player', 'multi_player'] },
-            game_mode: { type: 'string', enum: ['classic'] }
+            game_mode: { type: 'string', enum: GAME_MODE_ENUM }
         }
         },
 
@@ -31,28 +32,26 @@ export const game_routes = async (fastify: FastifyInstance) => {
         201: {
             type: 'object',
             additionalProperties: false,
-            required: ['success', 'game_id', 'game_type', 'game_mode'],
+            required: ['success', 'game_id'],
             properties: {
             success: { type: 'boolean', const: true },
             game_id: { type: 'string' },
-            game_type: { type: 'string', enum: ['single_player', 'multi_player'] },
-            game_mode: { type: 'string' },
             }
         },
         400: {
             type: 'object',
-            properties: { success: { type: 'boolean' }, reason: { type: 'string' } },
-            required: ['success', 'reason']
+            properties: { success: { type: 'boolean' }, code: { type: 'string' }, message: { type: 'string' } },
+            required: ['success', 'code', 'message']
         },
         403: {
             type: 'object',
-            properties: { success: { type: 'boolean' }, reason: { type: 'string' } },
-            required: ['success', 'reason']
+            properties: { success: { type: 'boolean' }, code: { type: 'string' }, message: { type: 'string' } },
+            required: ['success', 'code', 'message']
         },
         409: {
             type: 'object',
-            properties: { success: { type: 'boolean' }, reason: { type: 'string' } },
-            required: ['success', 'reason']
+            properties: { success: { type: 'boolean' }, code: { type: 'string' }, message: { type: 'string' } },
+            required: ['success', 'code', 'message']
         }
         }
     }

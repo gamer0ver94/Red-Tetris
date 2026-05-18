@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import * as auth_services from '../services/auth_services.ts'
-import type { PlayerStore } from '../stores/players_store.ts';
+import { AppError } from '../models/app_error_model.js';
 
 
 
@@ -12,15 +12,15 @@ export async function get_me(
     reply: FastifyReply
 ){
     
-    const sid_cookie = auth_services.read_sid_from_cookie(request)
-    const sid = sid_cookie.sid!
-
+    const {sid} = auth_services.read_sid_from_cookie(request)
     if (!sid)
         return reply.code(200).send({is_known: false});
 
-    const response =  await auth_services.find_me(sid, request.server.store.get_player_store());
+    const response =  auth_services.find_me(sid, request.server.store.get_player_store());
+    if(!response.success)
+        throw new AppError(response.code);
     
-    return reply.code(200).send(response);
+    return reply.code(200).send(response.data);
 }
 
 //Try to create new user with username
@@ -32,20 +32,17 @@ export async function post_register(
     
     const username = request.body.username
     if(!username)
-        return reply.code(400).send({
-            success: false,
-            reason: 'Username is required.'
-        });
+        throw new AppError('USERNAME_REQUIRED', 400);
 
-    const response = await auth_services.register(
+    const response =  auth_services.register(
         request.server.store.get_player_store(),
         request.body.username,
         request
     );
-    if(!response || response.success == false)
-        return reply.code(409).send(response)
+    if(!response.success)
+        throw new AppError(response.code, 409);
 
-    return reply.code(201).send(response)
+    return reply.code(201).send(response.data)
 }
 
 export async function logout(
@@ -56,12 +53,12 @@ export async function logout(
     const sid = sid_cookie.sid!
 
     if (!sid)
-        return reply.code(403).send({success: false, reason:'Missing sid'});
+        throw new AppError('SID_MISSING', 403);
 
-    const response = await auth_services.logout(sid, request.server.store, request.server.io);
+    const response = auth_services.logout(sid, request.server.store, true);
     
-    if(response.success == false)
-        return reply.code(403).send(response);
+    if(!response.success)
+        throw new AppError(response.code, 403);
     
     return reply.code(200).send({success: true});
 }
