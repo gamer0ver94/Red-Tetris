@@ -25,9 +25,9 @@ export class Board {
         this.current_piece = new_piece;
     }
 
-    public can_place(piece:Piece, dx=0, dy=0){
+    public can_place(piece:Piece, dx=0, dy=0, rotation = piece.get_rotation()){
       
-        for(const cell of piece.get_cells()){
+        for(const cell of piece.get_cells(rotation)){
             const x = cell.x + dx;
             const y = cell.y + dy;
 
@@ -50,15 +50,15 @@ export class Board {
         return true;
     }
 
-    public tick_down(dy = 1){
+    public tick_down(dy = 1):'moved'|'locked'| 'no_piece'{
         if(!this.current_piece)
-            return false;
+            return 'no_piece';
         if (this.can_place(this.current_piece, 0, dy)){
             this.current_piece.move_by(0, dy);
-            return true;
+            return 'moved';
         }
         this.lock_current_piece();
-        return false;
+        return 'locked';
     }
 
     public lock_current_piece(){
@@ -68,5 +68,60 @@ export class Board {
             this.grid[cell.y][cell.x] = cell.type;
 
         this.current_piece = null;
+    }
+
+    public clear_full_rows():number{
+        
+        const width = this.grid[0].length;
+        const remaining_rows = this.grid.filter((row) => row.some((cell) => cell === '.'));
+        
+        const cleared = this.grid.length - remaining_rows.length;
+
+        const empty_rows: BoardCell[][] = Array.from({ length: cleared }, () => {
+            return Array.from({ length: width }, () => '.' as BoardCell);
+        });
+        this.grid = [...empty_rows, ...remaining_rows];
+        return cleared;
+    }
+
+    public apply_cell_gravity_loop():number{
+        let total = 0;
+
+        while(true){
+            const clear = this.clear_full_rows();
+            if(clear == 0)
+                break;
+            total += clear;
+            
+            let moved = true;
+            while (moved)
+                moved = this.apply_cell_gravity();
+        }
+        return total;
+    }
+
+    public apply_cell_gravity():boolean{
+        let moved = false;
+
+        for (let y = this.grid.length - 2; y >= 0 ; y --){
+
+            for (let x = 0; x < this.grid[y].length; x ++){
+                const cell = this.grid[y][x];
+                if(cell === '.')
+                    continue;
+                
+                let target_y = y;
+
+                while(target_y + 1 < this.grid.length && this.grid[target_y + 1][x] === '.')
+                    target_y ++;
+
+                if(target_y !== y){
+                    this.grid[target_y][x] = cell;
+                    this.grid[y][x]= '.';
+                    moved = true;
+                }
+            }
+        }
+        return moved;
     }
 }

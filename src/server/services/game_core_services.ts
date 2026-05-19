@@ -21,33 +21,42 @@ export function move_piece_right(board:Board){
     }
 }
 
-export function  soft_drop(board){}
-
-export function  hard_drop(board){}
-
 export function  tick_board(
     board:Board,
     player_id:string,
     active_game:ActiveGame):
-    ModelResult<null, CodeType>{
-    
+    ModelResult<number, CodeType>{
+        
+        const player_res = active_game.get_player(player_id);
+        if(!player_res.success)
+            return player_res;
+        const player = player_res.data
+
         if(!board.get_current_piece()){
+            player.set_hold_false();
             const next_piece_res = active_game.get_next_piece_for_player(player_id);
             if(!next_piece_res.success)
                 return next_piece_res
 
             const spwan_res = spawn_piece(board, new Piece(next_piece_res.data));
             if(!spwan_res.success){
-                const player_res = active_game.get_player(player_id);
-                if(player_res.success)
-                    player_res.data.mark_lost();
-
+                player.mark_lost();
                 return spwan_res;
             }
-            return {success:true, data:null};
+            return {success:true, data:0};
         }
-        board.tick_down();
-        return { success:true, data:null};
+        let clear = 0
+        const res = board.tick_down();
+        if(res === 'locked'){
+            if(active_game.get_game_opts().gravity.fallAfterClear)
+                clear = board.apply_cell_gravity_loop();
+            else
+                clear = board.clear_full_rows();
+            if(clear > 0 && active_game.get_game_opts().grid.invisible)
+                player.reveal_grid_for(active_game.get_game_opts().grid.revealOnClearMs);
+
+        }
+        return { success:true, data: clear};
 }
 
 export function  spawn_piece(board:Board, piece:Piece):ModelResult<null, CodeType>{
@@ -58,6 +67,5 @@ export function  spawn_piece(board:Board, piece:Piece):ModelResult<null, CodeTyp
     return {success:true, data:null};
 }
 
-export function  clear_full_rows(board){}
 
 export function  add_garbage_rows(board, count){}

@@ -20,7 +20,7 @@ export type LobbyStartData = {
 
 export type moveAction = 'left' | 'right' | 'rotate';
 
-export type dropAction = 'regular' | 'soft' | 'heavy';
+export type dropAction = 'regular' | 'soft' | 'hard';
 
 export type pressType = 'release'|'press';
 
@@ -45,6 +45,8 @@ export interface ClientToServerEvents {
     'game:soft:release':() => void;
     'game:hard:press':() => void;
     'game:hard:release':() => void;
+    'game:rotate':() => void;
+    'game:hold':() => void;
 }
 
 export interface ServerToClientEvents{

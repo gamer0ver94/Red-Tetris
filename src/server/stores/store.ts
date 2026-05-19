@@ -3,6 +3,7 @@ import { LobbyStore } from "./lobby_store.ts";
 import { ActiveGameStore } from "./active_game_store.ts";
 import { ModelResult, type CodeType } from "../types/error_code_types.ts";
 import { Board } from "../models/board_model.js";
+import { PlayerInGame } from "../models/player_in_game_model.js";
 
 
 export class Store{
@@ -77,5 +78,19 @@ export class Store{
             return player_in_game_res;
 
         return {success:true, data:player_in_game_res.data.get_board()};
+    }
+
+    public get_player_in_game_by_sid(sid:string):ModelResult<PlayerInGame, CodeType>{
+
+        const p_res = this.players.get_player_by_sid(sid);
+        if(!p_res.success)
+            return p_res;
+
+        const active_game_res = this.active_game.get_active_game_by_player_id(p_res.data.get_player_id());
+        if(!active_game_res.success)
+            return active_game_res;
+
+        const player_res = active_game_res.data.get_player(p_res.data.get_player_id());
+        return player_res;
     }
 }

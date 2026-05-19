@@ -23,7 +23,14 @@ export function build_render_payload(active_game:ActiveGame, player_id:string, s
     const next_pieces_res = active_game.peek_pieces_for_player(player_id);
     let next_piece_types = null
     if(next_pieces_res.success)
-       next_piece_types = next_pieces_res.data 
+       next_piece_types = next_pieces_res.data
+
+    const opts = active_game.get_game_opts();
+
+    const show_grid = !opts.grid.invisible || self_res.data.is_grid_visible();
+    
+    const render_board = show_grid ? build_visible_board(self_board, false) : build_empty_board(self_board);
+    
 
     return {success:true, data:{
             self:{
@@ -32,7 +39,8 @@ export function build_render_payload(active_game:ActiveGame, player_id:string, s
                     current_piece?.get_y() ?? null,
                     current_piece?.get_rotation() ?? null],
                 current_piece_type: current_piece?.get_type() ?? null,
-                board:build_visible_board(self_board, true),
+                current_piece_shape: current_piece?.get_shape() ?? null,
+                board:render_board,
                 hold_piece_type:null,
                 next_piece_types,
             },
@@ -119,4 +127,9 @@ function build_visible_board(board:Board, cur_piece_visible:boolean):BoardType{
     }
 
     return visible;
+}
+
+function build_empty_board(board:Board):BoardType{
+
+    return board.get_board().map((row) => row.map(() => '.'));
 }

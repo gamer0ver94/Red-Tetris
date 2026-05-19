@@ -3,6 +3,8 @@ export type GameOptions = {
     grid:{
         width:number;
         height:number;
+        invisible:boolean;
+        revealOnClearMs:number;
     },
 
     pieces:{
@@ -10,20 +12,21 @@ export type GameOptions = {
         sharedSequence:boolean;
         allowHold:boolean;
         nextPreviewCount:number;
-        invisiblePiece:boolean;
+
     },
 
     gravity:{
         tickMs:number,
-        speedIncrease:boolean;
         lockDelayMs:number;
         softDropMultiplier:number;
+        fallAfterClear:boolean;
     },
 
     garbage:{
         enabled:boolean;
-        initialRows:number;
-        garbagePerClear:boolean;
+        canClear:boolean;
+        ratio:number; // 0 -> each lines makes garbage, 1 -> 1+ lines clears ....
+        clearCreateGarbage:boolean;//clear garbage send garbage back ?
     },
 
     scoring:{

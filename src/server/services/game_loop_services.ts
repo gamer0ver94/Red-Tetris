@@ -19,14 +19,12 @@ export function start_game_loop(
   const game_res = store.get_active_game_store().get_active_game_by_lobby_id(lobby_id);
   if(!game_res.success)
     return game_res;
-
   const active_game = game_res.data;
-  const ticks_ms = active_game.get_game_opts().gravity.tickMs
 
   let is_ticking = false;
   const timer = setInterval(() => {
-    if (is_ticking) return;
-
+    if (is_ticking)
+      return;
     is_ticking = true;
 
     void Promise.resolve()
@@ -35,7 +33,7 @@ export function start_game_loop(
       .finally(() => {
         is_ticking = false;
       });
-  }, ticks_ms);
+  }, 33);
 
   active_loops.set(lobby_id, timer);
 
@@ -56,14 +54,33 @@ export function stop_game_loop(lobby_id: string):ModelResult<null, CodeType> {
 }
 
 export function tick_game(active_game: ActiveGame) {
+
+  const now = Date.now();
+
   for (const player of active_game.get_players()) {
     if(!player.is_alive())
       continue;
-    tick_board(
-      player.get_board(),
-      player.get_player_id(),
-      active_game,
-    );
+
+    const gravity = player.get_gravity();
+    const ticks_ms = active_game.get_game_opts().gravity.tickMs;
+    const drop_multiplier = 1 + active_game.get_game_opts().gravity.softDropMultiplier;
+
+    let fall_every_ms:number;
+    if(gravity.hard_drop)
+      fall_every_ms = 0;
+    else if (gravity.soft_drop)
+      fall_every_ms = ticks_ms * drop_multiplier;
+    else
+      fall_every_ms = ticks_ms;
+  
+    if(now - gravity.last_fall_at >= fall_every_ms){
+      tick_board(
+        player.get_board(),
+        player.get_player_id(),
+        active_game,
+      );
+      gravity.last_fall_at = Date.now();
+    }
   }
 
 }

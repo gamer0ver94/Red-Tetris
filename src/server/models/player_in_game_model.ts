@@ -1,5 +1,14 @@
-import { PieceType } from "../types/game_types.js";
+import { Piece } from "./piece_model.js";
 import { Board } from "./board_model.js";
+import { PieceType } from "../types/game_types.js";
+
+type PlayerGravityState = {
+  last_fall_at: number;
+  fall_every_ms: number;
+  soft_drop: boolean;
+  hard_drop:boolean;
+};
+
 
 export class PlayerInGame{
 
@@ -9,6 +18,9 @@ export class PlayerInGame{
     private score:number;
     private lines:number;
     private alive:boolean;
+    private gravity_state:PlayerGravityState;
+    private grid_visible_until:number|null;
+    private has_hold:boolean
 
     constructor(
         board:Board,
@@ -20,6 +32,14 @@ export class PlayerInGame{
         this.lines = 0;
         this.hold_piece = null
         this.alive = true;
+        this.gravity_state = {
+            last_fall_at: Date.now(),
+            fall_every_ms:0,
+            soft_drop:false,
+            hard_drop:false,
+        }
+        this.grid_visible_until = null;
+        this.has_hold = false;
     }
 
     //Getters
@@ -43,14 +63,27 @@ export class PlayerInGame{
         return this.player_id;
     }
 
-    public get_hold_piece():PieceType|null{
+    public get_hold_piece():Piece|null{
         return this.hold_piece;
+    }
+
+    public get_gravity():PlayerGravityState{
+        return this.gravity_state;
+    }
+
+    public get_hold():boolean{
+        return this.has_hold
     }
 
     //Setters
     public set_hold_piece(piece:PieceType){
         this.hold_piece = piece;
     }
+
+    public set_hold_false(){
+        this.has_hold = false;
+    }
+
     public add_lines(lines:number){
         this.lines += lines;
     }
@@ -62,4 +95,23 @@ export class PlayerInGame{
     public mark_lost(){
         this.alive = false;
     }
+
+    public reveal_grid_for(ms:number){
+        this.grid_visible_until = Date.now() + ms;
+    }
+
+    public is_grid_visible():boolean{
+        if(this.grid_visible_until === null)
+            return false
+        return Date.now() < this.grid_visible_until;
+    }
+
+    public shift_hold_piece(current_piece:PieceType):PieceType{
+
+        const tmp_piece = this.hold_piece!;
+        this.hold_piece = current_piece;
+        this.has_hold = true;
+        return tmp_piece
+    }
+
 }

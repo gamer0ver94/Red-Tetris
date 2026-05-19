@@ -1,4 +1,4 @@
-import { PieceType, PieceShape, pieceShapes } from "../types/game_types.js";
+import { PieceType, PieceShape, pieceShapes, BoardType } from "../types/game_types.js";
 
 export class Piece{
     
@@ -28,14 +28,13 @@ export class Piece{
         return this.y_pos
     }
 
-    public get_shape(){
-        return this.shape
-    }
-
     public get_rotation(){
         return this.rotation
     }
 
+    public get_next_rotation():number{
+        return (this.rotation + 1) % 4;
+    }
 
     public set_x(new_x:number){
         this.x_pos = new_x;
@@ -50,13 +49,18 @@ export class Piece{
         this.y_pos += new_y;
     }
 
-    public get_cells(){
+    public add_rotation(){
+        this.rotation =(this.rotation + 1 ) % 4;
+    }
+
+    public get_cells(rotation=this.rotation){
         
         const cells : {x:number; y:number; type:PieceType}[] = [];
+        const shape = this.get_shape(rotation);
         
-        for(let y = 0; y < this.shape.length; y ++){
-            for (let x = 0; x < this.shape[y].length; x ++){
-                if (this.shape[y][x] !== '.'){
+        for(let y = 0; y < shape.length; y ++){
+            for (let x = 0; x < shape[y].length; x ++){
+                if (shape[y][x] !== '.'){
                     cells.push({
                         x: this.x_pos + x,
                         y: this.y_pos + y,
@@ -67,4 +71,20 @@ export class Piece{
         }
         return cells;
     }
+
+    public get_shape(rotation = this.rotation):PieceShape{
+        
+        let shape = this.shape;
+        for(let i = 0; i < rotation; i++)
+            shape = this.rotate_shape_clockwise(shape);
+
+        return shape
+    }
+
+    private rotate_shape_clockwise(shape: PieceShape): PieceShape {
+    return shape[0].map((_, x) =>
+        shape.map((row) => row[x]).reverse()
+    ) as PieceShape;
+}
+
 }

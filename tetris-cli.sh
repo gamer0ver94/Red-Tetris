@@ -3,13 +3,46 @@ set -euo pipefail
 
 docker compose up -d server
 
-docker compose exec -T server sh -lc 'cat > /app/.red-tetris-cli.mjs' <<'NODE'
+docker compose exec -T server sh -lc 'mkdir -p /app/node_modules/.cache && cat > /app/node_modules/.cache/red-tetris-cli.mjs' <<'NODE'
 import { io } from "socket.io-client";
 
 const baseUrl = process.env.TETRIS_URL || "http://127.0.0.1:1800";
 const username = `cli_${Date.now()}`;
 let lastRender = null;
 let inputReady = false;
+const RELEASE_AFTER_MS = 90;
+const activeDirections = new Set();
+const releaseTimers = new Map();
+const pieceShapes = {
+  I: [
+    [".", ".", ".", "."],
+    ["I", "I", "I", "I"],
+  ],
+  J: [
+    ["J", ".", ".", "."],
+    ["J", "J", "J", "."],
+  ],
+  L: [
+    [".", ".", "L", "."],
+    ["L", "L", "L", "."],
+  ],
+  S: [
+    [".", "S", "S", "."],
+    ["S", "S", ".", "."],
+  ],
+  T: [
+    [".", "T", ".", "."],
+    ["T", "T", "T", "."],
+  ],
+  Z: [
+    ["Z", "Z", ".", "."],
+    [".", "Z", "Z", "."],
+  ],
+  O: [
+    [".", "O", "O", "."],
+    [".", "O", "O", "."],
+  ],
+};
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -90,6 +123,55 @@ function drawBoard(board) {
   return [border, ...body, border].join("\n");
 }
 
+function rotateShape(shape, rotation) {
+  let rotated = shape.map((row) => [...row]);
+  const turns = ((rotation || 0) % 4 + 4) % 4;
+
+  for (let turn = 0; turn < turns; turn += 1) {
+    rotated = rotated[0].map((_, x) =>
+      rotated.map((row) => row[x]).reverse()
+    );
+  }
+
+  return rotated;
+}
+
+function boardWithCurrentPiece(state) {
+  const board = asRows(state.self.board).map((row) => [...asRows(row)]);
+  const pieceType = state.self.current_piece_type;
+  const [pieceX, pieceY, rotation] = state.self.current_pos || [];
+  const shape = pieceShapes[pieceType];
+
+  if (!shape || pieceX === null || pieceY === null || pieceX === undefined || pieceY === undefined) {
+    return board;
+  }
+
+  const rotatedShape = rotateShape(shape, rotation);
+
+  for (let y = 0; y < rotatedShape.length; y += 1) {
+    for (let x = 0; x < rotatedShape[y].length; x += 1) {
+      const cell = rotatedShape[y][x];
+      if (cell === ".") {
+        continue;
+      }
+
+      const boardY = pieceY + y;
+      const boardX = pieceX + x;
+
+      if (
+        boardY >= 0 &&
+        boardY < board.length &&
+        boardX >= 0 &&
+        boardX < (board[0]?.length || 0)
+      ) {
+        board[boardY][boardX] = cell;
+      }
+    }
+  }
+
+  return board;
+}
+
 function render(payload) {
   const state = payload?.success && payload?.data ? payload.data : payload;
 
@@ -102,9 +184,10 @@ function render(payload) {
   process.stdout.write("\x1Bc");
   console.log("Red Tetris CLI");
   console.log(`user: ${username}`);
-  console.log("controls: a/left = left, d/right = right, q = quit");
+  console.log("controls: a/left = left, d/right = right, r = rotate, s/down = soft, space/w/up = hard, h = hold, q = quit");
   console.log(`piece: ${state.self.current_piece_type ?? "-"} @ ${JSON.stringify(state.self.current_pos)}`);
-  console.log(drawBoard(state.self.board));
+  console.log(`hold: ${state.self.hold_piece_type ?? "-"} | next: ${(state.self.next_piece_types || []).join(" ") || "-"}`);
+  console.log(drawBoard(boardWithCurrentPiece(state)));
 
   const opponentNames = Object.keys(state.opponents || {});
   if (opponentNames.length) {
@@ -156,12 +239,82 @@ function redrawLastRender() {
   }
 }
 
-function emitMove(direction) {
-  socket.emit(`game:move:${direction}:press`);
+function emitPress(direction) {
+  if (activeDirections.has(direction)) {
+    return;
+  }
+
+  activeDirections.add(direction);
+  socket.emit(`game:${direction}:press`);
+}
+
+function emitRelease(direction) {
+  const timer = releaseTimers.get(direction);
+  if (timer) {
+    clearTimeout(timer);
+    releaseTimers.delete(direction);
+  }
+
+  if (!activeDirections.has(direction)) {
+    return;
+  }
+
+  activeDirections.delete(direction);
+  socket.emit(`game:${direction}:release`);
+}
+
+function scheduleRelease(direction) {
+  const timer = releaseTimers.get(direction);
+  if (timer) {
+    clearTimeout(timer);
+  }
+
+  releaseTimers.set(
+    direction,
+    setTimeout(() => {
+      emitRelease(direction);
+    }, RELEASE_AFTER_MS),
+  );
+}
+
+function handleDirection(direction) {
+  const opposite = direction === "left" ? "right" : "left";
+  emitRelease(opposite);
+  emitPress(direction);
+  scheduleRelease(direction);
+  redrawLastRender();
+}
+
+function handleSoftDrop() {
+  emitPress("soft");
+  scheduleRelease("soft");
+  redrawLastRender();
+}
+
+function handleHardDrop() {
+  emitRelease("soft");
+  socket.emit("game:hard:press");
+  setTimeout(() => {
+    socket.emit("game:hard:release");
+  }, 30);
+  redrawLastRender();
+}
+
+function handleHold() {
+  socket.emit("game:hold");
+  redrawLastRender();
+}
+
+function handleRotate() {
+  socket.emit("game:rotate");
   redrawLastRender();
 }
 
 function leaveAndClose() {
+  emitRelease("left");
+  emitRelease("right");
+  emitRelease("soft");
+  socket.emit("game:hard:release");
   socket.emit("lobby:leave");
   socket.close();
 }
@@ -185,12 +338,28 @@ function setupInput() {
       process.exit(0);
     }
 
-    if (key === "a" || key === "h" || key === "\u001b[D") {
-      emitMove("left");
+    if (key === "a" || key === "\u001b[D") {
+      handleDirection("left");
     }
 
     if (key === "d" || key === "l" || key === "\u001b[C") {
-      emitMove("right");
+      handleDirection("right");
+    }
+
+    if (key === "s" || key === "j" || key === "\u001b[B") {
+      handleSoftDrop();
+    }
+
+    if (key === " " || key === "w" || key === "k" || key === "\u001b[A") {
+      handleHardDrop();
+    }
+
+    if (key === "h") {
+      handleHold();
+    }
+
+    if (key === "r") {
+      handleRotate();
     }
   });
 }
@@ -241,7 +410,7 @@ leaveAndClose();
 NODE
 
 if [ -t 0 ]; then
-  docker compose exec server node /app/.red-tetris-cli.mjs
+  docker compose exec server node /app/node_modules/.cache/red-tetris-cli.mjs
 else
-  docker compose exec -T server node /app/.red-tetris-cli.mjs
+  docker compose exec -T server node /app/node_modules/.cache/red-tetris-cli.mjs
 fi

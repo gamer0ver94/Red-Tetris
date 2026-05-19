@@ -10,18 +10,19 @@ export const CLASSIC_OPTS:GameOptions = {
         sharedSequence:true,
         allowHold:false,
         nextPreviewCount:3,
-        invisiblePiece:false,
     },
     gravity:{
         tickMs: 800,
-        speedIncrease:false,
         lockDelayMs:100,
         softDropMultiplier:0.3,
+        fallAfterClear:false
     },
     garbage:{
         enabled:true,
-        initialRows:0,
-        garbagePerClear:true,
+        ratio:1,
+        canClear:false,
+        clearCreateGarbage:false,
+
     },
     scoring:{
         enabled:false,
@@ -121,24 +122,26 @@ export const SOLO_OPTS:GameOptions={
     grid:{
         width:10,
         height:20,
+        invisible:false,
+        revealOnClearMs:0,
     },
     pieces:{
-        randomSequence:false,
+        randomSequence:true,
         sharedSequence:false,
         allowHold:true,
-        nextPreviewCount:3,
-        invisiblePiece:true,
+        nextPreviewCount:4,
     },
     gravity:{
         tickMs:800,
-        speedIncrease:true,
         lockDelayMs:100,
         softDropMultiplier:0.3,
+        fallAfterClear:true,
     },
     garbage:{
         enabled:false,
-        initialRows:0,
-        garbagePerClear:false,
+        canClear:false,
+        ratio:0,
+        clearCreateGarbage:false,
     },
     scoring:{
         enabled:true,
@@ -176,7 +179,7 @@ export const BATTLE_OPTS:GameOptions = {
     },
     garbage:{
         enabled:true,
-        initialRows:1,
+        ratio:1,
         garbagePerClear:true,
     },
     scoring:{
