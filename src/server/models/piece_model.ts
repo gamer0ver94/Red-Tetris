@@ -8,7 +8,7 @@ export class Piece{
     private shape:PieceShape;
     private rotation:number;
 
-    constructor(type:PieceType, x_pos=5, y_pos=0){
+    constructor(type:PieceType, x_pos=3, y_pos=0){
         this.type = type;
         this.x_pos = x_pos;
         this.y_pos = y_pos;
@@ -72,7 +72,7 @@ export class Piece{
         return cells;
     }
 
-    public get_shape(rotation = this.rotation):PieceShape{
+    public get_shape(rotation = this.rotation):BoardType{
         
         let shape = this.shape;
         for(let i = 0; i < rotation; i++)
@@ -81,10 +81,10 @@ export class Piece{
         return shape
     }
 
-    private rotate_shape_clockwise(shape: PieceShape): PieceShape {
-    return shape[0].map((_, x) =>
-        shape.map((row) => row[x]).reverse()
-    ) as PieceShape;
-}
+    private rotate_shape_clockwise(shape: PieceShape): BoardType{
+        return shape[0].map((_, x) =>
+            shape.map((row) => row[x]).reverse()
+        );
+    }
 
 }

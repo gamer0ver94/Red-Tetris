@@ -151,26 +151,28 @@ export async function socket_game_core(
 
     socket.on('game:rotate', async() => {
         const player_in_game_res = store.get_player_in_game_by_sid(sid);
-        if(!player_in_game_res.success)
+        if (!player_in_game_res.success)
             return;
-        const player_in_game = player_in_game_res.data;
-        const board = player_in_game.get_board();
+
+        const board = player_in_game_res.data.get_board();
         const current_piece = board.get_current_piece();
-        if(current_piece){
-            const next_rotation = current_piece.get_next_rotation();
-            if(board.can_place(current_piece, 0, 0, next_rotation))
+        if (!current_piece)
+            return;
+
+        const next_rotation = current_piece.get_next_rotation();
+        const kicks = [
+            [0, 0],
+            [-1, 0],
+            [1, 0],
+            [-2, 0],
+            [2, 0],
+            [0, -1],
+        ];
+        for (const [dx, dy] of kicks) {
+            if (board.can_place(current_piece, dx, dy, next_rotation)) {
+                current_piece.move_by(dx, dy);
                 current_piece.add_rotation();
-            else if(board.can_place(current_piece, -1, 0, next_rotation)){
-                current_piece.move_by(-1,0);
-                current_piece.add_rotation();
-            }
-            else if (board.can_place(current_piece, 1, 0, next_rotation)){
-                current_piece.move_by(1,0);
-                current_piece.add_rotation();
-            }
-            else if(board.can_place(current_piece, 0, 1, next_rotation)){
-                current_piece.move_by(0,1);
-                current_piece.add_rotation();
+                return;
             }
         }
     })
