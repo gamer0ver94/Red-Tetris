@@ -1,38 +1,85 @@
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useContext, useRef } from 'react';
+import { socketContext } from '../socket/socketContext';
+
+type ActiveKeys = {
+  left: boolean;
+  right: boolean;
+  down: boolean;
+  rotateHeld: boolean;
+};
 
 export function InputHandler() {
-  const dispatch = useDispatch();
+  const socket = useContext(socketContext);
+  const active = useRef<ActiveKeys>({ left: false, right: false, down: false, rotateHeld: false });
 
   useEffect(() => {
+    if (!socket) return;
+
+    const emitPressRelease = (eventBase: string, pressed: boolean) => {
+      if (!socket) return;
+      if (pressed) socket.emit(`${eventBase}:press`);
+      else socket.emit(`${eventBase}:release`);
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      console.log("Key pressed:", e.key);
+      if (['ArrowLeft', 'ArrowRight', 'ArrowDown'].includes(e.key)) e.preventDefault();
 
       switch (e.key) {
-        case "ArrowLeft":
-          console.log("LEFT");
-          break;
+        case 'ArrowLeft':
+          if (active.current.left) return;
+          active.current.left = true;
+          emitPressRelease('game:left', true);
+          return;
+        case 'ArrowRight':
+          if (active.current.right) return;
+          active.current.right = true;
+          emitPressRelease('game:right', true);
+          return;
+        case 'ArrowDown':
+          if (active.current.down) return;
+          active.current.down = true;
+          socket.emit('game:hard:press');
+          return;
+        case 'r':
+        case 'R':
+          socket.emit('game:rotate');
+          return;
+      }
 
-        case "ArrowRight":
-          console.log("RIGHT");
-          break;
 
-        case "ArrowUp":
-          console.log("UP");
-          break;
+    };
 
-        case "ArrowDown":
-          console.log("DOWN");
-          break;
-        case "R":
-          console.log("ROTATE");
-          break;
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (['ArrowLeft', 'ArrowRight', 'ArrowDown'].includes(e.key)) e.preventDefault();
+
+      switch (e.key) {
+        case 'ArrowLeft':
+          if (!active.current.left) return;
+          active.current.left = false;
+          emitPressRelease('game:left', false);
+          return;
+        case 'ArrowRight':
+          if (!active.current.right) return;
+          active.current.right = false;
+          emitPressRelease('game:right', false);
+          return;
+        case 'ArrowDown':
+          if (!active.current.down) return;
+          active.current.down = false;
+          emitPressRelease('game:soft', false);
+          return;
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [dispatch]);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [socket]);
 
   return null;
 }
+
