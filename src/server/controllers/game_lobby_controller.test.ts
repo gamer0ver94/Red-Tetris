@@ -1,0 +1,138 @@
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import type { FastifyInstance } from 'fastify';
+
+import { register_user, unique_username, inject_as } from '../test/helpers/auth_helpers_test.ts';
+import { build_server } from '../app/build_server.ts';
+import type { TestAuthUser } from '../test/test_types.ts';
+
+describe('controller: lobby', () => {
+    
+    let app:FastifyInstance;
+    let tester_create:TestAuthUser;
+
+    beforeAll(async() => {
+        //create app
+        process.env.SESSION_KEY_BASE64 = Buffer.alloc(32, 1).toString('base64');
+        process.env.CLIENT_ORIGIN = 'http://localhost:1700';
+        app = await build_server();
+
+        //create  user(create_tester), (token_tester)
+        tester_create = await register_user(app, 'tester_create');
+    });
+
+    afterAll(async () => {
+        //close app
+        await app.close();
+    });
+
+    describe('controller: lobby: create', async () => {
+        
+        it('create legit game and updates stores', async () => {
+            //inject as lobby_route_tester, POST create game
+            const res = await inject_as(app, tester_create,{
+                method:'POST',
+                url:'/game/create',
+                payload: {
+                    game_type:'multi_player',
+                    game_mode:'classic'
+                }
+            });
+            //Route return
+            expect(res.statusCode).toBe(201);
+            const body = res.json();
+            expect(body.success).toBe(true);
+            expect(body.game_id).toBeDefined();
+            expect(body.game_type).toBe('multi_player');
+            expect(body.game_mode).toBe('classic');
+            
+            //Check in game memory
+            const game = await app.store.get_game_store().get_game_by_id(body.game_id);
+            expect(game).toBeDefined();
+            expect(game?.get_owner_id()).toBe(tester_create.player_id);
+            expect(game?.get_game_type()).toBe('multi_player');
+            expect(game?.get_game_mode()).toBe('classic');
+            expect(game?.get_game_status()).toBe('waiting');
+            expect(game?.get_player_ids().has(tester_create.player_id)).toBe(true);
+            
+            //Check in players memory
+            const player = await app.store.get_player_store().get_player_by_id(tester_create.player_id);
+            expect(player).toBeDefined();
+            expect(player?.get_player_status()).toBe('waiting');
+        });
+
+        it('returns 409 when the same player tries to create twice', async () => {
+            //re inject as create_tester
+            const res = await inject_as(app, tester_create,{
+                method:'POST',
+                url:'/game/create',
+                payload: {
+                    game_type:'multi_player',
+                    game_mode:'classic',
+                }
+            });
+            expect(res.statusCode).toBe(409);
+            const body = res.json();
+            expect(body.success).toBe(false);
+            expect(body.reason).toContain('already in a game');
+        });
+
+        it ('returns 403 when sid missing', async () => {
+            //inject as no one
+            const res = await app.inject({
+                method: 'POST',
+                url: '/game/create',
+                headers: {
+                'x-csrf-token': 'x'.repeat(32),
+                },
+                payload: {
+                game_type: 'multi_player',
+                game_mode: 'classic',
+                },
+            }); 
+            expect(res.statusCode).toBe(403);
+            const body = res.json();
+            expect(body.success).toBe(false);
+            expect(body.reason).toContain('Missing sid');
+        });
+
+        it('returns 403 with missing csrf', async () => {
+            const user = await register_user(app, 'csrf_missing_test');
+
+            const res = await app.inject( {
+                method: 'POST',
+                url: '/game/create',
+                headers:{
+                    cookie:user.cookie,
+                },
+                payload:{
+                    game_type:'multi_player',
+                    game_mode: 'classic',
+                },
+            });
+            expect(res.statusCode).toBe(403);
+            const body = res.json();
+            expect(body.success).toBe(false);
+            expect(body.reason).toContain('Token manipulation');
+        });
+
+        it('returns 403 with wrong csrf', async() => {
+            const user = await register_user(app, 'wrong_csrf_test');
+
+            const res = await inject_as(app, user, {
+                method:'POST',
+                url:'/game/create',
+                headers:{
+                    'x-csrf-token': 'f'.repeat(32)
+                },
+                payload:{
+                    game_type:'single_player',
+                    game_mode:'classic',
+                },
+            });
+            expect(res.statusCode).toBe(403);
+            const body = res.json();
+            expect(body.success).toBe(false);
+            expect(body.reason).toBe('Token manipulation')
+        });
+    });
+});
