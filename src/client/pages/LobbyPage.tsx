@@ -13,13 +13,16 @@ export default function LobbyPage() {
   const socket = useContext(socketContext);
 
   const [ready, setReady] = useState(false);
-  const [players, setPlayers] = useState<Array<{ player_id: string; username: string; ready: boolean }>>([]);
+  // Temporarily commented out to keep the client build passing.
+  // This roster state is not wired yet, and tsconfig has noUnusedLocals enabled.
+  // const [players, setPlayers] = useState<Array<{ player_id: string; username: string; ready: boolean }>>([]);
   const [joinCards, setJoinCards] = useState<string[]>([]);
 
 
   const gameIdFromSession = sessionStorage.getItem('game_id') || '';
-
-  const [ownerId, setOwnerId] = useState<string | null>(null);
+  // Temporarily commented out to keep the client build passing.
+  // Owner tracking is planned but not consumed yet, and tsconfig has noUnusedLocals enabled.
+  // const [ownerId, setOwnerId] = useState<string | null>(null);
 
   // TODO: will be updated once server sends lobby roster.
   // For now, single-player lobby always behaves like host.
@@ -153,5 +156,3 @@ export default function LobbyPage() {
     </div>
   );
 }
-
-

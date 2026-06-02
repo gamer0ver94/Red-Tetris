@@ -15,16 +15,19 @@ export default function HomePage() {
     const [gameMode, setGameMode] = useState("classic")
     const dispatch = useAppDispatch();
     const [error, setError] = useState("");
-    async function registerPlayerAndGo(route: string) {
-        const data = await fetchData("http://localhost:1800/auth/register", {
-            username: username,
-        }, "POST");
-        if (data?.username) {
-            dispatch(setUsername(data.username));
-            if (data.csrf_token) dispatch(setCsrfToken(data.csrf_token));
-            goTo(route);
-        }
-    }
+
+    // Temporarily commented out to keep the client build passing.
+    // This helper is currently unused, and tsconfig has noUnusedLocals enabled.
+    // async function registerPlayerAndGo(route: string) {
+    //     const data = await fetchData("http://localhost:1800/auth/register", {
+    //         username: username,
+    //     }, "POST");
+    //     if (data?.username) {
+    //         dispatch(setUsername(data.username));
+    //         if (data.csrf_token) dispatch(setCsrfToken(data.csrf_token));
+    //         goTo(route);
+    //     }
+    // }
 
     async function createLobbyAndGo() {
         setError("");
@@ -159,4 +162,3 @@ export default function HomePage() {
         </div>
     )
 }
-
