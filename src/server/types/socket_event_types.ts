@@ -1,5 +1,6 @@
 import type { Server, Socket } from 'socket.io';
 import type {GameStatus, PlayerStatus} from './status_types.ts'
+import type { RenderPayload } from './render_types.js';
 
 export type LobbyAction = 'join' | 'start' | 'leave';
 
@@ -17,10 +18,35 @@ export type LobbyStartData = {
     status:GameStatus
 }
 
+export type moveAction = 'left' | 'right' | 'rotate';
+
+export type dropAction = 'regular' | 'soft' | 'hard';
+
+export type pressType = 'release'|'press';
+
+export type ActionEventName = 
+|`${moveAction}:${pressType}`
+|`${dropAction}:${pressType}`
+
+
 export interface ClientToServerEvents {
-    'lobby:join': (data?:{ game_id:string}) => void;
+    'lobby:join': (p?:{ game_id:string}) => void;
     'lobby:start': () => void;
     'lobby:leave': () => void;
+
+    //Game actions
+    'game:left:press':() => void;
+    'game:left:release':() => void;
+    'game:right:press':() => void;
+    'game:right:release':() => void;
+    'game:rotate:press':() => void;
+    'game:rotate:release':() => void;
+    'game:soft:press':() => void;
+    'game:soft:release':() => void;
+    'game:hard:press':() => void;
+    'game:hard:release':() => void;
+    'game:rotate':() => void;
+    'game:hold':() => void;
 }
 
 export interface ServerToClientEvents{
@@ -29,12 +55,17 @@ export interface ServerToClientEvents{
     'lobby:join:update': (p: {message:string}) => void;
 
     'lobby:start:error': (p: {reason:string}) => void;
-    'lobby:start:success': (p: {data: {game_id:string; type:string; mode:string, status:'started'}}) => void;
+    'lobby:start:success': () => void;
 
     'lobby:leave:error': (p: {reason:string}) => void;
     'lobby:leave:success': () => void;
     'lobby:leave:update': (p: {message:string}) => void;
     'lobby:new_owner': () => void;
+
+    'game:render': (p: RenderPayload) => void;
+    'game:win': () => void;
+    'game:lose': () => void;
+    'game:error': (p: {reason: string}) => void;
 
     'player_status:change': (p: {new_status: PlayerStatus}) => void;
     'game_status:change': (p: {new_status: GameStatus}) => void;
@@ -47,17 +78,16 @@ export interface SocketData {
   game_id?: string;
 }
 
+
 export type TypedIoServer = Server<
   ClientToServerEvents,
   ServerToClientEvents,
-//   InterServerEvents,
   SocketData
 >;
 
 export type TypedSocket = Socket<
   ClientToServerEvents,
   ServerToClientEvents,
-//   InterServerEvents,
   SocketData
 >;
 
@@ -72,10 +102,8 @@ export type SessionResumePayload = {
     game:null | {
         game_id: string;
         owner_id: string;
-        game_type: string;
-        game_mode: string;
         game_status: GameStatus;
         players_ids: string[];
     };
-    render_state: null | unknown;
+    render_state: null | RenderPayload;
 }

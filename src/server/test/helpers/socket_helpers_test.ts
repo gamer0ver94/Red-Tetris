@@ -57,6 +57,32 @@ export async function register_socket_client(
     return socket as TestSocketClient;
 }
 
+export async function register_ready_socket_client(
+  base_url: string,
+  user: TestAuthUser,
+  opts?: { csrf_token?: string; cookie?: string; timeout_ms?: number },
+): Promise<{ socket: TestSocketClient; resume: ServerEventPayload<'session:resume'> }> {
+  const socket = ioClient(base_url, {
+    transports: ['websocket'],
+    reconnection: false,
+    forceNew: true,
+    autoConnect: false,
+    auth: { csrf_token: opts?.csrf_token ?? user.csrf_token },
+    extraHeaders: { cookie: opts?.cookie ?? user.cookie },
+  }) as TestSocketClient;
+
+  const resumePromise = receive_socket_as(socket, 'session:resume', opts?.timeout_ms ?? 1500);
+  socket.connect();
+
+  try {
+    const resume = await resumePromise;
+    return { socket, resume };
+  } catch (error) {
+    close_socket_client(socket);
+    throw error;
+  }
+}
+
 export function send_socket_as<E extends keyof ClientToServerEvents>(
     socket: TestSocketClient,
     event: E,

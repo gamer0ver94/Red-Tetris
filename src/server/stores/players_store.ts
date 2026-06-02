@@ -1,4 +1,5 @@
 import { Player } from '../models/player_model.ts'
+import { CodeType, ModelResult } from '../types/error_code_types.ts';
 import { PlayerStatus } from '../types/status_types.ts';
 
 
@@ -15,57 +16,55 @@ export class PlayerStore{
     }
     
     // GETTERS
-    public async get_all_u_names(): Promise<Set<string>>{
+    public get_all_u_names(): string[]{
         
-        const u_names = new Set<string>;
-        for(const player of this.sid_to_player_map.values()){
-            u_names.add(player.get_username());
-        }
-
-        return u_names;
+        return [... this.u_name_to_sid_map.keys()]
     }
 
-    public async get_all_ids(): Promise<Set<string>>{
+    public get_all_ids(): string[]{
         
-        const ids = new Set<string>;
-        for (const player of this.sid_to_player_map.values()){
-            ids.add(player.get_player_id())
-        }
-        return ids;
+        return [... this.sid_to_player_map.values()].map((player) => player.get_player_id());
     }
 
-    public async get_player_by_socket_id(socket_id: string): Promise<Player | undefined>{
+    public get_player_by_socket_id(socket_id: string): ModelResult<Player, CodeType>{
         const sid = this.socket_id_to_sid_map.get(socket_id);
-        const player = this.sid_to_player_map.get(sid!);
-        return (player)
+        if(!sid)
+            return{success:false, code:'PLAYER_NOT_FOUND'};
+        return this.get_player_by_sid(sid);
     }
 
-    public async get_player_by_username(username:string): Promise<Player | undefined>{
+    public get_player_by_username(username:string): ModelResult<Player, CodeType>{
         const sid = this.u_name_to_sid_map.get(username);
-        const player = this.sid_to_player_map.get(sid!);
-        return (player)
+        if(!sid)
+            return {success:false, code:'PLAYER_NOT_FOUND'}
+        return this.get_player_by_sid(sid);
     }
 
-    public async get_player_by_sid(sid:string):Promise<Player | undefined>{
-        return(this.sid_to_player_map.get(sid))
+    public get_player_by_sid(sid:string):ModelResult<Player, CodeType>{
+        
+        const player = this.sid_to_player_map.get(sid);
+        if(!player)
+            return {success:false, code:'PLAYER_NOT_FOUND'};
+        return{success:true, data:player}
     }
 
-    public async get_player_by_id(player_id:string):Promise<Player | undefined>{
+    public get_player_by_id(player_id:string):ModelResult<Player, CodeType>{
         
         for(const val of this.sid_to_player_map.values()){
             if(val.get_player_id() == player_id)
-                return val;
+                return {success:true, data:val};
         }
-        return undefined;
+        return {success:false, code:'PLAYER_NOT_FOUND'};
     }
 
     // SETTERS
-    public async set_socket_by_sid(sid:string, socket_id:string) : Promise<string>{
+    public set_socket_by_sid(sid:string, socket_id:string) : ModelResult<null, CodeType>{
         
-        const player = await this.get_player_by_sid(sid);
-        if(!player)
-            return 'Unknown sid';
+        const player_res = this.get_player_by_sid(sid);
+        if(!player_res.success)
+            return player_res;
         
+        const player = player_res.data;
         //remove old socket from map
         this.socket_id_to_sid_map.delete(player.get_socket());
         
@@ -73,54 +72,47 @@ export class PlayerStore{
 
         //set new socket to map
         this.socket_id_to_sid_map.set(player.get_socket(), sid);
-        return 'success';
+        return {success:true, data:null};
     }
 
-    public async set_player_status_by_sid(sid:string, player_status:PlayerStatus) : Promise<string>{
-        const player = await this.get_player_by_sid(sid);
-        if(!player) return 'Unknown sid';
-        player.set_player_status(player_status);
-        return 'success';
+    public set_player_status_by_sid(sid:string, player_status:PlayerStatus) : ModelResult<null, CodeType>{
+        const player = this.get_player_by_sid(sid);
+        if(!player.success) return player;
+        player.data.set_player_status(player_status);
+        return {success:true, data:null};
     }
 
     // METHODS
 
     // add a player in memory , returns 'success'| 'reason...'
-    public async add_player(player: Player) : Promise<string> {
+    public add_player(player: Player) : ModelResult<null, CodeType> {
         
         const sid = player.get_sid();
-        const u_name_list = await this.get_all_u_names()
         const username = player.get_username();
         
-        if( this.sid_to_player_map.has(sid)){
-            return 'You are already logged in'
-        }
+        if( this.sid_to_player_map.has(sid))
+            return {success:false, code:'PLAYER_EXIST'}
 
-        if (u_name_list.has(username)){
-            return 'Username taken, please choose another one'
-        }
+        if (this.u_name_to_sid_map.has(username))
+            return {success:false, code:'USERNAME_TAKEN'}
 
-        try{
             this.sid_to_player_map.set(sid, player);
             this.socket_id_to_sid_map.set(player.get_socket(), sid);
             this.u_name_to_sid_map.set(player.get_username(), sid);
-        }
-        catch (error){
-            return error instanceof Error? error.message : 'Unknow Error'
-        }
-        return 'success'
+
+        return {success:true, data:null};
     }
 
     //remove user and all related data
-    public async remove_player(player:Player):Promise<string>{
+    public remove_player(player:Player):ModelResult<null, CodeType>{
         
         const sid = player.get_sid();
         const existing = this.sid_to_player_map.get(sid);
         if (!existing)
-            return 'Unknown sid';
+            return {success:false, code:'SID_NOT_FOUND'};
         this.sid_to_player_map.delete(sid);
         this.u_name_to_sid_map.delete(existing.get_username());
         this.socket_id_to_sid_map.delete(existing.get_socket());
-        return 'success';
+        return {success:true, data:null};
     } 
 }

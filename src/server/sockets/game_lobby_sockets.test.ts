@@ -6,7 +6,7 @@ import { inject_as, register_user, unique_username } from '../test/helpers/auth_
 import {
   close_socket_client,
   receive_socket_as,
-  register_socket_client,
+  register_ready_socket_client,
   send_socket_as,
   start_socket_server,
   close_socket_server
@@ -56,7 +56,7 @@ describe('socket_game_lobby', () => {
     
     it('returns error when game_id is missing', async() => {
       const user = await register_user(app, unique_username('join_missing_gid'));
-      const socket = await register_socket_client(baseUrl, user);
+      const { socket } = await register_ready_socket_client(baseUrl, user);
       try {
         const p = receive_socket_as(socket, 'lobby:join:error');
         send_socket_as(socket, 'lobby:join');
@@ -70,7 +70,7 @@ describe('socket_game_lobby', () => {
 
     it('returns error when game does not exist', async() => {
       const user = await register_user(app, unique_username('join_missing_gid'));
-      const socket = await register_socket_client(baseUrl, user);
+      const { socket } = await register_ready_socket_client(baseUrl, user);
       try {
         const p = receive_socket_as(socket, 'lobby:join:error');
         send_socket_as(socket, 'lobby:join', {game_id:'fake_id'});
@@ -87,7 +87,7 @@ describe('socket_game_lobby', () => {
       const game_id = await createGame(app, owner, 'single_player');
 
       const user = await register_user(app, unique_username('join_single_player'));
-      const socket = await register_socket_client(baseUrl, user);
+      const { socket } = await register_ready_socket_client(baseUrl, user);
 
       try {
         const p = receive_socket_as(socket, 'lobby:join:error');
@@ -102,7 +102,7 @@ describe('socket_game_lobby', () => {
     it('returns error when player is already in the game', async() => {
       const user = await register_user(app, unique_username('join_twice'));
       const game_id = await createGame(app, user, 'multi_player');
-      const socket = await register_socket_client(baseUrl, user);
+      const { socket } = await register_ready_socket_client(baseUrl, user);
 
       try {
         const p = receive_socket_as(socket, 'lobby:join:error');
@@ -120,8 +120,8 @@ describe('socket_game_lobby', () => {
 
       const second = await register_user(app, unique_username('full_second'));
       const third = await register_user(app, unique_username('full_third'));
-      const secondSocket = await register_socket_client(baseUrl, second);
-      const thirdSocket = await register_socket_client(baseUrl, third);
+      const {socket:secondSocket} = await register_ready_socket_client(baseUrl, second);
+      const {socket:thirdSocket} = await register_ready_socket_client(baseUrl, third);
 
       try {
         await joinGame(secondSocket, game_id);
@@ -141,7 +141,7 @@ describe('socket_game_lobby', () => {
       const game_id = await createGame(app, owner, 'multi_player');
 
       const joiner = await register_user(app, unique_username('join_ok_user'));
-      const socket = await register_socket_client(baseUrl, joiner);
+      const  { socket } = await register_ready_socket_client(baseUrl, joiner);
 
       try {
         await joinGame(socket, game_id);
@@ -158,7 +158,7 @@ describe('socket_game_lobby', () => {
     
     it('returns error when user is not in a game', async() => {
       const user = await register_user(app, unique_username('start_no_game'));
-      const socket = await register_socket_client(baseUrl, user);
+      const { socket } = await register_ready_socket_client(baseUrl, user);
 
       try {
         const p = receive_socket_as(socket, 'lobby:start:error');
@@ -175,7 +175,7 @@ describe('socket_game_lobby', () => {
       const game_id = await createGame(app, owner, 'multi_player');
 
       const joiner = await register_user(app, unique_username('start_not_owner'));
-      const socket = await register_socket_client(baseUrl, joiner);
+      const { socket } = await register_ready_socket_client(baseUrl, joiner);
 
       try {
         await joinGame(socket, game_id);
@@ -191,7 +191,7 @@ describe('socket_game_lobby', () => {
     it('succeeds for owner in single_player', async() => {
       const owner = await register_user(app, unique_username('start_single_owner'));
       const game_id = await createGame(app, owner, 'single_player');
-      const socket = await register_socket_client(baseUrl, owner);
+      const { socket } = await register_ready_socket_client(baseUrl, owner);
 
       try {
         const p = receive_socket_as(socket, 'lobby:start:success');
@@ -212,8 +212,8 @@ describe('socket_game_lobby', () => {
       const game_id = await createGame(app, owner, 'multi_player');
 
       const joiner = await register_user(app, unique_username('start_multi_joiner'));
-      const ownerSocket = await register_socket_client(baseUrl, owner);
-      const joinerSocket = await register_socket_client(baseUrl, joiner);
+      const { socket: ownerSocket } = await register_ready_socket_client(baseUrl, owner);
+      const { socket: joinerSocket } = await register_ready_socket_client(baseUrl, joiner);
 
       try {
         await joinGame(joinerSocket, game_id);
@@ -242,7 +242,7 @@ describe('socket_game_lobby', () => {
 
     it('returns error when user is not in a game', async() => {
       const user = await register_user(app, unique_username('leave_no_game'));
-      const socket = await register_socket_client(baseUrl, user);
+      const { socket } = await register_ready_socket_client(baseUrl, user);
 
       try {
         const p = receive_socket_as(socket, 'lobby:leave:error');
@@ -257,7 +257,7 @@ describe('socket_game_lobby', () => {
     it('deletes single-player game when owner leaves', async() => {
       const owner = await register_user(app, unique_username('leave_single_owner'));
       const game_id = await createGame(app, owner, 'single_player');
-      const socket = await register_socket_client(baseUrl, owner);
+      const { socket } = await register_ready_socket_client(baseUrl, owner);
 
       try {
         const p = receive_socket_as(socket, 'lobby:leave:success');
@@ -274,7 +274,7 @@ describe('socket_game_lobby', () => {
     it('deletes multi-player game when empty', async() => {
       const owner = await register_user(app, unique_username('leave_multi_empty_owner'));
       const game_id = await createGame(app, owner, 'multi_player');
-      const socket = await register_socket_client(baseUrl, owner);
+      const { socket } = await register_ready_socket_client(baseUrl, owner);
 
       try {
         const p = receive_socket_as(socket, 'lobby:leave:success');
@@ -293,8 +293,8 @@ describe('socket_game_lobby', () => {
       const game_id = await createGame(app, owner, 'multi_player');
 
       const joiner = await register_user(app, unique_username('leave_non_owner_joiner'));
-      const ownerSocket = await register_socket_client(baseUrl, owner);
-      const joinerSocket = await register_socket_client(baseUrl, joiner);
+      const { socket:ownerSocket }= await register_ready_socket_client(baseUrl, owner);
+      const { socket:joinerSocket } = await register_ready_socket_client(baseUrl, joiner);
 
       try {
         await joinGame(joinerSocket, game_id);
@@ -324,9 +324,9 @@ describe('socket_game_lobby', () => {
       const owner = await register_user(app, unique_username('leave_owner_transfer_owner'));
       const game_id = await createGame(app, owner, 'multi_player');
 
-      const nextOwner = await register_user(app, unique_username('leave_owner_transfer_next'));
-      const ownerSocket = await register_socket_client(baseUrl, owner);
-      const nextOwnerSocket = await register_socket_client(baseUrl, nextOwner);
+      const  nextOwner = await register_user(app, unique_username('leave_owner_transfer_next'));
+      const { socket:ownerSocket } = await register_ready_socket_client(baseUrl, owner);
+      const { socket:nextOwnerSocket } = await register_ready_socket_client(baseUrl, nextOwner);
 
       try {
         await joinGame(nextOwnerSocket, game_id);

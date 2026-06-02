@@ -79,3 +79,5 @@ test-server-watch:
 test-server-coverage:
 	docker compose run --rm server sh -lc "npm run test:coverage"
 
+tetris:
+	bash ./tetris-cli.sh

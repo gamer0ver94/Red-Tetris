@@ -4,6 +4,7 @@ import type { PlayerStore } from '../stores/players_store.ts';
 import type { Store } from '../stores/store.ts';
 import * as auth_services from '../services/auth_services.ts';
 import {socket_game_lobby} from '../sockets/game_lobby_sockets.ts'
+import { socket_game_core } from '../sockets/game_core_sockets.ts';
 import * as helpers from '../sockets/misc_sockets.ts'
 import { playerStatusType, gameStatusType, PlayerStatus } from '../types/status_types.ts';
 import type { TypedIoServer, SessionResumePayload, TypedSocket } from '../types/socket_event_types.ts';
@@ -43,6 +44,16 @@ function socket_connection(io: TypedIoServer, store: Store) {
       return;
     }
 
+
+    socket.onAny((event, ...args) => {
+      console.log('[socket incoming]', {
+        event,
+        args,
+        socket_id: socket.id,
+        sid,
+      });
+    });
+
     // Mark this socket as the currently active one immediately.
     active_socket_ids.set(sid, socket.id);
 
@@ -61,12 +72,13 @@ async function initialize_socket_connection(
   store: Store,
 ) {
   const player_store = store.get_player_store();
-  const player = await player_store.get_player_by_sid(sid);
+  const player_res = player_store.get_player_by_sid(sid);
 
-  if (!player) {
+  if (!player_res.success) {
     disconnect_socket(socket, sid);
     return;
   }
+  const player = player_res.data;
 
   const reconnected = is_pending_socket(player.get_socket());
   clear_reconnect_timer(sid);
@@ -77,7 +89,7 @@ async function initialize_socket_connection(
     return;
   }
 
-  await player_store.set_socket_by_sid(sid, socket.id);
+  player_store.set_socket_by_sid(sid, socket.id);
 
   if (active_socket_ids.get(sid) !== socket.id) {
     socket.disconnect(true);
@@ -95,7 +107,7 @@ async function initialize_socket_connection(
     return;
   }
 
-  await player_store.set_player_status_by_sid(sid, restore_status);
+  player_store.set_player_status_by_sid(sid, restore_status);
 
   const resume = await build_session_resume_payload(sid, store, reconnected);
   if (resume && active_socket_ids.get(sid) === socket.id) {
@@ -103,6 +115,7 @@ async function initialize_socket_connection(
   }
 
   socket_game_lobby(io, socket, sid, store);
+  socket_game_core(socket, sid, store)
 }
 
 function socket_middleware(io: TypedIoServer, player_store:PlayerStore, decodeSecureSession:DecodeSecureSession){
@@ -125,10 +138,14 @@ function socket_middleware(io: TypedIoServer, player_store:PlayerStore, decodeSe
       if(!sid) return next (new Error('invalid session'));
 
       //call next only if all is legit
-      const ok = await auth_services.find_me(sid.toString(), player_store);
-      if (! ok.is_known || ok.csrf_token !== csrf_token) // === false
+      const ok_res = auth_services.find_me(sid.toString(), player_store);
+      if (
+        !ok_res.success ||
+        !ok_res.data.is_known ||
+        ok_res.data.csrf_token !== csrf_token
+      )
         return next(new Error('forbidden'));
-      socket.data.sid = sid;
+      socket.data.sid = sid.toString();
       next();
   }
   catch{
@@ -138,9 +155,11 @@ function socket_middleware(io: TypedIoServer, player_store:PlayerStore, decodeSe
 }
 
 async function socket_disconnect(io: TypedIoServer, sid:string, store:Store, socket_id:string){
-    const player = await store.get_player_store().get_player_by_sid(sid);
-    if (!player)
+    const player_res = store.get_player_store().get_player_by_sid(sid);
+    if (!player_res.success)
         return;
+    const player = player_res.data;
+
     if(player.get_socket() !== socket_id)
         return;
 
@@ -148,17 +167,23 @@ async function socket_disconnect(io: TypedIoServer, sid:string, store:Store, soc
 
     const marker = `pending_disconnect:${Date.now()}`;
     await helpers.change_player_status(io, playerStatusType.disconnected, sid, store.get_player_store());
-    await store.get_player_store().set_socket_by_sid(sid, marker);
+    store.get_player_store().set_socket_by_sid(sid, marker);
     reconnect_timers.set(sid, setTimeout(async () => {
         reconnect_timers.delete(sid);
 
-        const current = await store.get_player_store().get_player_by_sid(sid);
-        if (!current)
+        const current_res = store.get_player_store().get_player_by_sid(sid);
+        if (!current_res.success)
             return;
+        const current = current_res.data;
+
         if(current.get_socket() !== marker)
             return;
-        await auth_services.logout(sid, store, io);
-    }, 30000));
+
+        if (active_socket_ids.get(sid) === socket_id)
+            active_socket_ids.delete(sid);
+
+        auth_services.logout(sid, store, true);
+    }, 5000));
 }
 
 function read_cookie(cookieHeader, name:string){
@@ -184,15 +209,19 @@ function is_pending_socket(socket_id:string){
 }
 
 async function resolve_player_status(sid:string, store:Store):Promise< PlayerStatus| null>{
-    const player = await store.get_player_store().get_player_by_sid(sid);
-    if (!player)
+    const player_res = store.get_player_store().get_player_by_sid(sid);
+    if (!player_res.success)
         return null;
-    const game = await store.get_game_store().get_game_by_player_id(player.get_player_id());
-    if(!game)
+
+    const player = player_res.data;
+    const lobby_res = store.get_lobby_store().get_lobby_by_player_id(player.get_player_id());
+    if(!lobby_res.success)
         return playerStatusType.connected;
-    if(game.get_game_status() === gameStatusType.waiting)
+
+    const lobby = lobby_res.data;
+    if(lobby.get_game_status() === gameStatusType.waiting)
         return playerStatusType.waiting;
-    if(game.get_game_status() === gameStatusType.started)
+    if(lobby.get_game_status() === gameStatusType.started)
         return playerStatusType.playing;
     return playerStatusType.connected;
 }
@@ -202,10 +231,14 @@ async function build_session_resume_payload(
     store:Store,
     reconnected: boolean
 ): Promise<SessionResumePayload | null>{
-    const player = await store.get_player_store().get_player_by_sid(sid);
-    if (!player)
+    const player_res = store.get_player_store().get_player_by_sid(sid);
+    if (!player_res.success)
         return null;
-    const game = await store.get_game_store().get_game_by_player_id(player.get_player_id());
+
+    const player = player_res.data;
+    const lobby_res = store.get_lobby_store().get_lobby_by_player_id(player.get_player_id());
+    const lobby = lobby_res.success ? lobby_res.data : null;
+
     return {
         reconnected,
         player:{
@@ -214,14 +247,12 @@ async function build_session_resume_payload(
             player_status: await resolve_player_status(sid, store) || playerStatusType.connected,
             csrf_token: player.get_csrf_token(),
         },
-        game: game
+        game: lobby
         ?{
-            game_id: game.get_game_id(),
-            owner_id: game.get_owner_id(),
-            game_type: game.get_game_type(),
-            game_mode: game.get_game_mode(),
-            game_status: game.get_game_status(),
-            players_ids: [... game.get_player_ids()],
+            game_id: lobby.get_lobby_id(),
+            owner_id: lobby.get_owner_id(),
+            game_status: lobby.get_game_status(),
+            players_ids: lobby.get_player_ids(),
         }:null,
         render_state: null,
     };

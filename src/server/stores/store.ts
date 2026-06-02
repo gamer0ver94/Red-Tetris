@@ -1,50 +1,96 @@
-import { Player } from "../models/player_model.ts";
-import { Game } from "../models/game_model.ts";
 import { PlayerStore } from "./players_store.ts";
-import { GameStore } from "./games_store.ts";
+import { LobbyStore } from "./lobby_store.ts";
+import { ActiveGameStore } from "./active_game_store.ts";
+import { ModelResult, type CodeType } from "../types/error_code_types.ts";
+import { Board } from "../models/board_model.js";
+import { PlayerInGame } from "../models/player_in_game_model.js";
 
 
 export class Store{
 
-    private game: GameStore;
+    private lobby: LobbyStore;
+    private active_game: ActiveGameStore;
     private players: PlayerStore;
 
-    constructor(game:GameStore, players:PlayerStore){
-        this.game = game;
-        this.players = players;
+    constructor(){
+        this.players = new PlayerStore();
+        this.lobby = new LobbyStore();
+        this.active_game = new ActiveGameStore();
     }
 
-    public get_game_store() {
-        return this.game
-    }
+
 
     public get_player_store(){
-        return this.players
+        return this.players;
     }
 
-    public async get_all_sid_by_game_id(game_id:string){
-        
-        const game = await this.game.get_game_by_id(game_id)
-        const ids = game!.get_player_ids();
-        const sids = new Set<string>();
-        for (const id of ids){
-            const player = await this.players.get_player_by_id(id)
-            if(player)
-                sids.add(player.get_sid());
-        }
-        return sids
+    public get_active_game_store(){
+        return this.active_game;
     }
 
-    public async get_all_sockets_by_game_id(game_id:string){
+    public get_lobby_store(){
+        return this.lobby;
+    }
 
-        const game = await this.game.get_game_by_id(game_id);
-        const ids = game!.get_player_ids();
-        const socket_ids = new Set<string>;
-        for(const id of ids){
-            const player = await this.players.get_player_by_id(id);
-            if (player)
-                socket_ids.add(player.get_socket());
+
+    public get_all_sockets_by_lobby_id(lobby_id:string):ModelResult<string[], CodeType>{
+
+        const lobby_res = this.lobby.get_lobby_by_id(lobby_id);
+        if(!lobby_res.success)
+            return lobby_res
+
+        let socket_ids:string[] = [];
+        for(const player_id of lobby_res.data.get_player_ids()){
+            const player_res = this.players.get_player_by_id(player_id);
+            if (player_res.success)
+                socket_ids.push(player_res.data.get_socket());
         }
-        return socket_ids;
+        return {success:true, data:socket_ids};
+    }
+
+    public get_all_sids_by_lobby_id(lobby_id:string):ModelResult<string[], CodeType>{
+
+        const lobby_res = this.lobby.get_lobby_by_id(lobby_id);
+        if(!lobby_res.success)
+            return lobby_res;
+
+        let sids:string[] = [];
+        for(const player_id of lobby_res.data.get_player_ids()){
+            const p_res = this.players.get_player_by_id(player_id);
+            if(p_res.success)
+                sids.push(p_res.data.get_sid());
+        }
+        return {success:true, data:sids};
+    }
+
+    public get_board_by_sid(sid:string):ModelResult<Board, CodeType>{
+
+        const player_res = this.players.get_player_by_sid(sid);
+        if(!player_res.success)
+            return player_res;
+
+        const active_game_res = this.active_game.get_active_game_by_player_id(player_res.data.get_player_id());
+        if(!active_game_res.success)
+            return active_game_res;
+
+        const player_in_game_res = active_game_res.data.get_player(player_res.data.get_player_id());
+        if(!player_in_game_res.success)
+            return player_in_game_res;
+
+        return {success:true, data:player_in_game_res.data.get_board()};
+    }
+
+    public get_player_in_game_by_sid(sid:string):ModelResult<PlayerInGame, CodeType>{
+
+        const p_res = this.players.get_player_by_sid(sid);
+        if(!p_res.success)
+            return p_res;
+
+        const active_game_res = this.active_game.get_active_game_by_player_id(p_res.data.get_player_id());
+        if(!active_game_res.success)
+            return active_game_res;
+
+        const player_res = active_game_res.data.get_player(p_res.data.get_player_id());
+        return player_res;
     }
 }

@@ -25,16 +25,16 @@ services:
       context: ./src/server
       dockerfile: Dockerfile.docs
     volumes:
-      - asyncapi_site:/out
+      - ./src/server/docs/asyncapi_site:/out
   
-  client:
-    build:
-      context: ./src/client
-      dockerfile: Dockerfile
-    container_name: red_tetris_client
+  # client:
+  #   build:
+  #     context: ./src/client
+  #     dockerfile: Dockerfile
+  #   container_name: red_tetris_client
 
-    ports:
-      - "1700:80"
+  #   ports:
+  #     - "1700:80"
 volumes:
   server_node_modules: {}
   asyncapi_site: {}

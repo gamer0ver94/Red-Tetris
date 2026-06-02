@@ -10,10 +10,9 @@ import { existsSync } from 'node:fs';
 
 import { register_routes } from './register_routes.ts';
 import { register_sockets } from './register_sockets.ts';
-import { PlayerStore } from '../stores/players_store.ts';
-import { GameStore } from '../stores/games_store.ts';
 import { Store } from '../stores/store.ts';
-
+import { AppError} from '../models/app_error_model.js';
+import { codeType } from '../types/error_code_types.js';
 
 //Bootstrap for server
 export const build_server = async () => {
@@ -26,6 +25,9 @@ export const build_server = async () => {
 
   //Cache memory init
   await init_cache_memory(fastify);
+
+  //Errors Handling
+  await init_error_handler(fastify);
 
   //Swagger init for clear API docs
   await init_swagger(fastify);
@@ -72,12 +74,7 @@ async function init_cors_and_cookies(fastify: FastifyInstance, clientOrigin: str
 
 async function init_cache_memory(fastify: FastifyInstance){
   
-  //User data
-  const player_store = new PlayerStore();
-  //Game data
-  const game_store = new GameStore();
-
-  const store = new Store(game_store, player_store);
+  const store = new Store();
   fastify.decorate('store', store)
 
 }
@@ -140,4 +137,26 @@ export async function init_async_api(fastify: FastifyInstance) :
   }
 
   return {root, prefix, registered:true};
+}
+
+async function init_error_handler(fastify:FastifyInstance){
+
+  fastify.setErrorHandler((error, request, reply) => {
+    
+    if(error instanceof AppError){
+      return reply.code(error.status_code).send({
+        success:false,
+        code:error.code,
+        message:error.message,
+        details:error.details
+      });
+    }
+    request.log.error(error);
+    return reply.code(500).send({
+      success:false,
+      code:'INTERNAL_ERROR',
+      message:codeType.INTERNAL_ERROR
+    });
+
+  });
 }
