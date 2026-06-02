@@ -25,9 +25,8 @@ export function build_render_payload(active_game:ActiveGame, player_id:string, s
     if(next_pieces_res.success)
        next_piece_types = next_pieces_res.data
 
-    const opts = active_game.get_game_opts();
 
-    const show_grid = !opts.grid.invisible || self_res.data.is_grid_visible();
+    const show_grid = !active_game.get_config().is_invisible() || self_res.data.is_grid_visible();
     
     const render_board = show_grid ? build_visible_board(self_board, false) : build_empty_board(self_board);
     
@@ -86,7 +85,7 @@ function build_opponent_payload(
     store: Store,
 ): Record<string, OpponentRender> {
 
-    const mode = active_game.get_game_opts().multiplayer.seeOpponents;
+    const mode = active_game.get_config().get_oppenent_grid_mode();
 
     const opponent_render: Record<string, OpponentRender> = {};
 

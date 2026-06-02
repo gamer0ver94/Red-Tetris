@@ -4,6 +4,8 @@ export const CLASSIC_OPTS:GameOptions = {
     grid:{
         width: 10 ,
         height: 20,
+        invisible:false,
+        revealOnClearMs:0
     },
     pieces:{
         randomSequence:true,
@@ -44,24 +46,26 @@ export const HARD_OPTS:GameOptions = {
     grid:{
         width: 20,
         height: 30,
+        invisible:true,
+        revealOnClearMs:100,
     },
     pieces:{
         randomSequence:true,
         sharedSequence:false,
-        allowHold:true,
-        nextPreviewCount:0,
-        invisiblePiece:true,
+        allowHold:false,
+        nextPreviewCount:1,
     },
     gravity:{
         tickMs:600,
-        speedIncrease:true,
         lockDelayMs:50,
         softDropMultiplier:0.4,
+        fallAfterClear:false,
     },
     garbage:{
         enabled:true,
-        initialRows:1,
-        garbagePerClear:true,
+        ratio:1,
+        canClear:false,
+        clearCreateGarbage:false,
     },
     scoring:{
         enabled:true,
@@ -83,24 +87,26 @@ export const EASY_OPTS:GameOptions={
     grid:{
         width:10,
         height:20,
+        invisible:false,
+        revealOnClearMs:0,
     },
     pieces:{
         randomSequence:false,
         sharedSequence:true,
         allowHold:true,
         nextPreviewCount:7,
-        invisiblePiece:false,
     },
     gravity:{
         tickMs:900,
-        speedIncrease:false,
         lockDelayMs:150,
         softDropMultiplier:0.3,
+        fallAfterClear:true,
     },
     garbage:{
-        enabled:false,
-        initialRows:0,
-        garbagePerClear:false,
+        enabled:true,
+        ratio:0,
+        canClear:true,
+        clearCreateGarbage:true,
     },
     scoring:{
         enabled:false,
@@ -108,7 +114,7 @@ export const EASY_OPTS:GameOptions={
         backToBackBonus:false,
     },
     win:{
-        condition:'first_lost',
+        condition:'survival',
         limit:null,
     },
     multiplayer:{
@@ -163,24 +169,26 @@ export const BATTLE_OPTS:GameOptions = {
     grid:{
         width:20,
         height: 30,
+        invisible:false,
+        revealOnClearMs:0,
     },
     pieces:{
         randomSequence:true,
         sharedSequence:false,
         allowHold:true,
         nextPreviewCount:3,
-        invisiblePiece:true,
     },
     gravity:{
         tickMs:800,
-        speedIncrease:true,
         lockDelayMs:100,
         softDropMultiplier:0.3,
+        fallAfterClear:true,
     },
     garbage:{
         enabled:true,
         ratio:1,
-        garbagePerClear:true,
+        canClear:true,
+        clearCreateGarbage:true,
     },
     scoring:{
         enabled:true,

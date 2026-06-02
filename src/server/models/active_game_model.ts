@@ -1,6 +1,7 @@
 import { Board } from "./board_model.ts";
 import { PieceType } from "../types/game_types.ts";
 import { GameOptions } from "../types/game_options_types.ts";
+import { ConfigProvider } from "./config_provider_model.js";
 import { PlayerInGame } from "./player_in_game_model.ts";
 import { PieceProvider } from "./piece_provider_model.ts";
 import { ModelResult, CodeType } from "../types/error_code_types.js";
@@ -8,7 +9,7 @@ import { ModelResult, CodeType } from "../types/error_code_types.js";
 export class ActiveGame{
     private lobby_id:string;
     private players: Map<string, PlayerInGame>;
-    private opts: GameOptions
+    private config: ConfigProvider;
     piece_provider:PieceProvider;
 
     constructor(
@@ -18,8 +19,10 @@ export class ActiveGame{
     ){
         this.lobby_id = lobby_id;
         this.players = new Map<string, PlayerInGame>;
-        this.opts = game_opts;
-        this.piece_provider = new PieceProvider(game_opts, players_ids);
+        this.config = new ConfigProvider(game_opts);
+        const random = this.config.is_random_sequence();
+        const shared = this.config.is_shared_sequence();
+        this.piece_provider = new PieceProvider(players_ids, random, shared);
 
     }
 
@@ -46,8 +49,8 @@ export class ActiveGame{
         return this.get_players().filter((player) => player.get_player_id() !== player_id);
     }
 
-    public get_game_opts(){
-        return this.opts;
+    public get_config(){
+        return this.config;
     }
 
 
@@ -84,7 +87,7 @@ export class ActiveGame{
     public peek_pieces_for_player(player_id:string):ModelResult<PieceType[], CodeType>{
         return this.piece_provider.peek_for_player(
             player_id,
-            this.opts.pieces.nextPreviewCount
+            this.config.get_preview_count()
         );
     }
 }

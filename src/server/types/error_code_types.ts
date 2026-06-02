@@ -37,6 +37,9 @@ export const codeType = {
     BOARD_NOT_FOUND:'current board not found',
     TIMER_NOT_FOUND:'timer not found',
     GAME_STATUS_UNKNOWN:'unkown game_status',
+
+    NOT_ALLOWED:'action not allowed',
+    ONLY_HOLD_ONCE:'hold is only allowed once until piece lock',
 } as const;
 export type CodeType = keyof typeof codeType;
 

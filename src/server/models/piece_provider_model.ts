@@ -1,6 +1,6 @@
 import { pieceType, PieceType } from "../types/game_types.ts";
-import { GameOptions } from "../types/game_options_types.ts";
 import { CodeType, ModelResult } from "../types/error_code_types.ts";
+
 
 
 export class PieceProvider{
@@ -14,13 +14,14 @@ export class PieceProvider{
     private player_index: Map<string, number>;
 
     constructor(
-        opts:GameOptions,
         players_ids:string[],
+        random:boolean,
+        shared:boolean
     ){
         
         this.pieces = Object.values(pieceType) as PieceType[];
-        this.random_sequence = opts.pieces.randomSequence;
-        this.shared_sequence_enabled = opts.pieces.sharedSequence;
+        this.random_sequence = random;
+        this.shared_sequence_enabled = shared;
 
         this.shared_sequence = this.create_sequence();
         this.player_sequences = new Map<string, PieceType[]>();

@@ -1,5 +1,4 @@
 import { BoardCell, BoardType } from "../types/game_types.ts";
-import { dropAction, moveAction } from "../types/socket_event_types.js";
 import { Piece } from "./piece_model.ts";
 
 export class Board {

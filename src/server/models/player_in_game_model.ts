@@ -63,7 +63,7 @@ export class PlayerInGame{
         return this.player_id;
     }
 
-    public get_hold_piece():Piece|null{
+    public get_hold_piece():PieceType|null{
         return this.hold_piece;
     }
 

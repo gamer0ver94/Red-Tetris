@@ -12,7 +12,6 @@ export type GameOptions = {
         sharedSequence:boolean;
         allowHold:boolean;
         nextPreviewCount:number;
-
     },
 
     gravity:{

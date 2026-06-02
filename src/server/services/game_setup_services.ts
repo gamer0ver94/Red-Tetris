@@ -8,6 +8,7 @@ import { Store } from '../stores/store.js';
 import { GameOptions } from '../types/game_options_types.ts';
 import { PlayerInGame } from '../models/player_in_game_model.js';
 import { CodeType, ModelResult, StartGameData } from '../types/error_code_types.js';
+import { ConfigProvider } from '../models/config_provider_model.js';
 //Prepares game when lobby is ready
 
 
@@ -22,7 +23,7 @@ export function setup_active_game(lobby:Lobby, store:Store):ModelResult<null, Co
             return {success:false, code:add_game_res.code};
 
     for (const id of ids){
-        const board_res = create_board_for_player(id, lobby, opts, store);
+        const board_res = create_board_for_player(id, lobby, active_game.get_config(), store);
         if(!board_res.success)
             return {success:false, code:board_res.code, details:{trigger_id:id}};
         const piece_res = create_piece_for_player(active_game, board_res.data!, id);
@@ -32,12 +33,12 @@ export function setup_active_game(lobby:Lobby, store:Store):ModelResult<null, Co
     return {success:true, data:null};
 }
 
-function create_board_for_player(player_id:string, lobby:Lobby, opts:GameOptions, store:Store):ModelResult<Board,CodeType>{
+function create_board_for_player(player_id:string, lobby:Lobby, config:ConfigProvider, store:Store):ModelResult<Board,CodeType>{
 
     if(!lobby.get_player_ids().includes(player_id))
         return {success:false, code:'PLAYER_NOT_FOUND'};
-
-    const board = new Board(opts.grid.width, opts.grid.height);
+    const {width, height} = config.get_boundaries();
+    const board = new Board(width, height);
     const player_in_game = new PlayerInGame(board, player_id)
     const add_player_res = store.get_active_game_store().add_player_to_active_game(
         player_id,

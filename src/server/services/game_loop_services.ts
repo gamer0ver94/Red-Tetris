@@ -62,8 +62,8 @@ export function tick_game(active_game: ActiveGame) {
       continue;
 
     const gravity = player.get_gravity();
-    const ticks_ms = active_game.get_game_opts().gravity.tickMs;
-    const drop_multiplier = 1 + active_game.get_game_opts().gravity.softDropMultiplier;
+    const ticks_ms = active_game.get_config().get_tick_ms();
+    const drop_multiplier = 1 + active_game.get_config().get_drop_multiplier();
 
     let fall_every_ms:number;
     if(gravity.hard_drop)
