@@ -1,63 +1,43 @@
-.join-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
-  padding: 2rem;
-  gap: 2rem;
+.home-page{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    gap: 3%;
 }
 
-.join-panel {
-  background: rgba(15, 56, 15, 0.7);
-  border: 4px solid #000;
-  border-radius: 8px;
-  box-shadow: 
-    8px 8px 0 #000,
-    inset 0 0 20px rgba(48, 165, 80, 0.2);
-  padding: 3rem 2.5rem;
-  max-width: 450px;
-  width: 100%;
-  text-align: center;
+.game-mode-container{
+
 }
 
-.join-panel h2 {
-  font-family: 'Press Start 2P', cursive;
-  font-size: 14px;
-  color: #FFFF40;
-  text-shadow: 2px 2px 0 #000;
-  margin-bottom: 1.5rem;
-  letter-spacing: 2px;
+.home-container{
+    display: flex;
+    flex-direction: column;
+    gap: 50%;
 }
 
-.join-players {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 2rem;
+.game-mode-container{
+    align-self: flex-start;
 }
 
-.player-slot {
-  background: rgba(139, 172, 15, 0.3);
-  border: 3px solid #346856;
-  border-radius: 4px;
-  padding: 1.5rem;
-  text-align: center;
-  min-height: 100px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  box-shadow: 4px 4px 0 #000;
+.home-options{
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 50%;
+    height: 40%;
+    background-color: #333;
 }
 
-.player-slot.ready {
-  background: linear-gradient(145deg, #8BAC0F, #30A550);
-  box-shadow: 0 0 20px #00FF41;
+.home-button{
+    padding: 10px 20px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border-radius: 40px;
 }
 
-.join-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  flex-wrap: wrap;
+.mode{
+    align-self: flex-start;
 }

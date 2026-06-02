@@ -1,4 +1,8 @@
-.home {
-  display: flex;
-  flex-direction:column
+.register-page{
+
+}
+
+.about-container:hover{
+    animation: neonPulse 10s linear infinite;
+
 }

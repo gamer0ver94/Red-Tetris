@@ -11,6 +11,6 @@ export default function LogoutButton(){
         window.location.href = "/";
     }
     return (
-        <button onClick={Logout}>Logout</button>
+        <button className="logout-button" onClick={Logout}>Logout</button>
     )
 }

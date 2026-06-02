@@ -6,7 +6,7 @@ import { useAppDispatch } from "../hooks/reduxHooks";
 import { setUsername, setCsrfToken } from "../store/userSlice";
 import { fetchData } from "./fetch/fetch";
 import { ROUTES } from "../Types/Routes";
-
+import "./Form.css";
 export default function Form() {
   const goTo = useNavigate();
   const dispatch = useAppDispatch();
@@ -27,16 +27,17 @@ export default function Form() {
   }
 
   return (
-    <div>
+    <div className="form-container neon">
       <h1>Username:</h1>
       <input
+        className="register-input"
         type="text"
         placeholder="Username"
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />
 
-      <button onClick={confirm}>Confirm</button>
+      <button className="button-register" onClick={confirm}>Confirm</button>
     </div>
   );
 }

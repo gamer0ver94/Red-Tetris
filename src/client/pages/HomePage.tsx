@@ -6,6 +6,9 @@ import { setCsrfToken, setUsername } from "../store/userSlice";
 import { socket } from "../socket/socket";
 import LogoutButton from "../components/LogoutButton";
 import { ROUTES } from "../Types/Routes";
+import "./HomePage.css"
+import logo from "../assets/tetris_logo.png";
+import Logo from "../components/Logo";
 export default function HomePage() {
     const goTo = useNavigate()
     const username = useAppSelector((state) => state.user.username)
@@ -129,34 +132,29 @@ export default function HomePage() {
     }, [csrf_token]);
 
     return (
-        <div>
-            <div>
+        <div className="home-page">
+            <div className="game-mode-container neon">
                 <h1>Welcome, {username ? username : "No Player"}</h1>
-
             </div>
-            <div>
-                <h1>Mode: {gameMode}</h1>
-            </div>
-            <div>
-                <div>
+                <div className="mode neon">
+                    <h1>Mode: {gameMode}</h1>
                     <h1>Mode</h1>
                     <select value={gameMode} onChange={(e) => setGameMode(e.target.value)}>
                         <option value="classic">Classic</option>
                         <option value="hard">Bonus</option>
                     </select>
                 </div>
-
-            <div>
-                <button onClick={createLobbyAndGo}>Create</button>
-                <input
+            <Logo text = ""imagePath={logo}/>
+            <div className="home-options neon">
+                <button className="home-button" onClick={createLobbyAndGo}>Create</button>
+                <input className="home-button"
                     type="text"
                     placeholder="game_id"
                     value={gameIdInput}
                     onChange={(e) => setGameIdInput(e.target.value)}
                 />
-                <button onClick={joinLobbyAndGo}>Join</button>
+                <button className="home-button" onClick={joinLobbyAndGo}>Join</button>
                 <h1>{error}</h1>
-            </div>
             </div>
              <LogoutButton/>
         </div>
