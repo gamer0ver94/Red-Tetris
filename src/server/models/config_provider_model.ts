@@ -1,4 +1,5 @@
 import { GameOptions } from "../types/game_options_types.js";
+import { EndGameCondition } from "../types/game_types.js";
 
 export class ConfigProvider{
 
@@ -64,6 +65,14 @@ export class ConfigProvider{
 
     public get_preview_count():number{
         return this.opts.pieces.nextPreviewCount;
+    }
+
+    public get_win_condition():EndGameCondition{
+        return this.opts.win.condition;
+    }
+
+    public get_win_limit():number|null{
+        return this.opts.win.limit;
     }
 
     //MORE TO ADD ANYTIME WE NEED TO CHECK OPTS 

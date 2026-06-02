@@ -6,6 +6,7 @@ import type { SocketData, TypedIoServer, TypedSocket } from '../types/socket_eve
 import { start_game_loop } from "../services/game_loop_services.js";
 import { build_render_payload } from "../services/game_render_services.js";
 import { codeType } from "../types/error_code_types.js";
+import { change_player_status, change_game_status } from "../sockets/misc_sockets.ts";
 
 
 export async function socket_game_lobby(
@@ -70,7 +71,28 @@ async function start_lobby_event(
     for(const socket_id of socket_ids){
         await io.to(socket_id).emit('lobby:start:success');
     }
-    const loop_res = start_game_loop(game_id, store, async(game)=>{
+    const loop_res = start_game_loop(game_id, store, async(game, match_results)=>{
+        if(match_results){
+            for (const id of match_results.winners_id){
+                const player_res = store.get_player_store().get_player_by_id(id);
+                if(player_res.success){
+                    await io.to(player_res.data.get_socket()).emit('game:win');
+                    await change_player_status(io, playerStatusType.waiting, player_res.data.get_sid(), store.get_player_store());
+                }
+            }
+            for (const id of match_results.losers_id){
+                const player_res = store.get_player_store().get_player_by_id(id);
+                if(player_res.success){
+                    await io.to(player_res.data.get_socket()).emit('game:lose');
+                    await change_player_status(io, playerStatusType.waiting, player_res.data.get_sid(), store.get_player_store());
+                }
+            }
+            await change_game_status(io, gameStatusType.waiting, game_id, sids, store);
+            const active_game_res = store.get_active_game_store().get_active_game_by_lobby_id(game_id);
+            if(active_game_res.success)
+                store.get_active_game_store().delete_active_game(active_game_res.data);
+            return;
+        }
         for (const sid of sids){
             const player = store.get_player_store().get_player_by_sid(sid);
             if(!player.success)

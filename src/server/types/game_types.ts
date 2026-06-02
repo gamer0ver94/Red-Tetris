@@ -90,3 +90,5 @@ export type RotationTransition =
   | "0>3";
 
 export type KickType = [number, number];
+
+export type EndGameCondition = 'survival'|'first_lost'|'score'|'lines'|'time';

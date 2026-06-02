@@ -55,6 +55,7 @@ export function  tick_board(
                 clear = board.clear_full_rows();
             if(clear > 0 && active_game.get_config().is_invisible())
                 player.reveal_grid_for(active_game.get_config().get_reveal_on_clear_ms());
+            player.add_lines(clear);
 
         }
         return { success:true, data: clear};

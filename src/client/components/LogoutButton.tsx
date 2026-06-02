@@ -3,7 +3,7 @@ import "./LogoutButton.css";
 export default function LogoutButton(){
     const Logout = async () => {
         // Ensure logout request completes so server can clear rt.sid cookie.
-        const res = await fetchData("/auth/logout", null, "GET");
+        const res = await fetchData("http://localhost:1800/auth/logout", null, "GET");
         if (res == null) {
             window.location.href = "/";
             return;

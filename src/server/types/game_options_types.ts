@@ -1,3 +1,5 @@
+import { EndGameCondtion } from "./game_types.js";
+
 export type GameOptions = {
 
     grid:{
@@ -35,7 +37,7 @@ export type GameOptions = {
     },
 
     win:{
-        condition:'survival'|'first_lost'|'score'|'lines'|'time';
+        condition:EndGameCondtion;
         limit:number|null;
     },
 

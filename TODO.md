@@ -1,40 +1,11 @@
 # Server Game Roadmap
 
 
-## Core Socket Refactor
 
-- Keep sockets as input adapters only.
-  - Sockets may resolve `sid -> player_id -> active_game`.
-  - Sockets should not own gameplay rules.
-- Move these actions into `game_core_services.ts`:
-  - `move_left(active_game, player_id)` X
-  - `move_right(active_game, player_id)` X
-  - `rotate(active_game, player_id, direction)`
-  - `set_soft_drop(active_game, player_id, pressed)`
-  - `set_hard_drop(active_game, player_id, pressed)`
-  - `hold(active_game, player_id)` is already mostly there.
-- Replace direct board mutations in `game_core_sockets.ts` with service calls.
-- Keep DAS/ARR timers either in sockets for now or wrap them in an input-state helper.
 
 ## POUR LE FRONT
-- erase SID on logout 
-- Enlever current du render 
-- Raccoucir ID des games
+- START WITH END GAME -> make a classic first lost only and redirect to lobby
 - Rajouter option pour speedOverTime
-
-## Proper Rotation And Wall Kicks
-
-- Use `RotationProvider` for all piece shapes and SRS wall kicks.
-- Implement `rotate(active_game, player_id, direction)` in core:
-  - Get player and current piece.
-  - Compute `from` and `to` rotation.
-  - Get kicks from `RotationProvider`.
-  - Try each `[dx, dy]` with `board.can_place(piece, dx, dy, to)`.
-  - Apply first valid kick by moving piece and setting rotation.
-  - Return a `ModelResult`.
-- Add support for clockwise first.
-- Add counter-clockwise after the clockwise path is stable.
-- Decide later whether to support 180 rotation.
 
 ## Lock Delay
 

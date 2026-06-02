@@ -32,7 +32,7 @@ export const CLASSIC_OPTS:GameOptions = {
         backToBackBonus:false,
     },
     win:{
-        condition:'survival',
+        condition:'first_lost',
         limit:null,
     },
     multiplayer:{
@@ -73,7 +73,7 @@ export const HARD_OPTS:GameOptions = {
         backToBackBonus:true,
     },
     win:{
-        condition:'score',
+        condition:'first_lost',
         limit:2000,
     },
     multiplayer:{

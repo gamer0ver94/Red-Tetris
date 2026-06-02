@@ -20,7 +20,7 @@ export class PlayerInGame{
     private alive:boolean;
     private gravity_state:PlayerGravityState;
     private grid_visible_until:number|null;
-    private has_hold:boolean
+    private has_hold:boolean;
 
     constructor(
         board:Board,
@@ -113,5 +113,4 @@ export class PlayerInGame{
         this.has_hold = true;
         return tmp_piece
     }
-
 }

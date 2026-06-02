@@ -124,5 +124,22 @@ function build_visible_board(board:Board, cur_piece_visible:boolean):BoardType{
 
 function build_empty_board(board:Board):BoardType{
 
-    return board.get_board().map((row) => row.map(() => '.'));
+    const empty = board.get_board().map((row) => row.map(() => '.'));
+    const current_piece = board.get_current_piece();
+    
+    if (!current_piece)
+        return empty as BoardType;
+
+    for (const cell of current_piece.get_cells()) {
+        if (
+            cell.y >= 0 &&
+            cell.y < empty.length &&
+            cell.x >= 0 &&
+            cell.x < empty[0].length
+        ) {
+            empty[cell.y][cell.x] = cell.type;
+        }
+    }
+
+    return empty as BoardType;
 }
