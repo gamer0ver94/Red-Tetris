@@ -1,0 +1,122 @@
+:root {
+  --rt-bg: #0b1020;
+  --rt-card: rgba(15, 56, 15, 0.55);
+  --rt-border: #000;
+  --rt-accent: #ff8000;
+  --rt-accent2: #00ff41;
+}
+
+.card {
+  width: 420px;
+  max-width: calc(100vw - 2rem);
+  background: linear-gradient(145deg, rgba(48, 165, 80, 0.55), rgba(15, 56, 15, 0.55));
+  border: 4px solid var(--rt-border);
+  border-radius: 12px;
+  padding: 2rem 1.75rem;
+  box-shadow: 8px 8px 0 var(--rt-border), inset 0 0 18px rgba(139, 172, 15, 0.25);
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 6px;
+  background: linear-gradient(90deg, #FF0040, #FFFF40, #00FF41, #FF8000);
+  animation: rainbow 2s linear infinite;
+}
+
+.iconWrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.icon {
+  color: var(--rt-accent2);
+  width: 66px;
+  height: 66px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 3px solid rgba(0, 0, 0, 0.85);
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.name {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 14px;
+  color: #8BAC0F;
+  text-shadow: 2px 2px 0 #000;
+  margin-bottom: 0.75rem;
+}
+
+.meta {
+  font-size: 12px;
+  color: #bdbdbd;
+  margin-bottom: 1.75rem;
+}
+
+.readyText {
+  color: var(--rt-accent2);
+  text-shadow: 0 0 12px rgba(0, 255, 65, 0.45);
+  font-weight: 700;
+}
+
+.notReadyText {
+  color: var(--rt-accent);
+  text-shadow: 0 0 12px rgba(255, 128, 0, 0.45);
+  font-weight: 700;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.readyBtn {
+  border: 3px solid #000;
+  background: linear-gradient(145deg, #00FF41, #00b83a);
+  color: #061006;
+  font-weight: 800;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  box-shadow: 4px 4px 0 #000;
+  cursor: pointer;
+}
+
+.returnBtn {
+  border: 3px solid #000;
+  background: linear-gradient(145deg, #FF8000, #FF0040);
+  color: #1a000a;
+  font-weight: 800;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 10px;
+  padding: 12px 18px;
+  border-radius: 10px;
+  box-shadow: 4px 4px 0 #000;
+  cursor: pointer;
+}
+
+.returnBtn:hover,
+.readyBtn:hover {
+  transform: translateY(-1px);
+}
+
+@keyframes rainbow {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+

@@ -1,13 +1,15 @@
 import Logo from "../components/Logo";
 import Form from "../components/Form";
 import logo from "../assets/tetris_logo.png";
-export default function Home (){
+import "./RegisterPage.css"
+export default function RegisterPage (){
     return (
-        <div className="home">
+        <div>
             <div>
                 <Logo text = ""imagePath={logo}/>
             </div>
             <div>
+                {/* Component Form */}
                 <Form/>
             </div>
             <div>

@@ -5,6 +5,7 @@ import "./Form.css";
 import { useAppDispatch } from "../hooks/reduxHooks";
 import { setUsername, setCsrfToken } from "../store/userSlice";
 import { fetchData } from "./fetch/fetch";
+import { ROUTES } from "../Types/Routes";
 
 export default function Form() {
   const goTo = useNavigate();
@@ -21,7 +22,7 @@ export default function Form() {
     if (data.username) {
       dispatch(setUsername(data.username));
       dispatch(setCsrfToken(data.csrf_token));
-      goTo("/join");
+      goTo(ROUTES.HOME);
     }
   }
 
