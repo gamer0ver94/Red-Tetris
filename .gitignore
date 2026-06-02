@@ -5,3 +5,4 @@ build/
 coverage/
 .tmp/
 logs/
+/src/server*

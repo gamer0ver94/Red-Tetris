@@ -1,9 +1,0 @@
-FROM node:24-alpine
-
-WORKDIR /work
-
-RUN npm install -g @asyncapi/cli @asyncapi/html-template
-
-COPY docs/asyncapi.yaml ./docs/asyncapi.yaml
-
-CMD ["sh", "-lc", "rm -rf /out/* && asyncapi generate fromTemplate docs/asyncapi.yaml @asyncapi/html-template -o /out --force-write"]
