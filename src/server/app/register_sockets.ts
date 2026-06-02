@@ -97,11 +97,6 @@ async function initialize_socket_connection(
 
   await player_store.set_player_status_by_sid(sid, restore_status);
 
-//   if (active_socket_ids.get(sid) !== socket.id) {
-//     socket.disconnect(true);
-//     return;
-//   }
-
   const resume = await build_session_resume_payload(sid, store, reconnected);
   if (resume && active_socket_ids.get(sid) === socket.id) {
     socket.emit('session:resume', resume);
