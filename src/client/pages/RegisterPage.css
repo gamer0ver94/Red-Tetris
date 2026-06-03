@@ -1,8 +1,18 @@
 .register-page{
-
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
 }
 
 .about-container:hover{
     animation: neonPulse 10s linear infinite;
+}
 
+.about-container {
+    border-radius: 10px;
+    box-shadow: 
+        0 0 20px rgb(244, 244, 244),0 0 40px rgb(244, 244, 244);
+    font-size: 90%;
+    padding: 20px;
+    
 }

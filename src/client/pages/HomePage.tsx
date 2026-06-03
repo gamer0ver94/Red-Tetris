@@ -19,19 +19,6 @@ export default function HomePage() {
     const dispatch = useAppDispatch();
     const [error, setError] = useState("");
 
-    // Temporarily commented out to keep the client build passing.
-    // This helper is currently unused, and tsconfig has noUnusedLocals enabled.
-    // async function registerPlayerAndGo(route: string) {
-    //     const data = await fetchData("http://localhost:1800/auth/register", {
-    //         username: username,
-    //     }, "POST");
-    //     if (data?.username) {
-    //         dispatch(setUsername(data.username));
-    //         if (data.csrf_token) dispatch(setCsrfToken(data.csrf_token));
-    //         goTo(route);
-    //     }
-    // }
-
     async function createLobbyAndGo() {
         setError("");
         if (!csrf_token) return;
@@ -138,16 +125,15 @@ export default function HomePage() {
             </div>
                 <div className="mode neon">
                     <h1>Mode: {gameMode}</h1>
-                    <h1>Mode</h1>
                     <select value={gameMode} onChange={(e) => setGameMode(e.target.value)}>
                         <option value="classic">Classic</option>
                         <option value="hard">Bonus</option>
                     </select>
                 </div>
-            <Logo text = ""imagePath={logo}/>
+            <Logo text = "" imagePath={logo}/>
             <div className="home-options neon">
                 <button className="home-button" onClick={createLobbyAndGo}>Create</button>
-                <input className="home-button"
+                <input className="home-input"
                     type="text"
                     placeholder="game_id"
                     value={gameIdInput}
@@ -156,7 +142,9 @@ export default function HomePage() {
                 <button className="home-button" onClick={joinLobbyAndGo}>Join</button>
                 <h1>{error}</h1>
             </div>
+            <div className="logout-space">
              <LogoutButton/>
+            </div>
         </div>
     )
 }

@@ -1,4 +1,4 @@
-.home-page{
+.home-page {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -6,38 +6,109 @@
     gap: 3%;
 }
 
-.game-mode-container{
 
-}
-
-.home-container{
+.home-container {
     display: flex;
     flex-direction: column;
     gap: 50%;
 }
 
-.game-mode-container{
+.game-mode-container {
     align-self: flex-start;
+    text-align: center;
+    height: 5%;
+    width: 20%;
 }
 
-.home-options{
+.game-mode-container:hover {
+    align-self: flex-start;
+    animation: neonPulse 10s linear infinite;
+}
+
+.home-options {
     display: flex;
-    justify-content: space-around;
     flex-direction: column;
+    justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
     width: 50%;
-    height: 40%;
-    background-color: #333;
+    height: 30%;
 }
 
-.home-button{
+.home-options:hover {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    width: 50%;
+    height: 30%;
+    animation: neonPulse 10s linear infinite;
+}
+
+.home-button {
     padding: 10px 20px;
     font-size: 1.5rem;
     cursor: pointer;
     border-radius: 40px;
+    width: 50%;
+    color: rgb(255, 251, 251);
+    background-color: #4CAF50;
 }
 
-.mode{
+.home-button:hover {
+    padding: 10px 20px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    border-radius: 40px;
+    animation: neonPulse 10s linear infinite;
+}
+
+.mode {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-self: flex-start;
+    width: 20%;
+    text-align: center;
+    height: 15%;
+}
+
+.mode:hover {
+    align-self: flex-start;
+    animation: neonPulse 10s linear infinite;
+}
+
+.home-input {
+    padding: 10px 20px;
+    font-size: 1.5rem;
+    cursor: cursor;
+    width: 50%;
+    border-radius: 40px;
+    color: rgb(114, 114, 114);
+}
+
+.home-input:hover {
+    padding: 10px 20px;
+    font-size: 1.5rem;
+    cursor: cursor;
+    border-radius: 40px;
+    color: rgb(114, 114, 114);
+    animation: neonPulse 10s linear infinite;
+}
+
+select {
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 20px;
+    color: rgb(114, 114, 114);
+    width: 70%;
+    align-self: center;
+}
+
+select:hover {
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 20px;
+    color: rgb(0, 0, 0);
 }

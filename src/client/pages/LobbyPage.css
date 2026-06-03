@@ -1,0 +1,44 @@
+.lobby-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* top / middle / bottom spacing */
+  align-items: center;            /* horizontal centering */
+  height: 90vh;
+  color: white;
+}
+
+.lobby-players{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+
+.oponent-players {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+
+  justify-items: center;
+  align-items: center;
+
+}
+
+.player{
+  display: flex;
+  justify-content: center;
+  align-self: center;
+  margin-top: 5%;
+  width: 50%;
+}
+
+.logout-space{
+  margin-top: 5%;
+  display: flex;
+  justify-content: center;
+  width: 20%;
+}
+
+h2{
+  font-size: 60px;
+}

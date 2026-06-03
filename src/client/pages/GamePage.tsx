@@ -28,8 +28,6 @@ export default function GamePage() {
       dispatch(setBoard(payload.self.board));
       console.log('Received render payload:', payload);
 
-      // Only store opponent boards (do NOT store your own board here,
-      // so the UI won't show duplicates / extra boards)
       Object.entries(payload.opponents ?? {}).forEach(
         ([opponentUsername, opponent]) => {
           if (
@@ -82,14 +80,7 @@ export default function GamePage() {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <GameBoard />
           </div>
-          {/* Opponents on the left/right (rendered from payload.opponents) */}
           <div
-            style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 18,
-              justifyContent: 'center',
-            }}
           >
             {latestRender &&
               Object.entries(latestRender.opponents ?? {}).map(

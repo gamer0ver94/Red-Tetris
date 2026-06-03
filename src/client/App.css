@@ -6,22 +6,23 @@ body {
 * {
   text-decoration: none;
   font-family: 'Press Start 2P', cursive;
-  color: rgb(73, 73, 73);
+  font-size: 100%;
 }
 
 .neon {
     border-radius: 40px;
     box-shadow: 
-    0 0 20px rgb(244, 244, 244),0 0 40px rgb(244, 244, 244);
+        0 0 5px rgb(244, 244, 244),0 0 10px rgb(244, 244, 244);
+    color: rgb(82, 80, 80);
 }
 
 @keyframes neonPulse {
-
     /* WHITE */
     0% {
         box-shadow:
             0 0 5px rgba(255, 255, 255, 0.5),
             0 0 15px rgba(255, 255, 255, 0.3);
+        color: rgb(244, 244, 244);
     }
 
     /* RED */
@@ -42,8 +43,9 @@ body {
     21% {
         box-shadow:
             0 0 10px orange,
-            0 0 25px orange,
+            0 0 25px orange,fsfs
             0 0 45px orange;
+        color: rgb(244, 244, 244);
     }
 
     28% {
@@ -58,6 +60,7 @@ body {
             0 0 10px yellow,
             0 0 25px yellow,
             0 0 45px yellow;
+        color: rgb(0, 0, 0);
     }
 
     42% {
@@ -120,5 +123,6 @@ body {
         box-shadow:
             0 0 5px rgba(255, 255, 255, 0.5),
             0 0 15px rgba(255, 255, 255, 0.3);
+        color: rgb(244, 244, 244);
     }
 }

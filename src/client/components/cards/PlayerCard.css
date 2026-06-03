@@ -1,0 +1,38 @@
+.player-card{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  background-color: rgb(39, 39, 39);
+  width: 50%;
+  align-items: center;
+  color: rgb(255, 255, 255);
+  border-radius: 20px;
+    font-size: 80%;
+    text-align: center;
+}
+
+.player-card:hover{
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(39, 39, 39);
+  width: 20%;
+  align-items: center;
+  width: 50%;
+  animation: neonPulse 10s linear infinite;
+}
+button{
+  padding: 5px 10px;
+  width: 80%;
+  cursor: pointer;
+  border-radius: 20px;
+  color: rgb(114, 114, 114);
+}
+
+button:hover{
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 20px;
+  color: rgb(255, 255, 255);
+  background-color: rgb(52, 252, 2);
+}
