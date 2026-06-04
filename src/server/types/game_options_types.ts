@@ -19,8 +19,10 @@ export type GameOptions = {
     gravity:{
         tickMs:number,
         lockDelayMs:number;
+        maxLock:number;
         softDropMultiplier:number;
         fallAfterClear:boolean;
+        speedOnClear:boolean;
     },
 
     garbage:{

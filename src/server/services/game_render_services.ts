@@ -14,11 +14,8 @@ export function build_render_payload(active_game:ActiveGame, player_id:string, s
         return self_res;
 
     const self_board = self_res.data.get_board()
-
     if(!self_board)
         return {success:false, code:'BOARD_NOT_FOUND'};
-    
-    const current_piece = self_board.get_current_piece();
 
     const next_pieces_res = active_game.peek_pieces_for_player(player_id);
     let next_piece_types = null
@@ -30,12 +27,14 @@ export function build_render_payload(active_game:ActiveGame, player_id:string, s
     
     const render_board = show_grid ? build_visible_board(self_board, true) : build_empty_board(self_board);
     
+    const score = active_game.get_config().is_score_enable() ? self_res.data.get_score() : null;
 
     return {success:true, data:{
             self:{
                 board:render_board,
-                hold_piece_type:null,
+                hold_piece_type:self_res.data.get_hold_piece(),
                 next_piece_types,
+                score
             },
             opponents:  build_opponent_payload(active_game, player_id, store),
         },

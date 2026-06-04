@@ -59,6 +59,10 @@ export class ConfigProvider{
         return this.opts.gravity.tickMs;
     }
 
+    public get_lock_delay_ms():number{
+        return this.opts.gravity.lockDelayMs;
+    }
+
     public get_oppenent_grid_mode():'full'|'grid'|'highest'|'none'{
         return this.opts.multiplayer.seeOpponents
     }
@@ -75,5 +79,20 @@ export class ConfigProvider{
         return this.opts.win.limit;
     }
 
+    public is_speed_on():boolean{
+        return this.opts.gravity.speedOnClear;
+    }
+
+    public get_max_lock():number{
+        return this.opts.gravity.maxLock;
+    }
+
+    public is_score_enable():boolean{
+        return this.opts.scoring.enabled;
+    }
+
+    public is_back_to_back_enable():boolean{
+        return this.opts.scoring.backToBackBonus;
+    }
     //MORE TO ADD ANYTIME WE NEED TO CHECK OPTS 
 }

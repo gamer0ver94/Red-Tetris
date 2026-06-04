@@ -5,6 +5,7 @@ export type RenderPayload = {
     board:BoardType;
     hold_piece_type:null|string;
     next_piece_types:string[]|null;
+    score:number|null;
   }
   opponents:Record<string, OpponentRender>;
 }

@@ -16,8 +16,10 @@ export const CLASSIC_OPTS:GameOptions = {
     gravity:{
         tickMs: 800,
         lockDelayMs:100,
+        maxLock:15,
         softDropMultiplier:0.3,
-        fallAfterClear:false
+        fallAfterClear:false,
+        speedOnClear:true,
     },
     garbage:{
         enabled:true,
@@ -27,7 +29,7 @@ export const CLASSIC_OPTS:GameOptions = {
 
     },
     scoring:{
-        enabled:false,
+        enabled:true,
         comboBonus:false,
         backToBackBonus:false,
     },
@@ -58,8 +60,10 @@ export const HARD_OPTS:GameOptions = {
     gravity:{
         tickMs:600,
         lockDelayMs:50,
+        maxLock:5,
         softDropMultiplier:0.4,
         fallAfterClear:false,
+        speedOnClear:true,
     },
     garbage:{
         enabled:true,
@@ -99,8 +103,10 @@ export const EASY_OPTS:GameOptions={
     gravity:{
         tickMs:900,
         lockDelayMs:150,
+        maxLock:0,
         softDropMultiplier:0.3,
         fallAfterClear:true,
+        speedOnClear:false,
     },
     garbage:{
         enabled:true,
@@ -140,8 +146,10 @@ export const SOLO_OPTS:GameOptions={
     gravity:{
         tickMs:800,
         lockDelayMs:100,
+        maxLock:15,
         softDropMultiplier:0.3,
         fallAfterClear:true,
+        speedOnClear:true
     },
     garbage:{
         enabled:false,
@@ -181,8 +189,10 @@ export const BATTLE_OPTS:GameOptions = {
     gravity:{
         tickMs:800,
         lockDelayMs:100,
+        maxLock:20,
         softDropMultiplier:0.3,
         fallAfterClear:true,
+        speedOnClear:true,
     },
     garbage:{
         enabled:true,

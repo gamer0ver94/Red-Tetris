@@ -5,6 +5,7 @@ import { tick_board } from "./game_core_services.js";
 import { ActiveGame } from "../models/active_game_model.js";
 import { CodeType, ModelResult } from "../types/error_code_types.js";
 import { EndGameProvider } from "../models/end_game_provider.js";
+import { PlayerInGame } from "../models/player_in_game_model.js";
 
 const active_loops = new Map<string, NodeJS.Timeout>();
 
@@ -63,11 +64,12 @@ export function tick_game(active_game: ActiveGame) : {winners_id:string[], loser
   const now = Date.now();
 
     for (const player of active_game.get_players()) {
+
         if(!player.is_alive())
             continue;
 
         const gravity = player.get_gravity();
-        const ticks_ms = active_game.get_config().get_tick_ms();
+        const ticks_ms = get_player_tick_ms(active_game, player);
         const drop_multiplier = 1 + active_game.get_config().get_drop_multiplier();
 
         let fall_every_ms:number;
@@ -78,13 +80,19 @@ export function tick_game(active_game: ActiveGame) : {winners_id:string[], loser
         else
             fall_every_ms = ticks_ms;
 
-        if(now - gravity.last_fall_at >= fall_every_ms){
-            tick_board(
-            player.get_board(),
-            player.get_player_id(),
-            active_game,
+        const gravity_due = now - gravity.last_fall_at >= fall_every_ms;
+        const lock_check_due = player.is_lock_delay_active();
+
+        if(gravity_due || lock_check_due){
+            const tick_res = tick_board(
+              player.get_board(),
+              player.get_player_id(),
+              active_game,
+              now,
+              gravity_due,
             );
-            gravity.last_fall_at = Date.now();
+            if(tick_res.success && gravity_due && !tick_res.data.lock_waiting)
+                gravity.last_fall_at = Date.now();
         }
     }
     const end_res = EndGameProvider.evaluateEndGame(active_game, active_game.get_config().get_win_condition(), active_game.get_config().get_win_limit());
@@ -92,4 +100,20 @@ export function tick_game(active_game: ActiveGame) : {winners_id:string[], loser
         return {winners_id:end_res.winners_id, losers_id:end_res.losers_id};
     
     return null;
+}
+
+function get_player_tick_ms(active_game:ActiveGame, player:PlayerInGame):number{
+
+  const base = active_game.get_config().get_tick_ms();
+  const lines = player.get_lines();
+
+  if(!active_game.get_config().is_speed_on() || lines == 0)
+    return base;
+
+  const trigger_count = 2;
+  const speed_ms = 50;
+  const max_speed = 100;
+
+  const level = Math.floor(lines/trigger_count);
+  return Math.max(max_speed, base - level * speed_ms);
 }
