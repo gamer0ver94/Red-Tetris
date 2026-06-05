@@ -47,7 +47,7 @@ export async function join_lobby_event(
         
         if(response.data.socket_ids.length > 0){
             for (const sock of response.data.socket_ids)
-                await io.to(sock).emit('lobby:join:update', {message:`${response.data.username} just joined the lobby`});
+                await io.to(sock).emit('lobby:join:update', {message:`${response.data.username} just joined the lobby`, players_list: response.data.players_list });
         }
 }
 
