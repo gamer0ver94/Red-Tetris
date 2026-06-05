@@ -23,6 +23,7 @@ export class PlayerInGame{
     private has_hold:boolean;
     private touching_ground_since:number|null;
     private lock_reset_count:number;
+    private score_bonus:number;
 
     constructor(
         board:Board,
@@ -44,6 +45,7 @@ export class PlayerInGame{
         this.has_hold = false;
         this.touching_ground_since = null;
         this.lock_reset_count = 0;
+        this.score_bonus = 1;
     }
 
     //Getters
@@ -150,5 +152,17 @@ export class PlayerInGame{
         this.touching_ground_since = null;
         this.lock_reset_count += 1;
         return true;
+    }
+
+    public reset_bonus(){
+        this.score_bonus = 1;
+    }
+
+    public get_bonus():number{
+        return this.score_bonus;
+    }
+
+    public increase_bonus(){
+        this.score_bonus += 1;
     }
 }

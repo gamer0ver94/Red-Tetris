@@ -12,7 +12,7 @@ import { stop_game_loop } from './game_loop_services.js'
 import { MAPPED_OPTS, type GameMode } from '../types/pre_made_options.js'
 import { GameOptions } from '../types/game_options_types.js'
 import { CodeType, LeaveGameData, JoinLobbyData, ModelResult, StartGameData } from '../types/error_code_types.js'
-import { gameStatusType } from '../types/status_types.ts'
+import { gameStatusType, playerStatusType } from '../types/status_types.ts'
 
 export function join_game(
     sid:string,
@@ -256,6 +256,13 @@ function leave_game_started(player: Player, lobby: Lobby, store: Store):ModelRes
     };
 }
 
+
+export function ready_player(player:Player){
+    if(player.get_player_status() === playerStatusType.ready)
+        player.set_player_status(playerStatusType.waiting);
+    else
+        player.set_player_status(playerStatusType.ready);
+}
 
 
 function generate_unique_lobby_id(lobby_store: LobbyStore) : string{

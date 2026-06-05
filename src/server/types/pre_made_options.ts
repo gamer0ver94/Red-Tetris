@@ -30,7 +30,6 @@ export const CLASSIC_OPTS:GameOptions = {
     },
     scoring:{
         enabled:true,
-        comboBonus:false,
         backToBackBonus:false,
     },
     win:{
@@ -73,7 +72,6 @@ export const HARD_OPTS:GameOptions = {
     },
     scoring:{
         enabled:true,
-        comboBonus:true,
         backToBackBonus:true,
     },
     win:{
@@ -116,7 +114,6 @@ export const EASY_OPTS:GameOptions={
     },
     scoring:{
         enabled:false,
-        comboBonus:false,
         backToBackBonus:false,
     },
     win:{
@@ -159,7 +156,6 @@ export const SOLO_OPTS:GameOptions={
     },
     scoring:{
         enabled:true,
-        comboBonus:true,
         backToBackBonus:true,
     },
     win:{
@@ -202,7 +198,6 @@ export const BATTLE_OPTS:GameOptions = {
     },
     scoring:{
         enabled:true,
-        comboBonus:true,
         backToBackBonus:true,
     },
     win:{

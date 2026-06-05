@@ -14,4 +14,4 @@ export type RenderPayload = {
 export type OpponentRender = 
 | {view:'full'; board:BoardType}
 | {view:'grid'; board:BoardType}
-| {view:'highest'; highest:number};
+| {view:'highest'; board:BoardType};

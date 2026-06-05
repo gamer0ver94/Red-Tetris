@@ -31,6 +31,7 @@ export type ActionEventName =
 
 export interface ClientToServerEvents {
     'lobby:join': (p?:{ game_id:string}) => void;
+    'lobby:ready': () => void;
     'lobby:start': () => void;
     'lobby:leave': () => void;
 
@@ -50,6 +51,9 @@ export interface ClientToServerEvents {
 }
 
 export interface ServerToClientEvents{
+
+    'lobby:ready': () => void;
+
     'lobby:join:error': (p: {reason:string}) => void;
     'lobby:join:success': () => void;
     'lobby:join:update': (p: {message:string}) => void;

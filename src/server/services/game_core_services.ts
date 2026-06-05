@@ -77,6 +77,10 @@ export function  tick_board(
 
         board.lock_current_piece();
         clear = finish_piece_lock(board, active_game, player);
+        if(clear == 0)
+            player.reset_bonus();
+        if(clear > 0 && active_game.get_config().is_back_to_back_enable())
+            player.increase_bonus();
         return { success:true, data: {clear, lock_waiting:false}};
 }
 
@@ -155,7 +159,7 @@ function finish_piece_lock(board:Board, active_game:ActiveGame, player:PlayerInG
     if(clear > 0 && active_game.get_config().is_invisible())
         player.reveal_grid_for(active_game.get_config().get_reveal_on_clear_ms());
     player.add_lines(clear);
-    const score = ScoreProvider.line_clear(player.get_score(), clear);
+    const score = ScoreProvider.line_clear(player.get_score(), clear, player.get_bonus());
     player.set_score(score);
     return clear;
 }

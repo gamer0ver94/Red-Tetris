@@ -47,7 +47,7 @@ function build_opponent_view(board:Board, mode:'full'|'grid'|'highest'|'none'):O
     if(mode === 'highest')
         return{
             view:'highest',
-            highest:get_highest_occupied_row(board)
+            highest:build_highest_board(board)
         };
     if(mode === 'grid')
         return {
@@ -140,5 +140,18 @@ function build_empty_board(board:Board):BoardType{
         }
     }
 
+    return empty as BoardType;
+}
+
+function build_highest_board(board:Board):BoardType{
+    const empty = build_empty_board(board);
+    const highest_row = get_highest_occupied_row(board);
+    for (let y = 0; y < empty.length; y++) {
+        for (let x = 0; x < empty[0].length; x++) {
+            if (y === highest_row) {
+                empty[y][x] = 'X';
+            }
+        }
+    }
     return empty as BoardType;
 }

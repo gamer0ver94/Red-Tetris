@@ -26,6 +26,10 @@ export async function socket_game_lobby(
     socket.on('lobby:leave', async() => {
         await leave_lobby_event(io, socket, sid, store);
     });
+
+    socket.on('lobby:ready', async() => {
+        await ready_lobby_event(io, socket, sid, store);
+    });
 }
 
 
@@ -57,6 +61,11 @@ async function start_lobby_event(
     sid:string,
     store:Store
 ){
+
+    const all_ready = store.are_all_players_ready(sid);
+    if(!all_ready.success)
+        return await socket.emit('lobby:start:error', {reason:'Not all players are ready'});
+
     const response = lobby_services.start_game(sid, store);
     if(!response.success)
         return await socket.emit('lobby:start:error', {reason:codeType[response.code]});
@@ -132,3 +141,14 @@ async function leave_lobby_event(
     await socket.emit('lobby:leave:success');
     await helpers.change_player_status(io, playerStatusType.connected, sid, store.get_player_store())
 }
+
+async function ready_lobby_event(io:TypedIoServer, socket:TypedSocket, sid:string, store:Store){
+
+    const player_res = store.get_player_store().get_player_by_sid(sid);
+    if(!player_res.success)
+        return await socket.emit('lobby:ready:error', {reason:codeType[player_res.code]});
+
+    lobby_services.ready_player(player_res.data);
+    await socket.emit('lobby:ready:success');
+}
+

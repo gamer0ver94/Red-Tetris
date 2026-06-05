@@ -15,5 +15,6 @@ export const playerStatusType = {
     waiting_socket: 'waiting_socket',
     waiting: 'waiting',
     playing:'playing',
+    ready:'ready',
 }as const;
 export type PlayerStatus = typeof playerStatusType[keyof typeof playerStatusType];
