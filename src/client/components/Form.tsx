@@ -7,6 +7,7 @@ import { setUsername, setCsrfToken } from "../store/userSlice";
 import { fetchData } from "./fetch/fetch";
 import { ROUTES } from "../Types/Routes";
 import "./Form.css";
+import { config } from "../conf"
 export default function Form() {
   const goTo = useNavigate();
   const dispatch = useAppDispatch();
@@ -17,7 +18,7 @@ export default function Form() {
     const payload = {
       username: input
     }
-    const data = await fetchData("http://localhost:1800/auth/register", payload, "POST");
+    const data = await fetchData(config.register, payload, "POST");
     console.log(data);
     if (data.username) {
       dispatch(setUsername(data.username));

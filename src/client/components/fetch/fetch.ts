@@ -1,4 +1,7 @@
-export async function fetchData(url: string, object: any, method:string) {
+import { config } from "../../conf"
+export async function fetchData(route: string, object: any, method:string,) {
+  const url = `${config.url}${route}`;
+  console.log("test" + url)
     const options: RequestInit = {
         method,
         credentials: "include",
@@ -22,4 +25,20 @@ export async function fetchData(url: string, object: any, method:string) {
           console.error(err);
           return null;
         }
+}
+
+export async function fetchDataJson(route: string, object: any,token:string) {
+  const url = `${config.url}${route}`;
+  console.log(url, object, token)
+    const res = await fetch(url, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+                "x-csrf-token": token,
+            },
+            body: JSON.stringify(object),
+        });
+        console.log(res)
+        return res
 }

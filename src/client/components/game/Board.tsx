@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import GameCell from './Cell';
-
+import "./Board.css"
 type BoardCell = '.' | 'X' | string;
 
 type Props = {
@@ -19,19 +19,9 @@ export default function GameBoard({ board: boardProp }: Props) {
   }
 
   return (
-    <div
-      style={{
-        display: 'inline-block',
-        padding: 10,
-        borderRadius: 14,
-        background: '#2a2a2a',
-        border: '4px solid rgba(0,0,0,0.65)',
-        boxShadow:
-          'inset 0 0 0 1px rgba(255,255,255,0.06), 0 8px 28px rgba(0,0,0,0.25)',
-      }}
-    >
+    <div className='Board'>
       {board.map((row, rowIndex) => (
-        <div key={rowIndex} style={{ display: 'flex', lineHeight: 0 }}>
+        <div key={rowIndex} className="Boarder">
           {row.map((cell, colIndex) => (
             <GameCell key={colIndex} cell={cell} />
           ))}

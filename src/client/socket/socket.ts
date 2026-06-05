@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
-
-export const socket = io("http://localhost:1800", {
+import { config } from "../conf"
+export const socket = io(config.url, {
   autoConnect: false,
   withCredentials: true,
 });

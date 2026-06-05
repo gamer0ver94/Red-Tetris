@@ -11,7 +11,7 @@ import {
 import { ROUTES} from "../Types/Routes"
 import "./LobbyPage.css";
 import LogoutButton from "../components/LogoutButton";
-
+import { config } from "../conf"
 import { fetchData } from "../components/fetch/fetch";
 import { setCsrfToken, setUsername } from "../store/userSlice";
 
@@ -65,7 +65,7 @@ export default function LobbyPage() {
   useEffect(() => {
     async function loadUser() {
       const data = await fetchData(
-        "http://localhost:1800/auth/me",
+        config.authMe,
         null,
         "GET",
       );

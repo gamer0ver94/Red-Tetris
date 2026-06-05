@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks"
 import { useEffect, useState } from "react"
-import { fetchData } from "../components/fetch/fetch"
+import { fetchData, fetchDataJson } from "../components/fetch/fetch"
 import { setCsrfToken, setUsername } from "../store/userSlice";
 import { socket } from "../socket/socket";
 import LogoutButton from "../components/LogoutButton";
@@ -9,6 +9,8 @@ import { ROUTES } from "../Types/Routes";
 import "./HomePage.css"
 import logo from "../assets/tetris_logo.png";
 import Logo from "../components/Logo";
+import { config } from "../conf"
+{}
 export default function HomePage() {
     const goTo = useNavigate()
     const username = useAppSelector((state) => state.user.username)
@@ -22,17 +24,8 @@ export default function HomePage() {
     async function createLobbyAndGo() {
         setError("");
         if (!csrf_token) return;
-
-        const res = await fetch("http://localhost:1800/game/create", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-                "x-csrf-token": csrf_token,
-            },
-            body: JSON.stringify({ game_mode: gameMode }),
-        });
-
+        const res = await fetchDataJson(config.createLobby, { game_mode: gameMode },csrf_token
+        );
         if (!res.ok) {
             console.error("/game/create failed", await res.text().catch(() => ""));
             setError("Failed to Join Game");
@@ -40,6 +33,7 @@ export default function HomePage() {
         }
 
         const data = await res.json();
+        console.log("my data" + data)
         if (data?.success && data?.game_id) {
             setHostUsername(username?username:"");
             sessionStorage.setItem('game_id', data.game_id);
@@ -56,28 +50,27 @@ export default function HomePage() {
             setError("Please enter a valid game ID.");
             return;
         }
-        const res = await fetch(
-            `http://localhost:1800/game/join/${encodeURIComponent(gameIdInput.trim())}/${encodeURIComponent(username || "")}`,
-            {
-                method: "GET",
-                credentials: "include",
-            }
+        const url = config.joinLobby+ '/' +gameIdInput.trim() + "/" + username || ""
+        const res = await fetchData(
+            url,
+            null,"GET"
         );
         console.log("Join response status:", res);
-        if (!res.ok) {
+        if (!res.success) {
             setError("Failed to Join Game, server error.");
             return;
         }
 
-        const data = await res.json();
-        if (data?.success) {
-            dispatch(setCsrfToken(data.csrf_token));
-            if (data?.game_id) sessionStorage.setItem('game_id', data.game_id);
+        // const data = await res.json();
+        // console.log('another test', data, res)
+        if (res?.success) {
+            dispatch(setCsrfToken(res.csrf_token));
+            if (res?.game_id) sessionStorage.setItem('game_id', res.game_id);
             goTo(ROUTES.LOBBY);
         }
         else{
             setError("Failed to Join Game");
-            console.log("Failed to join game:", data);
+            console.log("Failed to join game:", res);
         }
     }
 
@@ -85,7 +78,7 @@ export default function HomePage() {
 
     useEffect(() => {
         async function loadUser() {
-            const data = await fetchData("http://localhost:1800/auth/me", null, "GET");
+            const data = await fetchData(config.authMe, null, "GET");
             if (data.username) {
                 dispatch(setUsername(data.username));
             }
