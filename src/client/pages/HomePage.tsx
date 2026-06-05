@@ -14,7 +14,7 @@ export default function HomePage() {
     const username = useAppSelector((state) => state.user.username)
     const csrf_token = useAppSelector((state) => state.user.csrf_token)
     const [gameIdInput, setGameIdInput] = useState("");
-
+  const [hostUsername, setHostUsername] = useState<string>('');
     const [gameMode, setGameMode] = useState("classic")
     const dispatch = useAppDispatch();
     const [error, setError] = useState("");
@@ -41,6 +41,7 @@ export default function HomePage() {
 
         const data = await res.json();
         if (data?.success && data?.game_id) {
+            setHostUsername(username?username:"");
             sessionStorage.setItem('game_id', data.game_id);
             goTo(ROUTES.LOBBY);
         }

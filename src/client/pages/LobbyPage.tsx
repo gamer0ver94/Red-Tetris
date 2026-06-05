@@ -8,7 +8,7 @@ import {
   playerLeft,
   setPlayerReadyStatus,
 } from "../store/lobbySlice";
-
+import { ROUTES} from "../Types/Routes"
 import "./LobbyPage.css";
 import LogoutButton from "../components/LogoutButton";
 
@@ -29,6 +29,15 @@ export default function LobbyPage() {
   const gameIdFromSession = sessionStorage.getItem("game_id") || "";
   const [hostUsername, setHostUsername] = useState<string>('');
 
+  const onNewOwner = (()=>{
+    setHostUsername(username?username:"")
+  })
+
+  const leaveLobby = (()=>{
+    socket.emit("lobby:leave");
+    goTo("/");
+  });
+
   const allPlayersReady = () => {
     for (const [, ready] of Object.entries(readyByUsername)) {
       if (ready != "ready") {
@@ -41,7 +50,7 @@ export default function LobbyPage() {
     setStatus(status === "ready" ? "not-ready" : "ready");
     console.log("READY TO START");
     socket?.emit("player:ready", { username });
-    if (allPlayersReady()) {
+    if (allPlayersReady() && hostUsername) {
       socket?.emit("lobby:start");
     }
     socket?.emit("lobby:start", { username });
@@ -108,8 +117,7 @@ export default function LobbyPage() {
     dispatch(playerJoined({ username }));
     socket.on("connect", () => {
       console.log(
-        "[Lobby] Socket connected successfully. socket.id=",
-        socket.id,
+        "Connected."
       );
     });
 
@@ -124,23 +132,13 @@ export default function LobbyPage() {
 
       if (extractedUsername && extractedUsername.trim().length > 0) {
         dispatch(playerJoined({ username: extractedUsername }));
-
-        if (!hostUsername) {
-          setHostUsername(extractedUsername);
-          console.log("[Lobby] hostAssigned:", extractedUsername);
-        }
-
-        console.log(
-          "[Lobby] playerAddedToRedux:",
-          extractedUsername,
-          "readyByUsername=",
-          readyByUsername,
-        );
       }
+      console.log("On join update:", payload);
     };
 
     const onPlayerLeave = (payload: any) => {
       const leaverUsername = payload?.username;
+      console.log("Player leave:", payload)
       if (leaverUsername) {
         dispatch(playerLeft({ username: leaverUsername }));
       }
@@ -168,12 +166,13 @@ export default function LobbyPage() {
     const onLobbyStarted = () => {
       console.log("HELLO WORLD", readyByUsername)
       
-      // goTo(ROUTES.GAME);
+      goTo(ROUTES.GAME);
     };
 
     socket.on("lobby:start:success", onLobbyStarted);
     socket.on("lobby:join:update", onPlayerJoinUpdate);
     socket.on("lobby:leave:update", onPlayerLeave);
+    socket.on("lobby:new_owner", onNewOwner);
     socket.on("session:resume", onSessionResume);
 
     return () => {
@@ -201,7 +200,7 @@ export default function LobbyPage() {
                   username={playerName}
                   ready={status === "ready"}
                   onReady={() => {}}
-                  onReturn={() => {}}
+                  onReturn={leaveLobby}
                 />
               ))}
           </div>
@@ -211,7 +210,7 @@ export default function LobbyPage() {
             username={username}
             ready={(readyByUsername[username] ?? "not-ready") === "ready"}
             onReady={onPlayerReady}
-            onReturn={() => {}}
+            onReturn={leaveLobby}
           />
         </div>
       </div>
