@@ -1,156 +1,222 @@
-import { useEffect, useMemo, useState, useContext } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../hooks/reduxHooks";
+import { useAppSelector, useAppDispatch } from "../hooks/reduxHooks";
 import { socketContext } from "../socket/socketContext";
 import PlayerCard from "../components/cards/PlayerCard";
+import {
+  playerJoined,
+  playerLeft,
+  setPlayerReadyStatus,
+} from "../store/lobbySlice";
+
 import "./LobbyPage.css";
 import LogoutButton from "../components/LogoutButton";
-import { ROUTES } from "../Types/Routes";
+
+import { fetchData } from "../components/fetch/fetch";
+import { setCsrfToken, setUsername } from "../store/userSlice";
+
 export default function LobbyPage() {
+  const dispatch = useAppDispatch();
   const goTo = useNavigate();
   const username = useAppSelector((state) => state.user.username) || "Player";
-
+  const csrf_token = useAppSelector((state) => state.user.csrf_token);
+  console.log("[Lobby] render: csrf_token exists?", !!csrf_token);
   const socket = useContext(socketContext);
-
-  const [ready, setReady] = useState(false);
-  const [joinCards, setJoinCards] = useState<string[]>([]);
-
+  const readyByUsername = useAppSelector(
+    (state) => state.lobby.readyByUsername,
+  );
+  const [status, setStatus] = useState<string>("not-ready");
   const gameIdFromSession = sessionStorage.getItem("game_id") || "";
-  const isSinglePlayerLobby = useMemo(() => true, []);
+  const [hostUsername, setHostUsername] = useState<string>('');
 
-  const isHost = isSinglePlayerLobby;
-
-  useEffect(() => {
-    if (!socket) return;
-    if (!socket.connected) {
-      socket.auth = socket.auth ?? {};
-      socket.connect();
+  const allPlayersReady = () => {
+    for (const [, ready] of Object.entries(readyByUsername)) {
+      if (ready != "ready") {
+        return false;
+      }
     }
-
-    return () => {};
-  }, [socket]);
-
-  async function handleReadyToggle() {
-    if (!isHost) return;
-
-    const next = !ready;
-    setReady(next);
-
-    if (next && isHost) {
+    return true;
+  };
+  const onPlayerReady = () => {
+    setStatus(status === "ready" ? "not-ready" : "ready");
+    console.log("READY TO START");
+    socket?.emit("player:ready", { username });
+    if (allPlayersReady()) {
       socket?.emit("lobby:start");
-      goTo("/game");
     }
-  }
+    socket?.emit("lobby:start", { username });
+    dispatch(
+      setPlayerReadyStatus({
+        username,
+        status: status === "ready" ? "not-ready" : "ready",
+      }),
+    );
+  };
 
-  function handleLeaveQueue() {
-    if (!socket) {
-      goTo(ROUTES.HOME);
-      return;
-    }
-
-    const onSuccess = () => {
-      socket.off("lobby:leave:success", onSuccess);
-      socket.off("lobby:leave:error", onError);
-      goTo(ROUTES.HOME);
-    };
-
-    const onError = () => {
-      socket.off("lobby:leave:success", onSuccess);
-      socket.off("lobby:leave:error", onError);
-    };
-
-    socket.once("lobby:leave:success", onSuccess);
-    socket.once("lobby:leave:error", onError);
-    socket.emit("lobby:leave");
-  }
-
-  const sharePayload = gameIdFromSession
-    ? {
-        label: "Join Queue",
-        gameId: gameIdFromSession,
+  useEffect(() => {
+    async function loadUser() {
+      const data = await fetchData(
+        "http://localhost:1800/auth/me",
+        null,
+        "GET",
+      );
+      if (data?.username) {
+        dispatch(setUsername(data.username));
       }
-    : null;
+      if (data?.csrf_token) {
+        dispatch(setCsrfToken(data.csrf_token));
+      } else {
+        goTo("/");
+      }
+    }
+
+    loadUser();
+  }, [dispatch]);
+
+  useEffect(() => {
+    console.log(
+      "[Lobby] connect-effect: socket.connected=",
+      socket?.connected,
+      "csrf_token=",
+      !!csrf_token,
+    );
+    if (!socket) return;
+    if (!csrf_token) return;
+    socket.auth = { csrf_token };
+
+    if (!socket.connected) {
+      socket.connect();
+    } else {
+      console.log("[Lobby] socket already connected, not calling connect()");
+    }
+  }, [socket, csrf_token]);
 
   useEffect(() => {
     if (!socket) return;
-    if (!gameIdFromSession) return;
 
-    if (!socket.connected) {
-      socket.auth = socket.auth ?? {};
-      socket.connect();
+    console.log(
+      "[Lobby] listeners effect mounted. socket.connected=",
+      socket.connected,
+    );
+
+    dispatch(playerJoined({ username }));
+
+    if (gameIdFromSession) {
+      socket.emit("lobby:join", { game_id: gameIdFromSession });
     }
 
-    const onJoinUpdate = (payload: any) => {
-      console.log("[socket] lobby:join:update", payload);
-      const message = String(payload?.message ?? "");
-      const firstWord = message.trim().split(/\s+/)[0];
-      if (firstWord) {
-        setJoinCards((prev) => [firstWord, ...prev]);
+    dispatch(playerJoined({ username }));
+    socket.on("connect", () => {
+      console.log(
+        "[Lobby] Socket connected successfully. socket.id=",
+        socket.id,
+      );
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("[Lobby] Socket connection error:", err.message);
+    });
+
+    const onPlayerJoinUpdate = (payload: any) => {
+      const message: string | undefined = payload?.message;
+
+      const extractedUsername = message?.replace(" just joined the lobby", "");
+
+      if (extractedUsername && extractedUsername.trim().length > 0) {
+        dispatch(playerJoined({ username: extractedUsername }));
+
+        if (!hostUsername) {
+          setHostUsername(extractedUsername);
+          console.log("[Lobby] hostAssigned:", extractedUsername);
+        }
+
+        console.log(
+          "[Lobby] playerAddedToRedux:",
+          extractedUsername,
+          "readyByUsername=",
+          readyByUsername,
+        );
       }
     };
-    socket.on("lobby:join:update", onJoinUpdate);
 
-    socket.emit("lobby:join", { game_id: gameIdFromSession });
+    const onPlayerLeave = (payload: any) => {
+      const leaverUsername = payload?.username;
+      if (leaverUsername) {
+        dispatch(playerLeft({ username: leaverUsername }));
+      }
+      console.log(payload);
+
+      if (leaverUsername && leaverUsername === username) {
+        sessionStorage.removeItem("game_id");
+        goTo("/");
+      }
+    };
+
+    const onSessionResume = (payload: any) => {
+      console.log("session:resume", payload);
+
+      const gameId = payload?.game?.game_id;
+      if (gameId) {
+        sessionStorage.setItem("game_id", gameId);
+      }
+    };
+
+    socket.onAny((event, ...args) => {
+      console.log("SOCKET EVENT:", event, args);
+    });
+
+    const onLobbyStarted = () => {
+      console.log("HELLO WORLD", readyByUsername)
+      
+      // goTo(ROUTES.GAME);
+    };
+
+    socket.on("lobby:start:success", onLobbyStarted);
+    socket.on("lobby:join:update", onPlayerJoinUpdate);
+    socket.on("lobby:leave:update", onPlayerLeave);
+    socket.on("session:resume", onSessionResume);
 
     return () => {
-      socket.off("lobby:join:update", onJoinUpdate);
-    };
-  }, [socket, gameIdFromSession]);
+      socket.off("connect");
+      socket.off("connect_error");
+      socket.off("lobby:join:update", onPlayerJoinUpdate);
 
+      socket.off("lobby:leave:update", onPlayerLeave);
+      socket.off("session:resume", onSessionResume);
+      socket.off("lobby:start:success", onLobbyStarted);
+      socket.offAny();
+    };
+  }, [socket]);
   return (
     <div className="lobby-container">
-      <div>
-        <h2>LOBBY</h2>
-      </div>
+      <h1>Lobby</h1>
       <div className="lobby-players">
         <div className="oponent-players">
-          <PlayerCard
-            username="oponent"
-            ready={false}
-            onReady={() => {}}
-            onReturn={() => {}}
-          />
-          <PlayerCard
-            username="oponent"
-            ready={false}
-            onReady={() => {}}
-            onReturn={() => {}}
-          />
-          <PlayerCard
-            username="oponent"
-            ready={false}
-            onReady={() => {}}
-            onReturn={() => {}}
-          />
-          <PlayerCard
-            username="oponent"
-            ready={false}
-            onReady={() => {}}
-            onReturn={() => {}}
-          />
-          <PlayerCard
-            username="oponent"
-            ready={false}
-            onReady={() => {}}
-            onReturn={() => {}}
-          />
-          <PlayerCard
-            username="oponent"
-            ready={false}
-            onReady={() => {}}
-            onReturn={() => {}}
-          />
+          <div className="oponent-players">
+            {Object.entries(readyByUsername)
+              .filter(([playerName]) => playerName !== username)
+              .map(([playerName, status]) => (
+                <PlayerCard
+                  key={playerName}
+                  username={playerName}
+                  ready={status === "ready"}
+                  onReady={() => {}}
+                  onReturn={() => {}}
+                />
+              ))}
+          </div>
         </div>
         <div className="player">
           <PlayerCard
-            username="test"
-            ready={false}
-            onReady={() => {}}
+            username={username}
+            ready={(readyByUsername[username] ?? "not-ready") === "ready"}
+            onReady={onPlayerReady}
             onReturn={() => {}}
           />
         </div>
       </div>
       <div className="logout-space">
+        <div>{gameIdFromSession}</div>
         <LogoutButton />
       </div>
     </div>

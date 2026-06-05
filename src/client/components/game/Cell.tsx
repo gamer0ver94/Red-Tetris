@@ -20,8 +20,6 @@ export default function GameCell({ cell }: Props) {
 
 
   const filledLike = !isEmpty;
-
-  // Make borders blend with the board background to reduce visible grid lines.
   const border = filledLike ? '1px solid rgba(60,60,60,0.25)' : '1px solid rgba(40,40,40,0.25)';
 
   return (

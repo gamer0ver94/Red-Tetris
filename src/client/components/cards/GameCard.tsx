@@ -6,69 +6,6 @@ type Props = {
   nextPiecesTypes: string[] | null;
 };
 
-// Temporarily commented out to keep the client build passing.
-// These preview helpers were previously unused, and tsconfig has noUnusedLocals enabled.
-// Keep them here as a reference until the card renders colored piece previews.
-// const PIECE_COLORS: Record<string, string> = {
-//   I: '#00B8CC',
-//   J: '#3B67CC',
-//   L: '#D99119',
-//   S: '#00B85A',
-//   T: '#8F69CC',
-//   Z: '#CC4141',
-//   O: '#C7A83E',
-// };
-//
-// type Cell = '.' | 'X';
-//
-// type Shape = Cell[][];
-//
-// const PIECE_SHAPES: Record<string, Shape> = {
-//   // 4x4-ish previews, centered via grid rendering below
-//   I: [
-//     ['.', 'X', 'X', 'X'],
-//     ['.', '.', '.', 'X'],
-//     ['.', '.', '.', '.'],
-//     ['.', '.', '.', '.'],
-//   ],
-//   T: [
-//     ['.', 'X', '.', '.'],
-//     ['X', 'X', 'X', '.'],
-//     ['.', '.', '.', '.'],
-//     ['.', '.', '.', '.'],
-//   ],
-//   O: [
-//     ['.', 'X', 'X', '.'],
-//     ['.', 'X', 'X', '.'],
-//     ['.', '.', '.', '.'],
-//     ['.', '.', '.', '.'],
-//   ],
-//   J: [
-//     ['X', '.', '.', '.'],
-//     ['X', 'X', 'X', '.'],
-//     ['.', '.', '.', '.'],
-//     ['.', '.', '.', '.'],
-//   ],
-//   L: [
-//     ['.', '.', 'X', '.'],
-//     ['X', 'X', 'X', '.'],
-//     ['.', '.', '.', '.'],
-//     ['.', '.', '.', '.'],
-//   ],
-//   S: [
-//     ['.', 'X', 'X', '.'],
-//     ['X', 'X', '.', '.'],
-//     ['.', '.', '.', '.'],
-//     ['.', '.', '.', '.'],
-//   ],
-//   Z: [
-//     ['X', 'X', '.', '.'],
-//     ['.', 'X', 'X', '.'],
-//     ['.', '.', '.', '.'],
-//     ['.', '.', '.', '.'],
-//   ],
-// };
-
 export default function GameCard({
   username,
   score = null,
