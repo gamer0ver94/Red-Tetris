@@ -6,6 +6,7 @@ import { ActiveGame } from "../models/active_game_model.js";
 import { RotationProvider } from "../models/rotation_provider_model.js";
 import { PlayerInGame } from "../models/player_in_game_model.js";
 import { ScoreProvider } from "../models/score_provider.js";
+import {resolve_garbage_to_send, resolve_garbage_send_back, spawn_garbage} from "./garbage_services.js";
 
 
 export function move_left(active_game:ActiveGame, player_id:string){
@@ -150,17 +151,66 @@ export function rotate(active_game:ActiveGame, player_id:string){
 }
 
 function finish_piece_lock(board:Board, active_game:ActiveGame, player:PlayerInGame){
+    
     player.clear_lock_delay();
-    let clear = 0;
-    if(active_game.get_config().get_line_clear_mode() == 'cell_gravity')
-        clear = board.apply_cell_gravity_loop();
-    else
-        clear = board.clear_full_rows();
+    
+    const clear_res = active_game.get_config().get_line_clear_mode() == 'cell_gravity'
+        ? board.apply_cell_gravity_loop()
+        : board.clear_full_rows();
+
+    const clear = clear_res.cleared_lines;
+    const cleared_garbage = clear_res.cleared_garbage;
+
     if(clear > 0 && active_game.get_config().is_invisible())
         player.reveal_grid_for(active_game.get_config().get_reveal_on_clear_ms());
+ 
     player.add_lines(clear);
-    const score = ScoreProvider.line_clear(player.get_score(), clear, player.get_bonus());
+    
+
+    let score = player.get_score();
+    score = ScoreProvider.line_clear(score, clear, player.get_bonus());
+    score = ScoreProvider.garbage_clear(score, cleared_garbage, player.get_bonus());
     player.set_score(score);
+    
+    if(!active_game.get_config().is_garbage_enabled())
+        return clear;
+
+    let garbage_to_send = resolve_garbage_to_send(clear, active_game.get_config().get_garbage_ratio());
+
+    garbage_to_send += resolve_garbage_send_back(cleared_garbage, active_game.get_config().is_clear_create_garbage_enabled());
+
+    if(garbage_to_send <= 0)
+        return clear;
+
+    const opponents = active_game.get_opponents_of(player.get_player_id()).filter((opponent) => opponent.is_alive());
+    if(opponents.length == 0)
+        return clear;
+
+    const opponents_boards = Object.fromEntries(
+        opponents.map((opponent) => [
+            opponent.get_player_id(),
+            opponent.get_board().get_board(),
+        ]),
+    );
+
+    const received = spawn_garbage(
+        opponents_boards,
+        garbage_to_send,
+        active_game.get_config().can_spawn_clearable_garbage(),
+    );
+
+    if (active_game.get_config().is_score_enable()) {
+        for (const opponent of opponents) {
+            const received_rows = received[opponent.get_player_id()] ?? 0;
+            if (received_rows <= 0)
+                continue;
+
+            opponent.set_score(
+                ScoreProvider.garbage_spawn(opponent.get_score(), received_rows),
+            );
+        }
+    }
+
     return clear;
 }
 

@@ -94,5 +94,21 @@ export class ConfigProvider{
     public is_back_to_back_enable():boolean{
         return this.opts.scoring.backToBackBonus;
     }
+
+    public is_garbage_enabled(): boolean {
+        return this.opts.garbage.enabled;
+    }
+
+    public can_spawn_clearable_garbage(): boolean {
+        return this.opts.garbage.canClear;
+    }
+
+    public get_garbage_ratio(): number {
+        return this.opts.garbage.ratio;
+    }
+
+    public is_clear_create_garbage_enabled(): boolean {
+        return this.opts.garbage.clearCreateGarbage;
+    }
     //MORE TO ADD ANYTIME WE NEED TO CHECK OPTS 
 }

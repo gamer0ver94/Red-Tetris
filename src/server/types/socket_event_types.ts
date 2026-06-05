@@ -31,7 +31,7 @@ export type ActionEventName =
 
 export interface ClientToServerEvents {
     'lobby:join': (p?:{ game_id:string}) => void;
-    'lobby:ready': () => void;
+    'lobby:ready': (p?: {ready_player_names:string[]}) => void;
     'lobby:start': () => void;
     'lobby:leave': () => void;
 
@@ -52,7 +52,9 @@ export interface ClientToServerEvents {
 
 export interface ServerToClientEvents{
 
-    'lobby:ready': () => void;
+    'lobby:ready:success': (p: LobbyReadyPayload) => void;
+    'lobby:ready:error': (p: {reason:string}) => void;
+    'lobby:ready:update': (p: LobbyReadyPayload) => void;
 
     'lobby:join:error': (p: {reason:string}) => void;
     'lobby:join:success': () => void;
@@ -110,4 +112,16 @@ export type SessionResumePayload = {
         players_ids: string[];
     };
     render_state: null | RenderPayload;
+}
+
+export type LobbyPlayerState = {
+    player_id:string;
+    username:string;
+    ready:boolean;
+    is_owner:boolean;
+}
+
+export type LobbyReadyPayload = {
+    players: LobbyPlayerState[];
+    owner_id:string;
 }
