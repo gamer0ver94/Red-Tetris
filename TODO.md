@@ -2,23 +2,6 @@
 
 ## Missing / Blocking Stuff
 
-### Scoring
-
-- Finish base line-clear scoring.
-  - Keep `ScoreProvider.line_clear(score, clear, bonus)` guarded for `clear <= 0`.
-  - Apply score only when the scoring rule should affect visible score.
-  - Still consider computing hidden/internal score for every mode so end-game tie-breaks always have a fallback.
-- Add scoring state to `PlayerInGame`.
-  - `combo_count`
-  - `back_to_back`
-- Apply scoring options.
-  - `scoring.enabled`
-  - `scoring.comboBonus`
-  - `scoring.backToBackBonus`
-- Decide whether soft/hard drop points exist in this project.
-- Keep `lines` updated independently from score.
-- Make score-based win condition work with tie handling.
-
 ### Garbage
 
 - Implement board garbage insertion.
@@ -133,3 +116,12 @@
 - Send score only when visible scoring should be displayed.
 - Optionally keep hidden/internal score server-side for tie-breaks.
 - Keep `hold_piece_type`, `next_piece_types`, board, and opponent payload consistently filled.
+
+
+### FRONTEND
+
+### True SPA 
+- always render / not pages 
+- block pages aptempt 
+- make 404 for unknow routes 
+- Add list for games mode + menu for custom

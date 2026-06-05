@@ -6,6 +6,21 @@ import PlayerCard from '../components/cards/PlayerCard';
 import './LobbyPage.css';
 import LogoutButton from '../components/LogoutButton';
 import { ROUTES } from '../Types/Routes';
+
+type LobbyPlayer = {
+  player_id?: string;
+  username: string;
+  ready: boolean;
+  is_owner?: boolean;
+};
+
+type LobbyRosterPayload = {
+  players?: LobbyPlayer[];
+  players_list?: string[];
+  owner_id?: string;
+  message?: string;
+};
+
 export default function LobbyPage() {
   const goTo = useNavigate();
   const username = useAppSelector((state) => state.user.username) || 'Player';
@@ -16,8 +31,8 @@ export default function LobbyPage() {
   // Temporarily commented out to keep the client build passing.
   // This roster state is not wired yet, and tsconfig has noUnusedLocals enabled.
   // const [players, setPlayers] = useState<Array<{ player_id: string; username: string; ready: boolean }>>([]);
-  const [joinCards, setJoinCards] = useState<string[]>([]);
-
+  const [players, setPlayers] = useState<LobbyPlayer[]>([]);
+  // const [joinCards, setJoinCards] = useState<string[]>([]);
 
   const gameIdFromSession = sessionStorage.getItem('game_id') || '';
   // Temporarily commented out to keep the client build passing.
@@ -28,9 +43,39 @@ export default function LobbyPage() {
   // For now, single-player lobby always behaves like host.
   const isSinglePlayerLobby = useMemo(() => true, []);
 
-  const isHost = isSinglePlayerLobby;
+  const selfPlayer = players.find((player) => player.username === username);
+  const isHost = selfPlayer?.is_owner ?? isSinglePlayerLobby;
+  const displayedPlayers = players.length > 0
+    ? players
+    : [{ username, ready, is_owner: isHost }];
 
+  function syncRoster(payload?: LobbyRosterPayload) {
+    if (!payload)
+      return;
 
+    if (Array.isArray(payload.players) && payload.players.length > 0) {
+      setPlayers(payload.players);
+
+      const self = payload.players.find((player) => player.username === username);
+      setReady(Boolean(self?.ready));
+      return;
+    }
+
+    if (Array.isArray(payload.players_list) && payload.players_list.length > 0) {
+      const playerNames = payload.players_list;
+
+      setPlayers((prev) => playerNames.map((playerName) => {
+        const existing = prev.find((player) => player.username === playerName);
+
+        return {
+          player_id: existing?.player_id,
+          username: playerName,
+          ready: existing?.ready ?? (playerName === username ? ready : false),
+          is_owner: existing?.is_owner ?? (playerName === username ? isHost : false),
+        };
+      }));
+    }
+  }
 
   useEffect(() => {
     if (!socket) return;
@@ -43,18 +88,67 @@ export default function LobbyPage() {
     };
   }, [socket]);
 
+  // async function handleReadyToggle() {
+  //   if (!isHost) return;
+  //
+  //   const next = !ready;
+  //   setReady(next);
+  //
+  //   if (next && isHost) {
+  //     socket?.emit('lobby:start');
+  //     goTo('/game');
+  //   }
+  // }
   async function handleReadyToggle() {
-    if (!isHost) return;
+    if (!socket) return;
 
-    const next = !ready;
-    setReady(next);
+    const onSuccess = (payload?: LobbyRosterPayload) => {
+      socket.off('lobby:ready:success', onSuccess);
+      socket.off('lobby:ready:error', onError);
 
-    if (next && isHost) {
-      socket?.emit('lobby:start');
-      goTo('/game');
-    }
+      if (payload?.players || payload?.players_list) {
+        syncRoster(payload);
+        return;
+      }
+
+      setReady((prev) => !prev);
+      setPlayers((prev) => prev.map((player) => (
+        player.username === username
+          ? { ...player, ready: !player.ready }
+          : player
+      )));
+    };
+
+    const onError = (payload: { reason: string }) => {
+      socket.off('lobby:ready:success', onSuccess);
+      socket.off('lobby:ready:error', onError);
+      console.error(payload.reason);
+    };
+
+    socket.once('lobby:ready:success', onSuccess);
+    socket.once('lobby:ready:error', onError);
+    socket.emit('lobby:ready');
   }
 
+  function handleStartGame() {
+    if (!socket || !isHost) return;
+
+    const onSuccess = () => {
+      socket.off('lobby:start:success', onSuccess);
+      socket.off('lobby:start:error', onError);
+      goTo('/game');
+    };
+
+    const onError = (payload: { reason: string }) => {
+      socket.off('lobby:start:success', onSuccess);
+      socket.off('lobby:start:error', onError);
+      console.error(payload.reason);
+    };
+
+    socket.once('lobby:start:success', onSuccess);
+    socket.once('lobby:start:error', onError);
+    socket.emit('lobby:start');
+  }
 
   function handleLeaveQueue() {
     if (!socket) {
@@ -78,7 +172,6 @@ export default function LobbyPage() {
     socket.emit('lobby:leave');
   }
 
-
   const sharePayload = gameIdFromSession ? {
     label: 'Join Queue',
     gameId: gameIdFromSession,
@@ -93,28 +186,34 @@ export default function LobbyPage() {
       socket.connect();
     }
 
-    const onJoinUpdate = (payload: any) => {
+    const onJoinUpdate = (payload: LobbyRosterPayload) => {
       console.log('[socket] lobby:join:update', payload);
-      const message = String(payload?.message ?? '');
-      const firstWord = message.trim().split(/\s+/)[0];
-      if (firstWord) {
-        setJoinCards((prev) => [firstWord, ...prev]);
-      }
+      // const message = String(payload?.message ?? '');
+      // const firstWord = message.trim().split(/\s+/)[0];
+      // if (firstWord) {
+      //   setJoinCards((prev) => [firstWord, ...prev]);
+      // }
+      syncRoster(payload);
     };
+
+    const onReadyUpdate = (payload: LobbyRosterPayload) => {
+      console.log('[socket] lobby:ready:update', payload);
+      syncRoster(payload);
+    };
+
     socket.on('lobby:join:update', onJoinUpdate);
+    socket.on('lobby:ready:update', onReadyUpdate);
 
     socket.emit('lobby:join', { game_id: gameIdFromSession });
 
-
     return () => {
       socket.off('lobby:join:update', onJoinUpdate);
+      socket.off('lobby:ready:update', onReadyUpdate);
     };
-  }, [socket, gameIdFromSession]);
-
+  }, [socket, gameIdFromSession, username, ready, isHost]);
 
   return (
     <div className="lobby-container">
-
       <div className="lobby-header">LOBBY</div>
       <LogoutButton />
       {sharePayload ? (
@@ -132,27 +231,52 @@ export default function LobbyPage() {
         </div>
       ) : null}
 
-
       {isSinglePlayerLobby ? (
-        <div className="lobby-players">
-          <PlayerCard
-            username={username}
-            ready={ready}
-            onReady={handleReadyToggle}
-            onReturn={() => handleLeaveQueue()}
-          />
-          {joinCards.map((cardName, idx) => (
+        <>
+          {/*
+          <div className="lobby-players">
             <PlayerCard
-              key={`${cardName}-${idx}`}
-              username={cardName}
-              ready={false}
-              onReady={() => {}}
-              onReturn={() => {}}
+              username={username}
+              ready={ready}
+              onReady={handleReadyToggle}
+              onReturn={() => handleLeaveQueue()}
             />
-          ))}
-        </div>
-      ) : null}
+            {joinCards.map((cardName, idx) => (
+              <PlayerCard
+                key={`${cardName}-${idx}`}
+                username={cardName}
+                ready={false}
+                onReady={() => {}}
+                onReturn={() => {}}
+              />
+            ))}
+          </div>
+          */}
+          <div className="lobby-players">
+            {displayedPlayers.map((player, idx) => {
+              const isSelf = player.username === username;
 
+              return (
+                <PlayerCard
+                  key={player.player_id ?? `${player.username}-${idx}`}
+                  username={player.username}
+                  ready={player.ready}
+                  onReady={isSelf ? handleReadyToggle : () => {}}
+                  onReturn={isSelf ? () => handleLeaveQueue() : () => {}}
+                />
+              );
+            })}
+          </div>
+
+          {isHost && (
+            <div style={{ marginTop: 16, display: 'flex', justifyContent: 'center' }}>
+              <button onClick={handleStartGame}>
+                Start game
+              </button>
+            </div>
+          )}
+        </>
+      ) : null}
     </div>
   );
 }

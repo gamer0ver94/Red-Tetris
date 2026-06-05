@@ -19,7 +19,7 @@ export default function HomePage() {
     // Temporarily commented out to keep the client build passing.
     // This helper is currently unused, and tsconfig has noUnusedLocals enabled.
     // async function registerPlayerAndGo(route: string) {
-    //     const data = await fetchData("http://localhost:1800/auth/register", {
+    //     const data = await fetchData("/register", {
     //         username: username,
     //     }, "POST");
     //     if (data?.username) {
@@ -33,7 +33,7 @@ export default function HomePage() {
         setError("");
         if (!csrf_token) return;
 
-        const res = await fetch("http://localhost:1800/game/create", {
+        const res = await fetch("game/create", {
             method: "POST",
             credentials: "include",
             headers: {
@@ -66,7 +66,7 @@ export default function HomePage() {
             return;
         }
         const res = await fetch(
-            `http://localhost:1800/game/join/${encodeURIComponent(gameIdInput.trim())}/${encodeURIComponent(username || "")}`,
+            `game/join/${encodeURIComponent(gameIdInput.trim())}/${encodeURIComponent(username || "")}`,
             {
                 method: "GET",
                 credentials: "include",
@@ -94,7 +94,7 @@ export default function HomePage() {
 
     useEffect(() => {
         async function loadUser() {
-            const data = await fetchData("http://localhost:1800/auth/me", null, "GET");
+            const data = await fetchData("auth/me", null, "GET");
             if (data.username) {
                 dispatch(setUsername(data.username));
             }

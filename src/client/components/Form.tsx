@@ -17,7 +17,7 @@ export default function Form() {
     const payload = {
       username: input
     }
-    const data = await fetchData("http://localhost:1800/auth/register", payload, "POST");
+    const data = await fetchData("auth/register", payload, "POST");
     console.log(data);
     if (data.username) {
       dispatch(setUsername(data.username));
