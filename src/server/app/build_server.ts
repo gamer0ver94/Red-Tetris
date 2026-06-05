@@ -17,8 +17,43 @@ import { codeType } from '../types/error_code_types.js';
 //Bootstrap for server
 export const build_server = async () => {
   
-  const fastify = Fastify({ logger: true });
-  const clientOrigin = process.env.CLIENT_ORIGIN ?? 'http://localhost:1700';
+    const tlsKeyPath = process.env.TLS_KEY_PATH ?? './src/server/ssl/key.pem';
+    const tlsCertPath = process.env.TLS_CERT_PATH ?? './src/server/ssl/cert.pem';
+    const hasTls = Boolean(
+    tlsKeyPath &&
+    tlsCertPath &&
+    existsSync(tlsKeyPath) &&
+    existsSync(tlsCertPath)
+    );
+
+    let fastify: FastifyInstance;
+    if (hasTls) {
+    const httpsOptions = {
+        key: readFileSync(tlsKeyPath),
+        cert: readFileSync(tlsCertPath),
+    };
+    fastify = Fastify({ logger: true, https: httpsOptions as any });
+    console.log('Starting HTTPS server using', tlsKeyPath, tlsCertPath);
+    } else {
+    fastify = Fastify({ logger: true });
+    }
+
+    const sessionManagerRaw = process.env.SESSION_MANAGER ?? '';
+    if (sessionManagerRaw) {
+        const entry = sessionManagerRaw.split(',')[0] || '';
+        const afterFirstSlash = entry.includes('/') ? entry.split('/', 2)[1] : entry;
+        const firstPart = (afterFirstSlash || '').split(':')[0];
+        const host = firstPart.split('.')[0];
+
+        if (host) {
+            process.env.CLIENT_ORIGIN = `http${hasTls ? 's' : ''}://${host}:1700`;
+            console.log('Detected SESSION_MANAGER host:', host);
+            console.log('Set CLIENT_ORIGIN to', process.env.CLIENT_ORIGIN);
+        }
+    }
+
+    const clientOrigin = process.env.CLIENT_ORIGIN;
+    console.log('Set  clientOrigin to', clientOrigin);
   
   //cors and secure cookie init 
   await init_cors_and_cookies(fastify, clientOrigin);
@@ -65,8 +100,8 @@ async function init_cors_and_cookies(fastify: FastifyInstance, clientOrigin: str
     cookie:{
       path: '/',
       httpOnly: true,
-      secure: false,
-      sameSite: 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 60*60*24,
     }
   });

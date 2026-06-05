@@ -39,7 +39,12 @@ export function join_game(
         return socket_ids_res;
 
     const socket_ids = socket_ids_res.data
-    return { success:true, data:{username, socket_ids }};
+
+    const players_list = store.get_all_usernames_by_lobby_id(lobby.get_lobby_id());
+    if(!players_list.success)
+        return players_list;
+
+    return { success:true, data:{username, socket_ids, players_list: players_list.data }};
 }
 
 export function start_game(sid:string, store:Store):ModelResult<StartGameData, CodeType>{
