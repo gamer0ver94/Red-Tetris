@@ -16,7 +16,7 @@ const start = async () => {
     }
   }
 
-  let listenHost = '127.0.0.1';
+  let listenHost = '0.0.0.0';
   const protocol = (process.env.TLS_KEY_PATH && process.env.TLS_CERT_PATH) ? 'https' : 'http';
 
   if (sessionManagerRaw) {

@@ -54,7 +54,7 @@ export const build_server = async () => {
 
     let clientOrigin = process.env.CLIENT_ORIGIN;
     if (!process.env.CLIENT_ORIGIN)
-      clientOrigin = "http://localhost:1800"
+      clientOrigin = "http://localhost:1700"
     console.log('Set  clientOrigin to', clientOrigin);
   
   //cors and secure cookie init 
