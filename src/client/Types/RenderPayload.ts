@@ -5,7 +5,7 @@ export type BoardType = BoardCell[][];
 export type OpponentRender =
   | { view: 'full'; board: BoardType }
   | { view: 'grid'; board: BoardType }
-  | { view: 'highest'; highest: number };
+  | { view: 'highest'; board: BoardType };
 
 export type RenderPayload = {
   self: {

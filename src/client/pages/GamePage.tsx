@@ -32,7 +32,7 @@ export default function GamePage() {
         ([opponentUsername, opponent]) => {
           if (
             opponent &&
-            (opponent.view === 'full' || opponent.view === 'grid')
+            (opponent.view === 'full' || opponent.view === 'grid' || opponent.view === 'highest')
           ) {
             dispatch({
               type: 'boardMap/setOpponentBoard',
@@ -87,7 +87,7 @@ export default function GamePage() {
                 ([opponentUsername, opponent]) => {
                   if (
                     opponent &&
-                    (opponent.view === 'full' || opponent.view === 'grid')
+                    (opponent.view === 'full' || opponent.view === 'grid' || opponent.view === 'highest')
                   ) {
                     return (
                       <div key={opponentUsername} style={{ minWidth: 220 }}>

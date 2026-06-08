@@ -121,12 +121,12 @@ function build_visible_board(board:Board, cur_piece_visible:boolean):BoardType{
     return visible;
 }
 
-function build_empty_board(board:Board):BoardType{
+function build_empty_board(board:Board, show_cur:boolean=true):BoardType{
 
     const empty = board.get_board().map((row) => row.map(() => '.'));
     const current_piece = board.get_current_piece();
     
-    if (!current_piece)
+    if (!current_piece || !show_cur)
         return empty as BoardType;
 
     for (const cell of current_piece.get_cells()) {
@@ -144,7 +144,7 @@ function build_empty_board(board:Board):BoardType{
 }
 
 function build_highest_board(board:Board):BoardType{
-    const empty = build_empty_board(board);
+    const empty = build_empty_board(board, false);
     const highest_row = get_highest_occupied_row(board);
     for (let y = 0; y < empty.length; y++) {
         for (let x = 0; x < empty[0].length; x++) {
