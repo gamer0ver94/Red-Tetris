@@ -63,6 +63,21 @@ export class Store{
         return {success:true, data:sids};
     }
 
+    public get_all_usernames_by_lobby_id(lobby_id:string):ModelResult<string[], CodeType>{
+
+        const lobby_res = this.lobby.get_lobby_by_id(lobby_id);
+        if(!lobby_res.success)
+            return lobby_res;
+
+        let usernames:string[] = [];
+        for(const player_id of lobby_res.data.get_player_ids()){
+            const p_res = this.players.get_player_by_id(player_id);
+            if(p_res.success)
+                usernames.push(p_res.data.get_username());
+        }
+        return {success:true, data:usernames};
+    }
+
     public get_board_by_sid(sid:string):ModelResult<Board, CodeType>{
 
         const player_res = this.players.get_player_by_sid(sid);
@@ -92,5 +107,23 @@ export class Store{
 
         const player_res = active_game_res.data.get_player(p_res.data.get_player_id());
         return player_res;
+    }
+
+    public are_all_players_ready(sid:string):ModelResult<boolean, CodeType>{
+
+        const lobby_res = this.lobby.get_lobby_by_player_id(sid);
+        if(!lobby_res.success)
+            return lobby_res;
+
+        for(const player_id of lobby_res.data.get_player_ids()){
+            const player_res = this.players.get_player_by_id(player_id);
+            if(!player_res.success)
+                return player_res;
+            if(player_res.data.get_sid() === sid)
+                continue;
+            if(player_res.data.get_player_status() !== 'ready')
+                return {success:true, data:false};
+        }
+        return {success:true, data:true};
     }
 }

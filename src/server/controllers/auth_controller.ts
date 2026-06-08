@@ -20,6 +20,9 @@ export async function get_me(
     if(!response.success)
         throw new AppError(response.code);
     
+    if (!response.data.is_known)
+        request.cookies.erase('sid');
+
     return reply.code(200).send(response.data);
 }
 
@@ -56,10 +59,14 @@ export async function logout(
         throw new AppError('SID_MISSING', 403);
 
     const response = auth_services.logout(sid, request.server.store, true);
-    request.cookies.erase('sid');
     
     if(!response.success)
         throw new AppError(response.code, 403);
     
+    const socket_id = response.data.player_socket_id;
+    if(socket_id && !socket_id.startsWith('pending_disconnect:'))
+        request.server.io.sockets.get(socket_id)?.disconnect(true);
+
+    request.cookies.erase('sid');
     return reply.code(200).send({success: true});
 }

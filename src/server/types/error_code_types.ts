@@ -78,6 +78,7 @@ export type PlayerData = {
 export type JoinLobbyData = {
     username:string;
     socket_ids:string[];
+    players_list:string[];
 }
 
 

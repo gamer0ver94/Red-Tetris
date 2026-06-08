@@ -139,7 +139,7 @@ export default function GamePage() {
 
           <GameCard
             username={username}
-            score={null}
+            score={latestRender?.self?.score ?? null}
             currentPieceType={
               latestRender?.self?.current_piece_type ?? null
             }

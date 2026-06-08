@@ -20,7 +20,10 @@ export class PlayerInGame{
     private alive:boolean;
     private gravity_state:PlayerGravityState;
     private grid_visible_until:number|null;
-    private has_hold:boolean
+    private has_hold:boolean;
+    private touching_ground_since:number|null;
+    private lock_reset_count:number;
+    private score_bonus:number;
 
     constructor(
         board:Board,
@@ -40,6 +43,9 @@ export class PlayerInGame{
         }
         this.grid_visible_until = null;
         this.has_hold = false;
+        this.touching_ground_since = null;
+        this.lock_reset_count = 0;
+        this.score_bonus = 1;
     }
 
     //Getters
@@ -75,6 +81,14 @@ export class PlayerInGame{
         return this.has_hold
     }
 
+    public get_touching_ground_since():number|null{
+        return this.touching_ground_since;
+    }
+
+    public is_lock_delay_active():boolean{
+        return this.touching_ground_since !== null;
+    }
+
     //Setters
     public set_hold_piece(piece:PieceType){
         this.hold_piece = piece;
@@ -84,12 +98,26 @@ export class PlayerInGame{
         this.has_hold = false;
     }
 
+    public start_lock_delay(now:number){
+        if(this.touching_ground_since === null)
+            this.touching_ground_since = now;
+    }
+
+    public reset_lock_delay(){
+        this.touching_ground_since = null;
+    }
+
+    public clear_lock_delay(){
+        this.touching_ground_since = null;
+        this.lock_reset_count = 0;
+    }
+
     public add_lines(lines:number){
         this.lines += lines;
     }
 
-    public add_score(points:number){
-        this.score += points;
+    public set_score(new_score:number){
+        this.score = new_score;
     }
 
     public mark_lost(){
@@ -114,4 +142,27 @@ export class PlayerInGame{
         return tmp_piece
     }
 
+    public try_reset_lock_delay(max_try:number):boolean{
+        
+        if(this.touching_ground_since == null)
+            return false;
+
+        if(max_try !== 0 && this.lock_reset_count >= max_try)
+            return false;
+        this.touching_ground_since = null;
+        this.lock_reset_count += 1;
+        return true;
+    }
+
+    public reset_bonus(){
+        this.score_bonus = 1;
+    }
+
+    public get_bonus():number{
+        return this.score_bonus;
+    }
+
+    public increase_bonus(){
+        this.score_bonus += 1;
+    }
 }

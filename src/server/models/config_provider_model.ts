@@ -1,4 +1,5 @@
 import { GameOptions } from "../types/game_options_types.js";
+import { EndGameCondition } from "../types/game_types.js";
 
 export class ConfigProvider{
 
@@ -58,6 +59,10 @@ export class ConfigProvider{
         return this.opts.gravity.tickMs;
     }
 
+    public get_lock_delay_ms():number{
+        return this.opts.gravity.lockDelayMs;
+    }
+
     public get_oppenent_grid_mode():'full'|'grid'|'highest'|'none'{
         return this.opts.multiplayer.seeOpponents
     }
@@ -66,5 +71,44 @@ export class ConfigProvider{
         return this.opts.pieces.nextPreviewCount;
     }
 
+    public get_win_condition():EndGameCondition{
+        return this.opts.win.condition;
+    }
+
+    public get_win_limit():number|null{
+        return this.opts.win.limit;
+    }
+
+    public is_speed_on():boolean{
+        return this.opts.gravity.speedOnClear;
+    }
+
+    public get_max_lock():number{
+        return this.opts.gravity.maxLock;
+    }
+
+    public is_score_enable():boolean{
+        return this.opts.scoring.enabled;
+    }
+
+    public is_back_to_back_enable():boolean{
+        return this.opts.scoring.backToBackBonus;
+    }
+
+    public is_garbage_enabled(): boolean {
+        return this.opts.garbage.enabled;
+    }
+
+    public can_spawn_clearable_garbage(): boolean {
+        return this.opts.garbage.canClear;
+    }
+
+    public get_garbage_ratio(): number {
+        return this.opts.garbage.ratio;
+    }
+
+    public is_clear_create_garbage_enabled(): boolean {
+        return this.opts.garbage.clearCreateGarbage;
+    }
     //MORE TO ADD ANYTIME WE NEED TO CHECK OPTS 
 }

@@ -14,11 +14,8 @@ export function build_render_payload(active_game:ActiveGame, player_id:string, s
         return self_res;
 
     const self_board = self_res.data.get_board()
-
     if(!self_board)
         return {success:false, code:'BOARD_NOT_FOUND'};
-    
-    const current_piece = self_board.get_current_piece();
 
     const next_pieces_res = active_game.peek_pieces_for_player(player_id);
     let next_piece_types = null
@@ -30,12 +27,14 @@ export function build_render_payload(active_game:ActiveGame, player_id:string, s
     
     const render_board = show_grid ? build_visible_board(self_board, true) : build_empty_board(self_board);
     
+    const score = active_game.get_config().is_score_enable() ? self_res.data.get_score() : null;
 
     return {success:true, data:{
             self:{
                 board:render_board,
-                hold_piece_type:null,
+                hold_piece_type:self_res.data.get_hold_piece(),
                 next_piece_types,
+                score
             },
             opponents:  build_opponent_payload(active_game, player_id, store),
         },
@@ -48,7 +47,7 @@ function build_opponent_view(board:Board, mode:'full'|'grid'|'highest'|'none'):O
     if(mode === 'highest')
         return{
             view:'highest',
-            highest:get_highest_occupied_row(board)
+            highest:build_highest_board(board)
         };
     if(mode === 'grid')
         return {
@@ -124,5 +123,35 @@ function build_visible_board(board:Board, cur_piece_visible:boolean):BoardType{
 
 function build_empty_board(board:Board):BoardType{
 
-    return board.get_board().map((row) => row.map(() => '.'));
+    const empty = board.get_board().map((row) => row.map(() => '.'));
+    const current_piece = board.get_current_piece();
+    
+    if (!current_piece)
+        return empty as BoardType;
+
+    for (const cell of current_piece.get_cells()) {
+        if (
+            cell.y >= 0 &&
+            cell.y < empty.length &&
+            cell.x >= 0 &&
+            cell.x < empty[0].length
+        ) {
+            empty[cell.y][cell.x] = cell.type;
+        }
+    }
+
+    return empty as BoardType;
+}
+
+function build_highest_board(board:Board):BoardType{
+    const empty = build_empty_board(board);
+    const highest_row = get_highest_occupied_row(board);
+    for (let y = 0; y < empty.length; y++) {
+        for (let x = 0; x < empty[0].length; x++) {
+            if (y === highest_row) {
+                empty[y][x] = 'X';
+            }
+        }
+    }
+    return empty as BoardType;
 }

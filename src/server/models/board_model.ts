@@ -1,4 +1,4 @@
-import { BoardCell, BoardType } from "../types/game_types.ts";
+import { BoardCell, BoardType, ClearedRowsResult } from "../types/game_types.ts";
 import { Piece } from "./piece_model.ts";
 
 export class Board {
@@ -69,29 +69,43 @@ export class Board {
         this.current_piece = null;
     }
 
-    public clear_full_rows():number{
-        
+    public clear_full_rows(): ClearedRowsResult{
         const width = this.grid[0].length;
-        const remaining_rows = this.grid.filter((row) => row.some((cell) => cell === '.'));
-        
-        const cleared = this.grid.length - remaining_rows.length;
+        let cleared_lines = 0;
+        let cleared_garbage = 0;
 
-        const empty_rows: BoardCell[][] = Array.from({ length: cleared }, () => {
-            return Array.from({ length: width }, () => '.' as BoardCell);
+        const remaining_rows = this.grid.filter((row) => {
+            const is_full = row.every((cell) => cell !== '.');
+            const has_piece_cell = row.some((cell) => this.is_piece_cell(cell));
+            const should_clear = is_full && has_piece_cell;
+
+            if(should_clear){
+                cleared_lines += 1;
+                if(row.includes('X'))
+                    cleared_garbage += 1;
+            }
+
+            return !should_clear;
         });
+
+            const empty_rows: BoardCell[][] = Array.from({ length: cleared_lines }, () =>
+                Array.from({ length: width }, () => '.' as BoardCell)
+            );
+
         this.grid = [...empty_rows, ...remaining_rows];
-        return cleared;
+        return { cleared_lines, cleared_garbage };
     }
 
-    public apply_cell_gravity_loop():number{
-        let total = 0;
-
+    public apply_cell_gravity_loop():ClearedRowsResult{
+        
+        const total: ClearedRowsResult = { cleared_lines: 0, cleared_garbage: 0 };
         while(true){
             const clear = this.clear_full_rows();
-            if(clear == 0)
+            if(clear.cleared_lines == 0)
                 break;
-            total += clear;
-            
+            total.cleared_lines += clear.cleared_lines;
+            total.cleared_garbage += clear.cleared_garbage;
+
             let moved = true;
             while (moved)
                 moved = this.apply_cell_gravity();
@@ -106,7 +120,7 @@ export class Board {
 
             for (let x = 0; x < this.grid[y].length; x ++){
                 const cell = this.grid[y][x];
-                if(cell === '.')
+                if(!this.is_piece_cell(cell))
                     continue;
                 
                 let target_y = y;
@@ -122,5 +136,9 @@ export class Board {
             }
         }
         return moved;
+    }
+
+    public is_piece_cell(cell:BoardCell):boolean{
+        return cell !== '.' && cell !== 'X';
     }
 }

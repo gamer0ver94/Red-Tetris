@@ -183,7 +183,7 @@ async function socket_disconnect(io: TypedIoServer, sid:string, store:Store, soc
             active_socket_ids.delete(sid);
 
         auth_services.logout(sid, store, true);
-    }, 5000));
+    }, 30000));
 }
 
 function read_cookie(cookieHeader, name:string){

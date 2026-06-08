@@ -5,6 +5,7 @@ export type RenderPayload = {
     board:BoardType;
     hold_piece_type:null|string;
     next_piece_types:string[]|null;
+    score:number|null;
   }
   opponents:Record<string, OpponentRender>;
 }
@@ -13,4 +14,4 @@ export type RenderPayload = {
 export type OpponentRender = 
 | {view:'full'; board:BoardType}
 | {view:'grid'; board:BoardType}
-| {view:'highest'; highest:number};
+| {view:'highest'; board:BoardType};

@@ -1,3 +1,5 @@
+import { EndGameCondtion } from "./game_types.js";
+
 export type GameOptions = {
 
     grid:{
@@ -17,8 +19,10 @@ export type GameOptions = {
     gravity:{
         tickMs:number,
         lockDelayMs:number;
+        maxLock:number;
         softDropMultiplier:number;
         fallAfterClear:boolean;
+        speedOnClear:boolean;
     },
 
     garbage:{
@@ -30,12 +34,11 @@ export type GameOptions = {
 
     scoring:{
         enabled:boolean;
-        comboBonus:boolean;
         backToBackBonus:boolean;
     },
 
     win:{
-        condition:'survival'|'first_lost'|'score'|'lines'|'time';
+        condition:EndGameCondtion;
         limit:number|null;
     },
 
