@@ -35,7 +35,7 @@ export default function LobbyPage() {
 
   const leaveLobby = (()=>{
     socket.emit("lobby:leave");
-    goTo("/");
+    goTo("/home");
   });
 
   const allPlayersReady = () => {
