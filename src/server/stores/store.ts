@@ -4,6 +4,7 @@ import { ActiveGameStore } from "./active_game_store.ts";
 import { ModelResult, type CodeType } from "../types/error_code_types.ts";
 import { Board } from "../models/board_model.js";
 import { PlayerInGame } from "../models/player_in_game_model.js";
+import { playerStatusType } from "../types/status_types.js";
 
 
 export class Store{
@@ -121,7 +122,7 @@ export class Store{
                 return player_res;
             if(player_res.data.get_sid() === sid)
                 continue;
-            if(player_res.data.get_player_status() !== 'ready')
+            if(player_res.data.get_player_status() !== playerStatusType.ready)
                 return {success:true, data:false};
         }
         return {success:true, data:true};

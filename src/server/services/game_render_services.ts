@@ -47,7 +47,7 @@ function build_opponent_view(board:Board, mode:'full'|'grid'|'highest'|'none'):O
     if(mode === 'highest')
         return{
             view:'highest',
-            highest:build_highest_board(board)
+            board:build_highest_board(board)
         };
     if(mode === 'grid')
         return {
