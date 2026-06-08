@@ -112,7 +112,11 @@ export class Store{
 
     public are_all_players_ready(sid:string):ModelResult<boolean, CodeType>{
 
-        const lobby_res = this.lobby.get_lobby_by_player_id(sid);
+        const id_res = this.players.get_player_by_sid(sid);
+        if(!id_res.success)
+            return id_res
+
+        const lobby_res = this.lobby.get_lobby_by_player_id(id_res.data.get_player_id());
         if(!lobby_res.success)
             return lobby_res;
 

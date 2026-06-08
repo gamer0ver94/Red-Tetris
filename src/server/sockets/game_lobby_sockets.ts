@@ -66,7 +66,7 @@ async function start_lobby_event(
 ){
 
     const all_ready = store.are_all_players_ready(sid);
-    if(!all_ready.success)
+    if(!all_ready.success || !all_ready.data)
         return await socket.emit('lobby:start:error', {reason:'Not all players are ready'});
 
     const response = lobby_services.start_game(sid, store);
