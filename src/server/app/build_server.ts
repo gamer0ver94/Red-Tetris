@@ -6,7 +6,7 @@ import swaggerUI from '@fastify/swagger-ui';
 import fastifyStatic from '@fastify/static';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 import { register_routes } from './register_routes.ts';
 import { register_sockets } from './register_sockets.ts';
@@ -102,8 +102,8 @@ async function init_cors_and_cookies(fastify: FastifyInstance, clientOrigin: str
     cookie:{
       path: '/',
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: false,
+      sameSite: 'lax',
       maxAge: 60*60*24,
     }
   });

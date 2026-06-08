@@ -21,7 +21,7 @@ export async function get_me(
         throw new AppError(response.code);
     
     if (!response.data.is_known)
-        request.cookies.erase('sid');
+        request.session.delete();
 
     return reply.code(200).send(response.data);
 }
@@ -67,6 +67,6 @@ export async function logout(
     if(socket_id && !socket_id.startsWith('pending_disconnect:'))
         request.server.io.sockets.get(socket_id)?.disconnect(true);
 
-    request.cookies.erase('sid');
+    request.session.delete();
     return reply.code(200).send({success: true});
 }

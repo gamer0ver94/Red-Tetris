@@ -16,7 +16,7 @@ export default function HomePage() {
     const username = useAppSelector((state) => state.user.username)
     const csrf_token = useAppSelector((state) => state.user.csrf_token)
     const [gameIdInput, setGameIdInput] = useState("");
-  const [hostUsername, setHostUsername] = useState<string>('');
+  const [, setHostUsername] = useState<string>('');
     const [gameMode, setGameMode] = useState("classic")
     const dispatch = useAppDispatch();
     const [error, setError] = useState("");

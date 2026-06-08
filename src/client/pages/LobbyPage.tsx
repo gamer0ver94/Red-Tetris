@@ -49,7 +49,7 @@ export default function LobbyPage() {
   const onPlayerReady = () => {
     setStatus(status === "ready" ? "not-ready" : "ready");
     console.log("READY TO START");
-    socket?.emit("player:ready", { username });
+    socket?.emit("lobby:ready");
     if (allPlayersReady() && hostUsername) {
       socket?.emit("lobby:start");
     }
