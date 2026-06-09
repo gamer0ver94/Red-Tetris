@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { auth_routes } from '../routes/auth_routes.ts';
 import { game_routes } from '../routes/game_routes.ts';
+import { history_routes } from '../routes/history_routes.ts';
 
 // all exposed routes 
 export const register_routes = async (fastify: FastifyInstance) => {
@@ -10,4 +11,6 @@ export const register_routes = async (fastify: FastifyInstance) => {
 
   //starts with /game
   await fastify.register(game_routes, { prefix: '/game'});
+
+  await fastify.register(history_routes, {prefix: '/history'});
 };

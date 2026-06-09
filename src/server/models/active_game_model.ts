@@ -77,6 +77,14 @@ export class ActiveGame{
         return {success:true, data:null};
     }
 
+    public are_all_dead():boolean{
+        for(const p of this.players.values()){
+            if(p.is_alive())
+                return false;
+        }
+        return true;
+    }
+
     //Methods
     public has_player(player_id:string):boolean{
         

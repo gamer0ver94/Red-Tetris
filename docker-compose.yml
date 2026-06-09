@@ -10,6 +10,7 @@ services:
     volumes:
       - ./src/server:/app
       - server_node_modules:/app/node_modules
+      - ./history.json:/app/history.json
     command: sh -lc "npm run dev"
     ports:
       - "1800:1800"

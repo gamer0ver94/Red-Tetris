@@ -7,17 +7,20 @@ export class Lobby{
     private player_ids: Set<string>;
     private game_opts:GameOptions;
     private game_status: GameStatus;
+    private game_mode:string;
 
     constructor(
         lobby_id: string,
         owner_id: string,
-        game_opts:GameOptions
+        game_opts:GameOptions,
+        game_mode:string,
     ){
         this.lobby_id = lobby_id;
         this.owner_id = owner_id;
         this.player_ids = new Set<string>();
         this.game_status = gameStatusType.created;
         this.game_opts = game_opts;
+        this.game_mode = game_mode
     }
 
     // Getters
@@ -43,6 +46,10 @@ export class Lobby{
 
     public get_player_count():number{
         return this.player_ids.size;
+    }
+
+    public get_game_mode():string{
+        return this.game_mode
     }
     
     //Setters

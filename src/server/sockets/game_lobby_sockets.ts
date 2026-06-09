@@ -34,6 +34,21 @@ export async function socket_game_lobby(
     socket.on('lobby:ready', async() => {
         await ready_lobby_event(io, socket, sid, store);
     });
+
+    socket.on('history:watch', async(data) => {
+        if(!data?.page)
+            return;
+
+        const ok = helpers.history_watch(sid, data.page, store);
+        if(!ok)
+            return;
+    });
+
+    socket.on('history:unwatch', async() => {
+            const ok = helpers.history_unwatch(sid, store);
+        if(!ok)
+            return;
+    });
 }
 
 

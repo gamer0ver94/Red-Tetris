@@ -115,7 +115,8 @@ export function create_game(
     const lobby = new Lobby(
         lobby_id,
         owner_id,
-        game_opts
+        game_opts,
+        game_mode,
     );
 
     const lobby_res = store.get_lobby_store().add_lobby(lobby);

@@ -19,6 +19,8 @@ export class EndGameProvider {
     
     public static evaluateEndGame(active_game:ActiveGame, condition:EndGameCondition, limit:number | null):EndGameResult{
 
+        if(active_game.are_all_dead())
+            return this.all_lost(active_game);
         if(condition === 'first_lost')
             return this.evaluate_first_lost(active_game);
 
@@ -35,6 +37,23 @@ export class EndGameProvider {
             return this.evaluate_survival(active_game);
 
         return {finished:false};
+    }
+
+    private static all_lost(active_game:ActiveGame):EndGameResult{
+        const players = active_game.get_players();
+        if(players.length == 1)
+            return {finished:true, winners_id:[], losers_id:players.map((player) => player.get_player_id())}
+
+        const highest = this.get_highest_score(players);
+        
+        const winners_id = players.filter((player) => player.get_score() >= highest).map((player) => player.get_player_id());
+        const losers_id = players.filter((player) => !winners_id.includes(player.get_player_id())).map((player) => player.get_player_id())
+
+        return {
+            finished:true,
+            winners_id,
+            losers_id,
+        }
     }
 
     private static evaluate_first_lost(active_game:ActiveGame):EndGameResult{
@@ -89,7 +108,7 @@ export class EndGameProvider {
         const players = active_game.get_players();
 
         const losers_id:string[] = players.filter((player) => !player.is_alive()).map((player) => player.get_player_id());
-        if(losers_id.length < players.length - 1)
+        if(losers_id.length < players.length - 1 || players.length == 1)
             return {finished:false};
         const winners_id:string[] = players.filter((player) => player.is_alive()).map((player) => player.get_player_id());
 

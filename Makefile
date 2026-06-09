@@ -26,10 +26,12 @@ up:
 	else \
 		echo "SESSION_MANAGER not set"; \
 	fi; \
-	if [ -f src/server/history.json ]; then \
-		chmod a-w src/server/history.json || true; \
-		echo "Found src/server/history.json — set to readonly"; \
+	if [ ! -f history.json ]; then \
+		printf '[]\n' > history.json; \
+		echo "Created history.json"; \
 	fi; \
+	chmod a+rw history.json || true; \
+	echo "history.json set to read/write"; \
 	$(COMPOSE) up server client
 
 build:
