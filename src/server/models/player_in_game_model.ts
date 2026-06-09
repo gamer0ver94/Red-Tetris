@@ -24,6 +24,7 @@ export class PlayerInGame{
     private touching_ground_since:number|null;
     private lock_reset_count:number;
     private score_bonus:number;
+    private total_lock:number;
 
     constructor(
         board:Board,
@@ -46,6 +47,7 @@ export class PlayerInGame{
         this.touching_ground_since = null;
         this.lock_reset_count = 0;
         this.score_bonus = 1;
+        this.total_lock = 0;
     }
 
     //Getters
@@ -87,6 +89,10 @@ export class PlayerInGame{
 
     public is_lock_delay_active():boolean{
         return this.touching_ground_since !== null;
+    }
+
+    public get_total_lock():number{
+        return this.total_lock
     }
 
     //Setters
@@ -164,5 +170,9 @@ export class PlayerInGame{
 
     public increase_bonus(){
         this.score_bonus += 1;
+    }
+
+    public increase_total_lock(count:number = 1){
+        this.total_lock += count;
     }
 }

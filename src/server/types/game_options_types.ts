@@ -22,7 +22,7 @@ export type GameOptions = {
         maxLock:number;
         softDropMultiplier:number;
         fallAfterClear:boolean;
-        speedOnClear:boolean;
+        speedOnLock:boolean;
     },
 
     garbage:{

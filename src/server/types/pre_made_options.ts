@@ -14,12 +14,12 @@ export const CLASSIC_OPTS:GameOptions = {
         nextPreviewCount:3,
     },
     gravity:{
-        tickMs: 800,
+        tickMs: 650,
         lockDelayMs:100,
         maxLock:15,
         softDropMultiplier:0.3,
         fallAfterClear:false,
-        speedOnClear:true,
+        speedOnLock:true,
     },
     garbage:{
         enabled:true,
@@ -57,12 +57,12 @@ export const HARD_OPTS:GameOptions = {
         nextPreviewCount:1,
     },
     gravity:{
-        tickMs:600,
+        tickMs:500,
         lockDelayMs:50,
         maxLock:5,
         softDropMultiplier:0.4,
         fallAfterClear:false,
-        speedOnClear:true,
+        speedOnLock:true,
     },
     garbage:{
         enabled:true,
@@ -99,12 +99,12 @@ export const EASY_OPTS:GameOptions={
         nextPreviewCount:7,
     },
     gravity:{
-        tickMs:900,
+        tickMs:800,
         lockDelayMs:150,
         maxLock:0,
         softDropMultiplier:0.3,
         fallAfterClear:true,
-        speedOnClear:false,
+        speedOnLock:false,
     },
     garbage:{
         enabled:true,
@@ -141,12 +141,12 @@ export const SOLO_OPTS:GameOptions={
         nextPreviewCount:4,
     },
     gravity:{
-        tickMs:800,
+        tickMs:650,
         lockDelayMs:100,
         maxLock:15,
         softDropMultiplier:0.3,
         fallAfterClear:true,
-        speedOnClear:true
+        speedOnLock:true
     },
     garbage:{
         enabled:false,
@@ -183,12 +183,12 @@ export const BATTLE_OPTS:GameOptions = {
         nextPreviewCount:3,
     },
     gravity:{
-        tickMs:800,
+        tickMs:650,
         lockDelayMs:100,
         maxLock:20,
         softDropMultiplier:0.3,
         fallAfterClear:true,
-        speedOnClear:true,
+        speedOnLock:true,
     },
     garbage:{
         enabled:true,

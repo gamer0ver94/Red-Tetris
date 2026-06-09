@@ -39,7 +39,7 @@ export function start_game_loop(
       .finally(() => {
         is_ticking = false;
       });
-  }, 150);
+  }, 30);
 
   active_loops.set(lobby_id, timer);
 
@@ -105,15 +105,16 @@ export function tick_game(active_game: ActiveGame) : {winners_id:string[], loser
 function get_player_tick_ms(active_game:ActiveGame, player:PlayerInGame):number{
 
   const base = active_game.get_config().get_tick_ms();
-  const lines = player.get_lines();
+  const locks = player.get_total_lock();
+  // console.log(player.get_total_lock());
 
-  if(!active_game.get_config().is_speed_on() || lines == 0)
+  if(!active_game.get_config().is_speed_on() || locks == 0)
     return base;
 
-  const trigger_count = 2;
-  const speed_ms = 50;
+  const trigger_count = 1;
+  const speed_ms = 15;
   const max_speed = 100;
 
-  const level = Math.floor(lines/trigger_count);
+  const level = Math.floor(locks/trigger_count);
   return Math.max(max_speed, base - level * speed_ms);
 }

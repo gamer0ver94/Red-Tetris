@@ -1,29 +1,8 @@
 # Server Game Roadmap
 
-## Missing / Blocking Stuff
 
 
-## Join and Ready 
 
-- send socket join:ready to all players in lobby with updated list : 
-{
-  username: playerStatusType.waiting || playerStatusType.wating
-  is_host:bool
-}
-
-
-- on join -> send actual player list (updated with status)
-
-- create PlayersInLobbyType{
-  username:status,
-  is_host
-}
-
-- send to front the list on join and ready/unready
-
-### Garbage
-
-- check cleanClear + fallAfterLock
 
 ### End Game
 

@@ -80,7 +80,7 @@ export class ConfigProvider{
     }
 
     public is_speed_on():boolean{
-        return this.opts.gravity.speedOnClear;
+        return this.opts.gravity.speedOnLock;
     }
 
     public get_max_lock():number{

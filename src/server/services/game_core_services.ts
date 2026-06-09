@@ -77,6 +77,7 @@ export function  tick_board(
             return { success:true, data: {clear:0, lock_waiting:true}};
 
         board.lock_current_piece();
+        player.increase_total_lock();
         clear = finish_piece_lock(board, active_game, player);
         if(clear == 0)
             player.reset_bonus();
