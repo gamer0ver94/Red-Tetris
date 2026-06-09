@@ -52,20 +52,20 @@ export interface ClientToServerEvents {
 
 export interface ServerToClientEvents{
 
-    'lobby:ready:success': (p: LobbyReadyPayload) => void;
+    'lobby:ready:success': () => void;
     'lobby:ready:error': (p: {reason:string}) => void;
     'lobby:ready:update': (p: LobbyReadyPayload) => void;
 
     'lobby:join:error': (p: {reason:string}) => void;
     'lobby:join:success': () => void;
-    'lobby:join:update': (p: {message:string}) => void;
+    'lobby:join:update': (p: LobbyReadyPayload) => void;
 
     'lobby:start:error': (p: {reason:string}) => void;
     'lobby:start:success': () => void;
 
     'lobby:leave:error': (p: {reason:string}) => void;
     'lobby:leave:success': () => void;
-    'lobby:leave:update': (p: {message:string}) => void;
+    'lobby:leave:update': (p: LobbyReadyPayload) => void;
     'lobby:new_owner': () => void;
 
     'game:render': (p: RenderPayload) => void;
@@ -115,13 +115,13 @@ export type SessionResumePayload = {
 }
 
 export type LobbyPlayerState = {
-    player_id:string;
     username:string;
-    ready:boolean;
+    status:PlayerStatus;
     is_owner:boolean;
 }
 
 export type LobbyReadyPayload = {
     players: LobbyPlayerState[];
-    owner_id:string;
+    owner_name:string;
+    all_ready:boolean;
 }

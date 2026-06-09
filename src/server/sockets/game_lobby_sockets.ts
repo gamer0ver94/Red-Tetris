@@ -52,9 +52,12 @@ export async function join_lobby_event(
         await helpers.change_player_status(io, playerStatusType.waiting, sid, store.get_player_store());
         await socket.emit('lobby:join:success');
         
+        const list = extract_status_list(sid,store);
+        if(!list)
+            return await socket.emit('lobby:join:error', {reason: 'Error while extracting list'});
         if(response.data.socket_ids.length > 0){
             for (const sock of response.data.socket_ids)
-                await io.to(sock).emit('lobby:join:update', {message:`${response.data.username} just joined the lobby`, players_list: response.data.players_list });
+                await io.to(sock).emit('lobby:join:update', list );
         }
 }
 
@@ -129,20 +132,22 @@ async function leave_lobby_event(
     if(!response.success)
         return await socket.emit('lobby:leave:error', {reason:codeType[response.code]});
     
-    if (response.data.deleted)
-        return await socket.emit('lobby:leave:success');
-    
     if(response.data.new_owner)
         await io.to(response.data.new_owner_socket).emit('lobby:new_owner');
     
     //send lobby:leave:success to socket + change status(go back to connected)
     const leaver_name = response.data.leaver_name;
-    for( const socket_id of response.data.socket_ids)
-        await io.to(socket_id).emit('lobby:leave:update', {
-            message:`${leaver_name} just left the game`
-        });
     await socket.emit('lobby:leave:success');
-    await helpers.change_player_status(io, playerStatusType.connected, sid, store.get_player_store())
+    await helpers.change_player_status(io, playerStatusType.connected, sid, store.get_player_store());
+
+    const random_player_res = store.get_player_store().get_player_by_socket_id(response.data.socket_ids[0])
+    if(!random_player_res.success)
+        return;
+    const list = extract_status_list(random_player_res.data.get_sid(),store);
+    if(!list)
+        return await socket.emit('lobby:join:error', {reason: 'Error while extracting list'});
+    for( const socket_id of response.data.socket_ids)
+        await io.to(socket_id).emit('lobby:leave:update', list);
 }
 
 async function ready_lobby_event(io:TypedIoServer, socket:TypedSocket, sid:string, store:Store){
@@ -151,66 +156,35 @@ async function ready_lobby_event(io:TypedIoServer, socket:TypedSocket, sid:strin
     if (!player_res.success)
         return await socket.emit('lobby:ready:error', { reason: codeType[player_res.code] });
 
-    lobby_services.ready_player(player_res.data);
+    const ready_res = lobby_services.ready_player(sid, store);
+    if(!ready_res.success)
+        return await socket.emit('lobby:ready:error', { reason: codeType[ready_res.code] });
 
-    const payload_res = build_lobby_ready_payload(sid, store);
-    if (!payload_res.success)
-        return await socket.emit('lobby:ready:error', { reason: codeType[payload_res.code] });
+    const status_list = extract_status_list(sid, store);
+    if (!status_list)
+        return await socket.emit('lobby:ready:error', { reason:'Error while extracting list'});
 
-    const lobby_res = store.get_lobby_store().get_lobby_by_player_id(player_res.data.get_player_id());
-    if (!lobby_res.success)
-        return;
+    await socket.emit('lobby:ready:success');
 
-    const socket_ids_res = store.get_all_sockets_by_lobby_id(lobby_res.data.get_lobby_id());
-    // better: resolve lobby id separately, not owner_id
-
-    await socket.emit('lobby:ready:success', payload_res.data);
-
-
-
-    const sockets_res = store.get_all_sockets_by_lobby_id(lobby_res.data.get_lobby_id());
+    const sockets_res = store.get_all_sockets_by_lobby_id(ready_res.data);
     if (!sockets_res.success)
         return;
 
-    for (const socket_id of sockets_res.data) {
-        if (socket_id === socket.id)
-            continue;
-        await io.to(socket_id).emit('lobby:ready:update', payload_res.data);
-    }
+    for (const socket_id of sockets_res.data)
+        await io.to(socket_id).emit('lobby:ready:update', status_list);
 }
 
 
-function build_lobby_ready_payload(sid:string, store:Store): ModelResult<LobbyReadyPayload, CodeType>{
+function extract_status_list(sid:string, store:Store):LobbyReadyPayload|null{
 
-    const player_res = store.get_player_store().get_player_by_sid(sid);
-    if(!player_res.success)
-        return player_res;
+    const player_res = store.get_player_store().get_player_by_sid(sid)
+    if(!player_res.success) return null;
 
     const lobby_res = store.get_lobby_store().get_lobby_by_player_id(player_res.data.get_player_id());
-    if(!lobby_res.success)
-        return lobby_res;
+    if(!lobby_res.success) return null;
 
-    const lobby = lobby_res.data;
-    const players = lobby.get_player_ids().map((player_id) => {
-        const p_res = store.get_player_store().get_player_by_id(player_id);;
-        if(!p_res.success)
-            return null;
+    const list_res = lobby_services.extract_player_in_lobby_status(lobby_res.data.get_lobby_id(), store);
+    if(!list_res.success) return null;
 
-        const player = p_res.data;
-
-        return {
-            player_id,
-            username:player.get_username(),
-            ready: player.get_player_status() === playerStatusType.ready,
-            is_owner: lobby.is_owner(player_id)
-        }
-    }).filter((player) : player is LobbyPlayerState => player !== null);
-
-    return {
-        success:true,
-        data:{
-            players,
-            owner_id: lobby.get_owner_id(),
-        }
-    }
+    return list_res.data;
 }

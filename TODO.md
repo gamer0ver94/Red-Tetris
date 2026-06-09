@@ -2,42 +2,28 @@
 
 ## Missing / Blocking Stuff
 
-### Scoring
 
-- Finish base line-clear scoring.
-  - Keep `ScoreProvider.line_clear(score, clear, bonus)` guarded for `clear <= 0`.
-  - Apply score only when the scoring rule should affect visible score.
-  - Still consider computing hidden/internal score for every mode so end-game tie-breaks always have a fallback.
-- Add scoring state to `PlayerInGame`.
-  - `combo_count`
-  - `back_to_back`
-- Apply scoring options.
-  - `scoring.enabled`
-  - `scoring.comboBonus`
-  - `scoring.backToBackBonus`
-- Decide whether soft/hard drop points exist in this project.
-- Keep `lines` updated independently from score.
-- Make score-based win condition work with tie handling.
+## Join and Ready 
+
+- send socket join:ready to all players in lobby with updated list : 
+{
+  username: playerStatusType.waiting || playerStatusType.wating
+  is_host:bool
+}
+
+
+- on join -> send actual player list (updated with status)
+
+- create PlayersInLobbyType{
+  username:status,
+  is_host
+}
+
+- send to front the list on join and ready/unready
 
 ### Garbage
 
-- Implement board garbage insertion.
-  - Add garbage rows from bottom.
-  - Remove rows from top.
-  - Generate one or more holes per garbage row.
-  - Mark garbage cells as `X`.
-- Apply garbage options.
-  - `garbage.enabled`
-  - `garbage.canClear`
-  - `garbage.ratio`
-  - `garbage.clearCreateGarbage`
-- Decide garbage routing.
-  - Multiplayer sends garbage to opponents.
-  - Solo ignores garbage or stores pending garbage depending on mode.
-  - Clearing garbage may or may not send garbage back.
-- Decide if garbage affects scoring.
-  - `ScoreProvider.garbage_clear`
-  - `ScoreProvider.garbage_spawn`
+- check cleanClear + fallAfterLock
 
 ### End Game
 

@@ -12,7 +12,8 @@ import { stop_game_loop } from './game_loop_services.js'
 import { MAPPED_OPTS, type GameMode } from '../types/pre_made_options.js'
 import { GameOptions } from '../types/game_options_types.js'
 import { CodeType, LeaveGameData, JoinLobbyData, ModelResult, StartGameData } from '../types/error_code_types.js'
-import { gameStatusType, playerStatusType } from '../types/status_types.ts'
+import { gameStatusType, PlayerInLobbyStatus, PlayerStatus, playerStatusType } from '../types/status_types.ts'
+import { LobbyPlayerState, LobbyReadyPayload } from '../types/socket_event_types.js'
 
 export function join_game(
     sid:string,
@@ -257,11 +258,62 @@ function leave_game_started(player: Player, lobby: Lobby, store: Store):ModelRes
 }
 
 
-export function ready_player(player:Player){
-    if(player.get_player_status() === playerStatusType.ready)
+export function ready_player(sid:string, store:Store):ModelResult<string, CodeType>{
+
+    const player_res = store.get_player_store().get_player_by_sid(sid);
+    if(!player_res.success)
+        return player_res;
+    const player = player_res.data;
+
+    const lobby_res = store.get_lobby_store().get_lobby_by_player_id(player.get_player_id());
+    if(!lobby_res.success)
+        return lobby_res;
+    const lobby_id = lobby_res.data.get_lobby_id();
+    const status = player.get_player_status();
+    if(status === playerStatusType.ready){
         player.set_player_status(playerStatusType.waiting);
-    else
+        return {success:true, data:lobby_id}
+    }
+    if(status === playerStatusType.waiting){
         player.set_player_status(playerStatusType.ready);
+        return {success:true, data:lobby_id}
+    }
+    return {success:false, code:'NOT_ALLOWED'}
+}
+
+
+
+export function extract_player_in_lobby_status(lobby_id:string, store:Store)
+    :ModelResult<LobbyReadyPayload, CodeType>{
+
+        const lobby_res = store.get_lobby_store().get_lobby_by_id(lobby_id);
+        if(!lobby_res.success)
+            return lobby_res;
+        const lobby = lobby_res.data;
+
+        const owner_res = store.get_player_store().get_player_by_id(lobby.get_owner_id());
+        if(!owner_res.success)
+            return owner_res;
+        const owner_name = owner_res.data.get_username();
+        const owner_id = owner_res.data.get_player_id();
+
+        const player_ids = lobby_res.data.get_player_ids();
+        const ready_res = store.are_all_players_ready(owner_res.data.get_sid());
+        if(!ready_res.success)
+            return ready_res;
+
+        let players:LobbyPlayerState[] = [];
+        
+        for(const player_id of player_ids){
+            const player_res = store.get_player_store().get_player_by_id(player_id);
+            if(!player_res.success)
+                continue;
+            const is_owner = lobby_res.data.get_owner_id() === player_id ? true:false;
+            const username = player_res.data.get_username();
+            const status = player_res.data.get_player_status();
+            players.push({username, status, is_owner})
+        }
+        return {success:true, data:{players, owner_name, all_ready:ready_res.data}}
 }
 
 
