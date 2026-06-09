@@ -9,6 +9,7 @@ import { codeType } from "../types/error_code_types.js";
 import { change_player_status, change_game_status } from "../sockets/misc_sockets.ts";
 import {LobbyPlayerState, LobbyReadyPayload} from '../types/socket_event_types.ts';
 import { ModelResult, CodeType } from '../types/error_code_types.ts';
+import { finish_active_game } from "../services/game_end_services.js";
 
 
 
@@ -87,31 +88,40 @@ async function start_lobby_event(
         await io.to(socket_id).emit('lobby:start:success');
     }
 
-    const list = extract_status_list(sid, store);
+    
     const loop_res = start_game_loop(game_id, store, async(game, match_results)=>{
         if(match_results){
-            for (const id of match_results.winners_id){
-                const player_res = store.get_player_store().get_player_by_id(id);
-                if(player_res.success){
-                    await io.to(player_res.data.get_socket()).emit('game:win');
-                    await change_player_status(io, playerStatusType.waiting, player_res.data.get_sid(), store.get_player_store());
-                    if (list)
-                        await io.to(player_res.data.get_socket()).emit('lobby:ready:update', list);
-                }
-            }
-            for (const id of match_results.losers_id){
-                const player_res = store.get_player_store().get_player_by_id(id);
-                if(player_res.success){
-                    await io.to(player_res.data.get_socket()).emit('game:lose');
-                    await change_player_status(io, playerStatusType.waiting, player_res.data.get_sid(), store.get_player_store());
-                    if (list)
-                        await io.to(player_res.data.get_socket()).emit('lobby:ready:update', list);
-                }
-            }
-            await change_game_status(io, gameStatusType.waiting, game_id, sids, store);
-            const active_game_res = store.get_active_game_store().get_active_game_by_lobby_id(game_id);
-            if(active_game_res.success)
-                store.get_active_game_store().delete_active_game(active_game_res.data);
+            const finish_res = finish_active_game(
+                game_id,
+                store,
+                match_results.winners_id,
+                match_results.losers_id,
+            );
+
+            if(!finish_res.success)
+                return;
+
+            await emit_win_lose(
+                io,
+                store,
+                finish_res.data.winner_ids,
+                finish_res.data.loser_ids,
+            );
+
+            const random_player_res = store.get_player_store().get_player_by_socket_id(
+                finish_res.data.socket_ids[0],
+            );
+
+            if(!random_player_res.success)
+                return;
+
+            const list = extract_status_list(random_player_res.data.get_sid(), store);
+            if(!list)
+                return;
+
+            for(const socket_id of finish_res.data.socket_ids)
+                await io.to(socket_id).emit('lobby:ready:update', list);
+
             return;
         }
         for (const sid of sids){
@@ -142,18 +152,24 @@ async function leave_lobby_event(
         await io.to(response.data.new_owner_socket).emit('lobby:new_owner');
     
     //send lobby:leave:success to socket + change status(go back to connected)
-    const leaver_name = response.data.leaver_name;
     await socket.emit('lobby:leave:success');
-    await helpers.change_player_status(io, playerStatusType.connected, sid, store.get_player_store());
+    await helpers.change_player_status(io, response.data.status, sid, store.get_player_store());
+
+    if(response.data.winner_ids.length > 0 || response.data.loser_ids.length > 0)
+        await emit_win_lose(io, store, response.data.winner_ids, response.data.loser_ids);
+
+    if(response.data.socket_ids.length === 0)
+        return;
 
     const random_player_res = store.get_player_store().get_player_by_socket_id(response.data.socket_ids[0])
     if(!random_player_res.success)
         return;
     const list = extract_status_list(random_player_res.data.get_sid(),store);
     if(!list)
-        return await socket.emit('lobby:join:error', {reason: 'Error while extracting list'});
+        return await socket.emit('lobby:leave:error', {reason: 'Error while extracting list'});
     for( const socket_id of response.data.socket_ids)
         await io.to(socket_id).emit('lobby:leave:update', list);
+
 }
 
 async function ready_lobby_event(io:TypedIoServer, socket:TypedSocket, sid:string, store:Store){
@@ -193,4 +209,28 @@ function extract_status_list(sid:string, store:Store):LobbyReadyPayload|null{
     if(!list_res.success) return null;
 
     return list_res.data;
+}
+
+async function emit_win_lose(
+    io:TypedIoServer,
+    store:Store,
+    winner_ids:string[],
+    loser_ids:string[],
+) {
+    
+    for(const id of winner_ids){
+        const res = store.get_player_store().get_player_by_id(id);
+        if(!res.success)
+            continue;
+        await io.to(res.data.get_socket()).emit('game:win');
+        await change_player_status(io, playerStatusType.waiting, res.data.get_sid(), store.get_player_store());
+    }
+
+    for(const id of loser_ids){
+        const res = store.get_player_store().get_player_by_id(id);
+        if(!res.success)
+            continue;
+        await io.to(res.data.get_socket()).emit('game:lose');
+        await change_player_status(io, playerStatusType.waiting, res.data.get_sid(), store.get_player_store());
+    }
 }

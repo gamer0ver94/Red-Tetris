@@ -14,6 +14,8 @@ import { GameOptions } from '../types/game_options_types.js'
 import { CodeType, LeaveGameData, JoinLobbyData, ModelResult, StartGameData } from '../types/error_code_types.js'
 import { gameStatusType, PlayerInLobbyStatus, PlayerStatus, playerStatusType } from '../types/status_types.ts'
 import { LobbyPlayerState, LobbyReadyPayload } from '../types/socket_event_types.js'
+import { EndGameProvider } from '../models/end_game_provider.js'
+import { finish_active_game } from './game_end_services.js'
 
 export function join_game(
     sid:string,
@@ -176,6 +178,9 @@ function leave_game_waiting(player: Player, lobby: Lobby, store: Store):ModelRes
                 leaver_name,
                 socket_ids:[],
                 new_owner:false,
+                winner_ids:[],
+                loser_ids:[],
+                status:playerStatusType.connected,
             },
         };
     }
@@ -205,6 +210,9 @@ function leave_game_waiting(player: Player, lobby: Lobby, store: Store):ModelRes
             new_owner_socket,
             leaver_name,
             socket_ids:socket_res.data,
+            winner_ids:[],
+            loser_ids:[],
+            status:playerStatusType.connected,
         },
     };
 }
@@ -213,46 +221,81 @@ function leave_game_started(player: Player, lobby: Lobby, store: Store):ModelRes
     const player_id = player.get_player_id();
     const lobby_id = lobby.get_lobby_id();
     const leaver_name = player.get_username();
+
     const socket_res = store.get_all_sockets_by_lobby_id(lobby_id);
+    if(!socket_res.success)
+        return socket_res;
 
 
     const game_remove_res = store.get_active_game_store().remove_player_from_active_game(player_id, lobby_id);
     if (!game_remove_res.success)
         return game_remove_res;
 
-    const lobby_remove_res = store.get_lobby_store().remove_player_from_lobby(player_id, lobby_id);
-    if(!lobby_remove_res.success)
-        return lobby_remove_res;
-
     const active_game_res = store.get_active_game_store().get_active_game_by_lobby_id(lobby_id);
-    //Shall stop based on opts in a game_end_services.ts ? 
-    const need_stop = true;
-
+    if(!active_game_res.success)
+        return active_game_res
+    const active_game = active_game_res.data;
+    
+    const remaing_ids = active_game.get_players_ids();
+    const socket_ids_res = store.get_all_sockets_by_lobby_id(lobby_id);
+    let ended_match = false;
     let stopped_loop = false;
-    if(need_stop){
+    let winner_ids:string[] = [];
+    let loser_ids:string[] = [];
 
-        const stop_res = stop_game_loop(lobby_id);
-        stopped_loop = stop_res.success;
-
-        lobby.set_game_status(gameStatusType.finish);
-    
-        if(active_game_res.success)
-            store.get_active_game_store().delete_active_game(active_game_res.data);
-    
-        store.get_lobby_store().delete_lobby(lobby_id)
+    if(remaing_ids.length === 0){
+        ended_match = true;
     }
-    
-    const socket_ids = socket_res.success ? socket_res.data : [];
+    else if (remaing_ids.length === 1){
+        winner_ids = remaing_ids;
+        ended_match = true;
+    }
+    else{
+        const condition = active_game.get_config().get_win_condition();
+        const limit = active_game.get_config().get_win_limit();
 
+        const end_res = EndGameProvider.evaluateEndGame(
+            active_game,
+            condition,
+            limit,
+        );
+
+        if (end_res.finished) {
+            ended_match = true;
+            winner_ids = end_res.winners_id ?? [];
+            loser_ids = end_res.losers_id ?? [];
+        }
+        else {
+            
+            return{
+                success:true,
+                data:{
+                    deleted:ended_match,
+                    stopped_loop,
+                    leaver_name,
+                    new_owner:false,
+                    winner_ids:[],
+                    loser_ids:[],
+                    socket_ids: socket_ids_res.success ? socket_ids_res.data : [],
+                    status:playerStatusType.waiting,
+                },
+            };
+        }
+    }
+    const finish_res = finish_active_game(lobby_id, store, winner_ids, loser_ids);
+    if(!finish_res.success)
+        return finish_res;
     return{
         success:true,
         data:{
-            deleted:need_stop,
-            stopped_loop,
-            forfeit:true,
+            deleted:ended_match,
+            stopped_loop:finish_res.data.stopped_loop,
             leaver_name,
-            socket_ids,
+            socket_ids:finish_res.data.socket_ids,
             new_owner:false,
+            winner_ids,
+            loser_ids,
+            status:playerStatusType.waiting,
         },
     };
 }

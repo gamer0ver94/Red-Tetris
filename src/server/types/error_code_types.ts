@@ -50,11 +50,13 @@ export type ModelResult<T, Code extends CodeType = CodeType> =
 export type LeaveGameData = {
     deleted: boolean;
     stopped_loop: boolean;
-    forfeit?:boolean;
     leaver_name:string;
     socket_ids:string[];
     new_owner:boolean;
     new_owner_socket?:string;
+    winner_ids:string[];
+    loser_ids:string[];
+    status:PlayerStatus;
 }
 
 export type LogoutData = {
@@ -88,4 +90,12 @@ export type StartGameData = {
     game_status:GameStatus;
     sids:string[];
     socket_ids:string[];
+}
+
+export type FinishGameData = {
+    lobby_id: string;
+    stopped_loop: boolean;
+    winner_ids: string[];
+    loser_ids: string[];
+    socket_ids: string[];
 }
