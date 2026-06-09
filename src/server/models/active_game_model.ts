@@ -11,6 +11,7 @@ export class ActiveGame{
     private players: Map<string, PlayerInGame>;
     private config: ConfigProvider;
     piece_provider:PieceProvider;
+    private started_at:number
 
     constructor(
         lobby_id:string,
@@ -23,6 +24,7 @@ export class ActiveGame{
         const random = this.config.is_random_sequence();
         const shared = this.config.is_shared_sequence();
         this.piece_provider = new PieceProvider(players_ids, random, shared);
+        this.started_at = Date.now()
 
     }
 
@@ -51,6 +53,10 @@ export class ActiveGame{
 
     public get_config(){
         return this.config;
+    }
+
+    public get_start_time(){
+        return this.started_at;
     }
 
 
