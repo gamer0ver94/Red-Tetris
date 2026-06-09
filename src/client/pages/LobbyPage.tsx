@@ -8,35 +8,41 @@ import {
   playerLeft,
   setPlayerReadyStatus,
 } from "../store/lobbySlice";
-import { ROUTES} from "../Types/Routes"
+import { ROUTES } from "../Types/Routes";
 import "./LobbyPage.css";
 import LogoutButton from "../components/LogoutButton";
-import { config } from "../conf"
+import { config } from "../conf";
 import { fetchData } from "../components/fetch/fetch";
 import { setCsrfToken, setUsername } from "../store/userSlice";
-
+type LobbyPlayer = {
+  username: string;
+  status: string;
+  isOwner: boolean;
+};
 export default function LobbyPage() {
   const dispatch = useAppDispatch();
   const goTo = useNavigate();
   const username = useAppSelector((state) => state.user.username) || "Player";
   const csrf_token = useAppSelector((state) => state.user.csrf_token);
-  console.log("[Lobby] render: csrf_token exists?", !!csrf_token);
   const socket = useContext(socketContext);
   const readyByUsername = useAppSelector(
     (state) => state.lobby.readyByUsername,
   );
   const [status, setStatus] = useState<string>("not-ready");
   const gameIdFromSession = sessionStorage.getItem("game_id") || "";
-  const [hostUsername, setHostUsername] = useState<string>('');
+  const [hostUsername, setHostUsername] = useState<string>("");
+  const [lobbyPlayers, setLobbyPlayers] = useState<Record<string, LobbyPlayer>>(
+    {},
+  );
 
-  const onNewOwner = (()=>{
-    setHostUsername(username?username:"")
-  })
+  const onNewOwner = () => {
+    setHostUsername(username ? username : "");
+  };
 
-  const leaveLobby = (()=>{
+  const leaveLobby = () => {
     socket.emit("lobby:leave");
     goTo("/home");
-  });
+  };
 
   const allPlayersReady = () => {
     for (const [, ready] of Object.entries(readyByUsername)) {
@@ -64,11 +70,7 @@ export default function LobbyPage() {
 
   useEffect(() => {
     async function loadUser() {
-      const data = await fetchData(
-        config.authMe,
-        null,
-        "GET",
-      );
+      const data = await fetchData(config.authMe, null, "GET");
       if (data?.username) {
         dispatch(setUsername(data.username));
       }
@@ -116,9 +118,7 @@ export default function LobbyPage() {
 
     dispatch(playerJoined({ username }));
     socket.on("connect", () => {
-      console.log(
-        "Connected."
-      );
+      console.log("Connected.");
     });
 
     socket.on("connect_error", (err) => {
@@ -126,19 +126,16 @@ export default function LobbyPage() {
     });
 
     const onPlayerJoinUpdate = (payload: any) => {
-      const message: string | undefined = payload?.message;
-
-      const extractedUsername = message?.replace(" just joined the lobby", "");
-
-      if (extractedUsername && extractedUsername.trim().length > 0) {
-        dispatch(playerJoined({ username: extractedUsername }));
-      }
-      console.log("On join update:", payload);
+      const players: Record<string, LobbyPlayer> = Object.fromEntries(
+        payload.players.map((player: LobbyPlayer) => [player.username, player]),
+      );
+      setLobbyPlayers(players);
+      console.log("loby players", lobbyPlayers);
     };
 
     const onPlayerLeave = (payload: any) => {
       const leaverUsername = payload?.username;
-      console.log("Player leave:", payload)
+      console.log("Player leave:", payload);
       if (leaverUsername) {
         dispatch(playerLeft({ username: leaverUsername }));
       }
@@ -164,8 +161,8 @@ export default function LobbyPage() {
     });
 
     const onLobbyStarted = () => {
-      console.log("HELLO WORLD", readyByUsername)
-      
+      console.log("HELLO WORLD", readyByUsername);
+
       goTo(ROUTES.GAME);
     };
 
@@ -186,19 +183,22 @@ export default function LobbyPage() {
       socket.offAny();
     };
   }, [socket]);
+  useEffect(() => {
+  console.log("lobbyPlayers updated:", lobbyPlayers);
+}, ["nana",lobbyPlayers]);
   return (
     <div className="lobby-container">
       <h1>Lobby</h1>
       <div className="lobby-players">
         <div className="oponent-players">
           <div className="oponent-players">
-            {Object.entries(readyByUsername)
+            {Object.entries(lobbyPlayers)
               .filter(([playerName]) => playerName !== username)
-              .map(([playerName, status]) => (
+              .map(([playerName, player]) => (
                 <PlayerCard
                   key={playerName}
-                  username={playerName}
-                  ready={status === "ready"}
+                  username={player.username}
+                  ready={player.status === "ready"}
                   onReady={() => {}}
                   onReturn={leaveLobby}
                 />
