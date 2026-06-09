@@ -5,11 +5,12 @@ import { gameStatusType, playerStatusType } from "../types/status_types.ts";
 import type { SocketData, TypedIoServer, TypedSocket } from '../types/socket_event_types.ts';
 import { start_game_loop } from "../services/game_loop_services.js";
 import { build_render_payload } from "../services/game_render_services.js";
-import { codeType } from "../types/error_code_types.js";
+import { codeType, FinishGameData } from "../types/error_code_types.js";
 import { change_player_status, change_game_status } from "../sockets/misc_sockets.ts";
 import {LobbyPlayerState, LobbyReadyPayload} from '../types/socket_event_types.ts';
 import { ModelResult, CodeType } from '../types/error_code_types.ts';
 import { finish_active_game } from "../services/game_end_services.js";
+import { HistoryEntry } from "../types/history_types.js";
 
 
 
@@ -36,10 +37,10 @@ export async function socket_game_lobby(
     });
 
     socket.on('history:watch', async(data) => {
-        if(!data?.page)
+        if(!data)
             return;
 
-        const ok = helpers.history_watch(sid, data.page, store);
+        const ok = helpers.history_watch(sid, data, store);
         if(!ok)
             return;
     });
@@ -122,6 +123,8 @@ async function start_lobby_event(
                 finish_res.data.winner_ids,
                 finish_res.data.loser_ids,
             );
+            
+            await emit_history_updates(io, store, finish_res.data.new_entries);
 
             const random_player_res = store.get_player_store().get_player_by_socket_id(
                 finish_res.data.socket_ids[0],
@@ -170,8 +173,10 @@ async function leave_lobby_event(
     await socket.emit('lobby:leave:success');
     await helpers.change_player_status(io, response.data.status, sid, store.get_player_store());
 
-    if(response.data.winner_ids.length > 0 || response.data.loser_ids.length > 0)
+    if(response.data.winner_ids.length > 0 || response.data.loser_ids.length > 0){
         await emit_win_lose(io, store, response.data.winner_ids, response.data.loser_ids);
+        await emit_history_updates(io, store, response.data.new_entries,);
+    }
 
     if(response.data.socket_ids.length === 0)
         return;
@@ -247,5 +252,22 @@ async function emit_win_lose(
             continue;
         await io.to(res.data.get_socket()).emit('game:lose');
         await change_player_status(io, playerStatusType.waiting, res.data.get_sid(), store.get_player_store());
+    }
+}
+
+async function emit_history_updates(
+    io:TypedIoServer,
+    store:Store,
+    new_entries:HistoryEntry[]
+){
+    const watched_socket = helpers.get_all_watchers();
+
+    for(const [socket_id, state] of watched_socket){
+
+        const player_res = store.get_player_store().get_player_by_socket_id(socket_id);
+        if(!player_res.success)
+            continue;
+        if(helpers.should_update(state, new_entries, player_res.data.get_username()))
+            await io.to(socket_id).emit('history:update');
     }
 }

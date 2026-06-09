@@ -19,5 +19,13 @@ export type historyPageType =
 | '/win'
 | '/lose';
 
-
+export type HistoryWatchState = 
+| { page:'/me'; start:number; end:number }
+| { page:'/users'; query:string; start:number; end:number }
+| { page:'/mode'; mode:string; start:number; end:number }
+| { page:'/date'; new_first:boolean; start:number; end:number }
+| { page:'/score'; start:number; end:number }
+| { page:'/lobby'; lobby_id:string; start:number; end:number }
+| { page:'/win'; start:number; end:number }
+| { page:'/lose'; start:number; end:number };
 

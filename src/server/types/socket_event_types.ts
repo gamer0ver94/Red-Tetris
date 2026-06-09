@@ -1,7 +1,7 @@
 import type { Server, Socket } from 'socket.io';
 import type {GameStatus, PlayerStatus} from './status_types.ts'
 import type { RenderPayload } from './render_types.js';
-import { HistoryEntry, historyPageType } from './history_types.js';
+import { HistoryEntry, historyPageType, HistoryWatchState } from './history_types.js';
 
 export type LobbyAction = 'join' | 'start' | 'leave';
 
@@ -51,7 +51,7 @@ export interface ClientToServerEvents {
     'game:hold':() => void;
 
     //history Actions
-    'history:watch': (p:{page:historyPageType}) => void;
+    'history:watch': (p:HistoryWatchState) => void;
     'history:unwatch': () => void;
 }
 

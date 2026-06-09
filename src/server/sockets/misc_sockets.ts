@@ -3,10 +3,10 @@ import { Store } from "../stores/store.ts"
 import { find_me } from "../services/auth_services.ts";
 import { GameStatus, PlayerStatus } from "../types/status_types.ts";
 import type { TypedIoServer } from '../types/socket_event_types.ts';
-import { historyPageType } from "../types/history_types.js";
+import { HistoryEntry, HistoryWatchState } from "../types/history_types.js";
 
 
-const sock_id_to_page = new Map<string, historyPageType>();
+const sock_id_to_state = new Map<string, HistoryWatchState>();
 
 export async function change_player_status(
     io: TypedIoServer,
@@ -42,14 +42,14 @@ export async function change_game_status(
     }
 }
 
-export  function history_watch(sid:string, page:historyPageType, store:Store):boolean{
+export  function history_watch(sid:string, state:HistoryWatchState, store:Store):boolean{
 
     const player_res = store.get_player_store().get_player_by_sid(sid);
     if(!player_res.success)
         return false;
-    if(sock_id_to_page.get(player_res.data.get_socket()))
-        sock_id_to_page.delete(player_res.data.get_socket());
-    sock_id_to_page.set(player_res.data.get_socket(), page);
+    if(sock_id_to_state.get(player_res.data.get_socket()))
+        sock_id_to_state.delete(player_res.data.get_socket());
+    sock_id_to_state.set(player_res.data.get_socket(), state);
     return true;
 }
 
@@ -58,17 +58,44 @@ export function history_unwatch(sid:string, store:Store):boolean{
     const player_res = store.get_player_store().get_player_by_sid(sid);
     if(!player_res.success)
         return false;
-    if(sock_id_to_page.get(player_res.data.get_socket()))
-        sock_id_to_page.delete(player_res.data.get_socket());
+    if(sock_id_to_state.get(player_res.data.get_socket()))
+        sock_id_to_state.delete(player_res.data.get_socket());
     return true;
 }
 
-export function get_page_for_socket_id(socket_id:string):historyPageType| null{
-    return sock_id_to_page.get(socket_id) ?? null;
+export function get_page_for_socket_id(socket_id:string):HistoryWatchState| null{
+    return sock_id_to_state.get(socket_id) ?? null;
 }
 
-export function get_all_watch_socket_for_page(page:historyPageType):string[]{
-    return [...sock_id_to_page.entries()]
-    .filter(([, watched]) => watched === page)
-    .map(([socket_id]) => socket_id);
+export function get_all_watchers(): [string, HistoryWatchState][]{
+    return [...sock_id_to_state]
+}
+
+export function should_update(state:HistoryWatchState, entries:HistoryEntry[], username:string):boolean{
+
+    if(entries.length <= 0)
+        return false;
+
+    if(state.page == '/date' || state.page == '/score')
+        return true;
+
+    if(state.page == '/win')
+        return entries.filter((entry) => entry.is_winner == true).map((entry) => entry).length >= 1;
+    
+    if(state.page == '/lose')
+        return entries.filter((entry) => entry.is_winner == false).map((entry) => entry).length >= 1;
+
+    if (state.page == '/lobby')
+        return entries.filter((entry) => entry.lobby_id == state.lobby_id).map((entry) => entry).length >= 1;
+
+    if(state.page == '/mode')
+        return entries.filter((entry) => entry.game_mode == state.mode).map((entry) => entry).length >= 1;
+
+    if(state.page == '/users')
+        return entries.filter((entry) => entry.username.includes(state.query)).map((entry) => entry).length >= 1;
+
+    if(state.page == '/me')
+        return entries.filter((entry) => entry.username == username).map((entry) => entry).length >= 1;
+
+    return false;
 }

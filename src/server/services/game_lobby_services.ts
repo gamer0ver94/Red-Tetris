@@ -182,6 +182,7 @@ function leave_game_waiting(player: Player, lobby: Lobby, store: Store):ModelRes
                 winner_ids:[],
                 loser_ids:[],
                 status:playerStatusType.connected,
+                new_entries:[],
             },
         };
     }
@@ -214,6 +215,7 @@ function leave_game_waiting(player: Player, lobby: Lobby, store: Store):ModelRes
             winner_ids:[],
             loser_ids:[],
             status:playerStatusType.connected,
+            new_entries:[],
         },
     };
 }
@@ -279,6 +281,7 @@ function leave_game_started(player: Player, lobby: Lobby, store: Store):ModelRes
                     loser_ids:[],
                     socket_ids: socket_ids_res.success ? socket_ids_res.data : [],
                     status:playerStatusType.waiting,
+                    new_entries:[]
                 },
             };
         }
@@ -297,6 +300,7 @@ function leave_game_started(player: Player, lobby: Lobby, store: Store):ModelRes
             winner_ids,
             loser_ids,
             status:playerStatusType.waiting,
+            new_entries:finish_res.data.new_entries,
         },
     };
 }

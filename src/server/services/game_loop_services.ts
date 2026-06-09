@@ -97,7 +97,7 @@ export function tick_game(active_game: ActiveGame) : {winners_id:string[], loser
     }
     const end_res = EndGameProvider.evaluateEndGame(active_game, active_game.get_config().get_win_condition(), active_game.get_config().get_win_limit());
     if(end_res.finished)
-        return {winners_id:end_res.winners_id, losers_id:end_res.losers_id};
+        return {winners_id:end_res.winners_id!, losers_id:end_res.losers_id!};
     
     return null;
 }

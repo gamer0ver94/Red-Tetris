@@ -1,4 +1,5 @@
 import { GameOptions } from "./game_options_types.js";
+import { HistoryEntry } from "./history_types.js";
 import { GameStatus, PlayerStatus } from "./status_types.js";
 
 export const codeType = {
@@ -57,6 +58,7 @@ export type LeaveGameData = {
     winner_ids:string[];
     loser_ids:string[];
     status:PlayerStatus;
+    new_entries:HistoryEntry[];
 }
 
 export type LogoutData = {
@@ -98,4 +100,5 @@ export type FinishGameData = {
     winner_ids: string[];
     loser_ids: string[];
     socket_ids: string[];
+    new_entries:HistoryEntry[];
 }
