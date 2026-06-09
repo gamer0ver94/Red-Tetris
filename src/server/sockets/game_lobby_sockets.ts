@@ -86,6 +86,8 @@ async function start_lobby_event(
     for(const socket_id of socket_ids){
         await io.to(socket_id).emit('lobby:start:success');
     }
+
+    const list = extract_status_list(sid, store);
     const loop_res = start_game_loop(game_id, store, async(game, match_results)=>{
         if(match_results){
             for (const id of match_results.winners_id){
@@ -93,6 +95,8 @@ async function start_lobby_event(
                 if(player_res.success){
                     await io.to(player_res.data.get_socket()).emit('game:win');
                     await change_player_status(io, playerStatusType.waiting, player_res.data.get_sid(), store.get_player_store());
+                    if (list)
+                        await io.to(player_res.data.get_socket()).emit('lobby:ready:update', list);
                 }
             }
             for (const id of match_results.losers_id){
@@ -100,6 +104,8 @@ async function start_lobby_event(
                 if(player_res.success){
                     await io.to(player_res.data.get_socket()).emit('game:lose');
                     await change_player_status(io, playerStatusType.waiting, player_res.data.get_sid(), store.get_player_store());
+                    if (list)
+                        await io.to(player_res.data.get_socket()).emit('lobby:ready:update', list);
                 }
             }
             await change_game_status(io, gameStatusType.waiting, game_id, sids, store);
