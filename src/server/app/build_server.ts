@@ -180,6 +180,7 @@ async function init_error_handler(fastify:FastifyInstance){
 
   fastify.setErrorHandler((error, request, reply) => {
     
+    request.log.error(error);
     if(error instanceof AppError){
       return reply.code(error.status_code).send({
         success:false,
@@ -188,7 +189,15 @@ async function init_error_handler(fastify:FastifyInstance){
         details:error.details
       });
     }
-    request.log.error(error);
+    if (error.validation) {
+      return reply.code(400).send({
+        success: false,
+        code: 'VALIDATION_ERROR',
+        message: error.message,
+        details: error.validation,
+      });
+    }
+    
     return reply.code(500).send({
       success:false,
       code:'INTERNAL_ERROR',

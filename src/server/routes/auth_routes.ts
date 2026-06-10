@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import * as auth_controller from '../controllers/auth_controller.ts';
 import { playerStatusType } from '../types/status_types.ts';
-
+import { ERROR_RESPONSE_SCHEMA } from '../types/error_code_types.js';
 const PLAYER_STATUS_ENUM = Object.values(playerStatusType);
 
 
@@ -54,20 +54,8 @@ export const auth_routes = async (fastify: FastifyInstance) => {
             csrf_token: {type: 'string'},
           },
         },
-        400:{
-          type:'object',
-          properties:{
-            success: {type: 'boolean'},
-            reason: {type: 'string'},
-          },
-        },
-        409:{
-          type:'object',
-          properties:{
-            success: {type: 'boolean'},
-            reason: {type: 'string'},
-          },
-        },
+        400:ERROR_RESPONSE_SCHEMA,
+        409:ERROR_RESPONSE_SCHEMA,
       },
     },
   }, auth_controller.post_register);
@@ -87,13 +75,7 @@ export const auth_routes = async (fastify: FastifyInstance) => {
                         success: {type: 'boolean'},
                     },
                 },
-                403:{
-                    type:'object',
-                    properties:{
-                        success: {type: 'boolean'},
-                        reason: {type: 'string'},
-                    },
-                },
+                403:ERROR_RESPONSE_SCHEMA,
             },
          },
     } , auth_controller.logout);

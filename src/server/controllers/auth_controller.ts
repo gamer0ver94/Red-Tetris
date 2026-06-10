@@ -65,7 +65,7 @@ export async function logout(
     
     const socket_id = response.data.player_socket_id;
     if(socket_id && !socket_id.startsWith('pending_disconnect:'))
-        request.server.io.sockets.get(socket_id)?.disconnect(true);
+        request.server.io.sockets.sockets.get(socket_id)?.disconnect(true);
 
     request.session.delete();
     return reply.code(200).send({success: true});

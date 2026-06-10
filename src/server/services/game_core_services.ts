@@ -38,7 +38,9 @@ export function  tick_board(
     player_id:string,
     active_game:ActiveGame,
     now = Date.now(),
-    apply_gravity = true):
+    apply_gravity = true,
+    force_lock= false,
+):
     ModelResult<{clear:number, lock_waiting:boolean}, CodeType>{
         
         const player_res = active_game.get_player(player_id);
@@ -73,7 +75,7 @@ export function  tick_board(
 
         player.start_lock_delay(now);
         const touching_ground_since = player.get_touching_ground_since()!;
-        if(now - touching_ground_since < active_game.get_config().get_lock_delay_ms())
+        if(!force_lock && now - touching_ground_since < active_game.get_config().get_lock_delay_ms())
             return { success:true, data: {clear:0, lock_waiting:true}};
 
         board.lock_current_piece();

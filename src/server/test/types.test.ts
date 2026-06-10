@@ -3,7 +3,7 @@ import type { Socket } from 'socket.io-client';
 import type {
   ClientToServerEvents,
   ServerToClientEvents,
-} from '../types/socket_event_types.ts';
+} from '../types/socket_event_types.js';
 
 export type TestAuthUser = {
   username: string;
