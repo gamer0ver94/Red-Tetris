@@ -2,7 +2,31 @@ import Logo from "../components/Logo";
 import Form from "../components/Form";
 import logo from "../assets/tetris_logo.png";
 import "./RegisterPage.css"
+import { useEffect } from "react";
+import { fetchData } from "../components/fetch/fetch"
+import { config } from "../conf"
+import { setCsrfToken, setUsername } from "../store/userSlice";
+import { useAppDispatch } from "../hooks/reduxHooks";
+import { useNavigate } from "react-router-dom";
 export default function RegisterPage (){
+      const dispatch = useAppDispatch ();
+      const goTo = useNavigate ();
+      useEffect(() => {
+        async function loadUser() {
+          const data = await fetchData(config.authMe, null, "GET");
+          if (data?.username) {
+            dispatch(setUsername(data.username));
+          }
+          if (data?.csrf_token) {
+            dispatch(setCsrfToken(data.csrf_token));
+            goTo("/home");
+          } else {
+            // goTo("/");
+          }
+        }
+    
+        loadUser();
+      }, [dispatch]);
     return (
         <div className="register-page">
             <div>
