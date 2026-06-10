@@ -1,0 +1,19 @@
+.custom{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    font-size: 80%;
+}
+input{
+    width:50px
+}
+
+.field{
+    display:flex;
+    justify-content: space-between;
+}
+
+h3{
+    color: green;
+}
