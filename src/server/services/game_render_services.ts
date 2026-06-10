@@ -145,11 +145,14 @@ function build_empty_board(board:Board, show_cur:boolean=true):BoardType{
 
 function build_highest_board(board:Board):BoardType{
     const empty = build_empty_board(board, false);
-    const highest_row = get_highest_occupied_row(board);
-    for (let y = 0; y < empty.length; y++) {
-        for (let x = 0; x < empty[0].length; x++) {
-            if (y === highest_row) {
-                empty[y][x] = 'X';
+    const grid = board.get_board();
+
+    for (let x = 0; x < grid[0].length; x++) {
+        for (let y = 0; y < grid.length; y++) {
+            if (grid[y][x] !== '.') {
+                for(let fill_y = y; fill_y < grid.length; fill_y ++)
+                    empty[fill_y][x] = 'X';
+                break;
             }
         }
     }
