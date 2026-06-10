@@ -136,6 +136,10 @@ export default function LobbyPage() {
     const onPlayerLeave = (payload: any) => {
       const leaverUsername = payload?.username;
       console.log("Player leave:", payload);
+      const players: Record<string, LobbyPlayer> = Object.fromEntries(
+        payload.players.map((player: LobbyPlayer) => [player.username, player]),
+      );
+      setLobbyPlayers(players);
       if (leaverUsername) {
         dispatch(playerLeft({ username: leaverUsername }));
       }
@@ -184,8 +188,8 @@ export default function LobbyPage() {
     };
   }, [socket]);
   useEffect(() => {
-  console.log("lobbyPlayers updated:", lobbyPlayers);
-}, ["nana",lobbyPlayers]);
+    console.log("lobbyPlayers updated:", lobbyPlayers);
+  }, ["nana", lobbyPlayers]);
   return (
     <div className="lobby-container">
       <h1>Lobby</h1>
