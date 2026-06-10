@@ -22,7 +22,7 @@ const history_date_query = {
 }
 
 export const history_routes = async (fastify: FastifyInstance) =>{
-
+ 
     fastify.get('/me', {
         schema: {
             tags: ['history'],
