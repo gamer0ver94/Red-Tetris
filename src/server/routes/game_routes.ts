@@ -1,8 +1,9 @@
 import { FastifyInstance } from 'fastify'
 
 import * as game_controller from '../controllers/game_lobby_controller.ts'
+import { GameOptions } from '../types/game_options_types.js';
 
-const GAME_MODE_ENUM = ['classic', 'hard', 'easy', 'solo', 'battle'];
+const GAME_MODE_ENUM = ['classic', 'hard', 'easy', 'solo', 'battle', 'custom'];
 
 export const game_routes = async (fastify: FastifyInstance) => {
 
@@ -20,12 +21,109 @@ export const game_routes = async (fastify: FastifyInstance) => {
         },
 
         body: {
-        type: 'object',
-        additionalProperties: false,
-        required: ['game_mode'],
-        properties: {
-            game_mode: { type: 'string', enum: GAME_MODE_ENUM }
-        }
+            type: 'object',
+            additionalProperties: false,
+            required: ['game_mode'],
+            properties: {
+                game_mode: { type: 'string', enum: GAME_MODE_ENUM },
+                options: {
+                type: 'object',
+                additionalProperties: false,
+                required: ['grid', 'pieces', 'gravity', 'garbage', 'scoring', 'win', 'multiplayer'],
+                properties: {
+                    grid: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['width', 'height', 'invisible', 'revealOnClearMs'],
+                    properties: {
+                        width: { type: 'integer', minimum: 1 },
+                        height: { type: 'integer', minimum: 1 },
+                        invisible: { type: 'boolean' },
+                        revealOnClearMs: { type: 'integer', minimum: 0 },
+                    },
+                    },
+                    pieces: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['randomSequence', 'sharedSequence', 'allowHold', 'nextPreviewCount'],
+                    properties: {
+                        randomSequence: { type: 'boolean' },
+                        sharedSequence: { type: 'boolean' },
+                        allowHold: { type: 'boolean' },
+                        nextPreviewCount: { type: 'integer', minimum: 0 },
+                    },
+                    },
+                    gravity: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['tickMs', 'lockDelayMs', 'maxLock', 'softDropMultiplier', 'fallAfterClear', 'speedOnLock'],
+                    properties: {
+                        tickMs: { type: 'integer', minimum: 1 },
+                        lockDelayMs: { type: 'integer', minimum: 0 },
+                        maxLock: { type: 'integer', minimum: 0 },
+                        softDropMultiplier: { type: 'number', minimum: 1 },
+                        fallAfterClear: { type: 'boolean' },
+                        speedOnLock: { type: 'boolean' },
+                    },
+                    },
+                    garbage: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['enabled', 'canClear', 'ratio', 'clearCreateGarbage'],
+                    properties: {
+                        enabled: { type: 'boolean' },
+                        canClear: { type: 'boolean' },
+                        ratio: { type: 'number', minimum: 0 },
+                        clearCreateGarbage: { type: 'boolean' },
+                    },
+                    },
+                    scoring: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['enabled', 'backToBackBonus'],
+                    properties: {
+                        enabled: { type: 'boolean' },
+                        backToBackBonus: { type: 'boolean' },
+                    },
+                    },
+                    win: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['condition', 'limit'],
+                    properties: {
+                        condition: {
+                        type: 'string',
+                        enum: ['survival', 'first_lost', 'score', 'lines', 'time'],
+                        },
+                        limit: {
+                        anyOf: [
+                            { type: 'integer', minimum: 0 },
+                            { type: 'null' },
+                        ],
+                        },
+                    },
+                    },
+                    multiplayer: {
+                    type: 'object',
+                    additionalProperties: false,
+                    required: ['enabled', 'maxPlayers', 'seeOpponents'],
+                    properties: {
+                        enabled: { type: 'boolean' },
+                        maxPlayers: {
+                        anyOf: [
+                            { type: 'integer', minimum: 1 },
+                            { type: 'null' },
+                        ],
+                        },
+                        seeOpponents: {
+                        type: 'string',
+                        enum: ['full', 'grid', 'highest', 'none'],
+                        },
+                    },
+                    },
+                },
+                },
+            },
         },
 
         response: {

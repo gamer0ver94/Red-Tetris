@@ -5,11 +5,13 @@ import { read_sid_from_cookie, find_me } from '../services/auth_services.ts';
 import * as helpers from '../sockets/misc_sockets.ts'
 import { gameStatusType, playerStatusType } from '../types/status_types.ts';
 import { AppError } from '../models/app_error_model.js';
+import { GameOptions } from '../types/game_options_types.js';
 
 export async function post_create(
     request:FastifyRequest <{Body : {
         csrf_token: string,
-        game_mode: string
+        game_mode: string,
+        options?:GameOptions
     } }>,
     reply:FastifyReply
 ){
@@ -29,6 +31,7 @@ export async function post_create(
         request.server.store,
         sid,
         request.body.game_mode,
+        request.body.options,
     );
     if (!response.success)
         throw new AppError(response.code, 409);

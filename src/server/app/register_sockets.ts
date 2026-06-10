@@ -74,8 +74,8 @@ async function initialize_socket_connection(
   const player_store = store.get_player_store();
   const player_res = player_store.get_player_by_sid(sid);
 
-  if (!player_res.success) {
-    disconnect_socket(socket, sid);
+  if (!player_res.success) { 
+    disconnect_socket(socket, sid, store);
     return;
   }
   const player = player_res.data;
@@ -98,7 +98,7 @@ async function initialize_socket_connection(
 
   const restore_status = await resolve_player_status(sid, store);
   if (!restore_status) {
-    disconnect_socket(socket, sid);
+    disconnect_socket(socket, sid, store);
     return;
   }
 
@@ -163,6 +163,7 @@ async function socket_disconnect(io: TypedIoServer, sid:string, store:Store, soc
     if(player.get_socket() !== socket_id)
         return;
 
+    helpers.history_unwatch(sid, store);
     clear_reconnect_timer(sid);
 
     const marker = `pending_disconnect:${Date.now()}`;
@@ -258,8 +259,9 @@ async function build_session_resume_payload(
     };
 }
 
-function disconnect_socket(socket: TypedSocket, sid: string) {
+function disconnect_socket(socket: TypedSocket, sid: string, store:Store) {
   if (active_socket_ids.get(sid) === socket.id) {
+    helpers.history_unwatch(sid, store);
     active_socket_ids.delete(sid);
   }
   socket.disconnect(true);

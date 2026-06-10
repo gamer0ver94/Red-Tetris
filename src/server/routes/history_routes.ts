@@ -11,6 +11,16 @@ const history_range_query = {
     },
 };
 
+const history_date_query = {
+     type: 'object',
+    additionalProperties: false,
+    properties: {
+        start: { type: 'integer', minimum: 0, default: 0 },
+        end: { type: 'integer', minimum: 0, default: 10 },
+        new_first: {type:'boolean', default: true},
+    },   
+}
+
 export const history_routes = async (fastify: FastifyInstance) =>{
 
     fastify.get('/me', {
@@ -53,19 +63,11 @@ export const history_routes = async (fastify: FastifyInstance) =>{
         },
     }, history_controller.get_mode_history);
 
-    fastify.get('/date/:new_first', {
+    fastify.get('/date', {
         schema: {
             tags: ['history'],
             summary: 'Get history entries sorted by date',
-            params: {
-                type: 'object',
-                additionalProperties: false,
-                required: ['new_first'],
-                properties: {
-                    new_first: { type: 'boolean' },
-                },
-            },
-            querystring: history_range_query,
+            querystring: history_date_query ,
         },
     }, history_controller.get_date_history);
 

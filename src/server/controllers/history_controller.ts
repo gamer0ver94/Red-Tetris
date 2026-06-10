@@ -48,11 +48,10 @@ export async function get_mode_history(
 }
 
 export async function get_date_history(
-    request:FastifyRequest<{Params: {new_first:boolean}, Querystring: {start:number, end:number}}>,
+    request:FastifyRequest<{Querystring: {start:number, end:number, new_first:boolean}}>,
     reply:FastifyReply
 ){
-    const {start = 0, end = 10} = request.query;
-    const {new_first} = request.params;
+    const {start = 0, end = 10, new_first} = request.query;
 
     const {sid} = read_sid_from_cookie(request);
     if (!sid)

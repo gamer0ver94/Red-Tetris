@@ -1,0 +1,22 @@
+[
+  {
+    "username": "yy",
+    "is_winner": true,
+    "score": 100,
+    "is_hidden": false,
+    "game_mode": "classic",
+    "total_time": "27847",
+    "end_date": "2026-06-10T09:42:10.938Z",
+    "lobby_id": "f5de"
+  },
+  {
+    "username": "TT",
+    "is_winner": false,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "classic",
+    "total_time": "7956",
+    "end_date": "2026-06-09T23:07:31.704Z",
+    "lobby_id": "c1cf"
+  }
+]

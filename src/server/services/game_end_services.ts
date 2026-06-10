@@ -101,5 +101,6 @@ function save_history_entries(
             return {success:false, code:'INTERNAL_ERROR'};
         new_entries.push(entry)
     }
+    console.log('[history saved]', new_entries);
     return {success:true, data:new_entries};
 }

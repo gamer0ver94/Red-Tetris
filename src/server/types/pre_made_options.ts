@@ -33,8 +33,8 @@ export const CLASSIC_OPTS:GameOptions = {
         backToBackBonus:false,
     },
     win:{
-        condition:'first_lost',
-        limit:null,
+        condition:'lines',
+        limit:1,
     },
     multiplayer:{
         enabled:true,
