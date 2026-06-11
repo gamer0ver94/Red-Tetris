@@ -1,5 +1,145 @@
 [
   {
+    "username": "tie_2_11",
+    "is_winner": true,
+    "score": 200,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "32",
+    "end_date": "2026-06-11T21:12:47.465Z",
+    "lobby_id": "4e47"
+  },
+  {
+    "username": "tie_host_10",
+    "is_winner": true,
+    "score": 200,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "32",
+    "end_date": "2026-06-11T21:12:47.465Z",
+    "lobby_id": "4e47"
+  },
+  {
+    "username": "lines_limit_9",
+    "is_winner": true,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "33",
+    "end_date": "2026-06-11T21:12:47.427Z",
+    "lobby_id": "c2b1"
+  },
+  {
+    "username": "score_limit_8",
+    "is_winner": true,
+    "score": 100,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "31",
+    "end_date": "2026-06-11T21:12:47.390Z",
+    "lobby_id": "bd68"
+  },
+  {
+    "username": "time_limit_7",
+    "is_winner": true,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "94",
+    "end_date": "2026-06-11T21:12:47.355Z",
+    "lobby_id": "6a74"
+  },
+  {
+    "username": "all_dead_2_6",
+    "is_winner": false,
+    "score": 10,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "32",
+    "end_date": "2026-06-11T21:12:47.257Z",
+    "lobby_id": "011d"
+  },
+  {
+    "username": "all_dead_host_5",
+    "is_winner": true,
+    "score": 20,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "32",
+    "end_date": "2026-06-11T21:12:47.257Z",
+    "lobby_id": "011d"
+  },
+  {
+    "username": "survival_3_4",
+    "is_winner": false,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "33",
+    "end_date": "2026-06-11T21:12:47.217Z",
+    "lobby_id": "0be7"
+  },
+  {
+    "username": "survival_2_3",
+    "is_winner": false,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "33",
+    "end_date": "2026-06-11T21:12:47.217Z",
+    "lobby_id": "0be7"
+  },
+  {
+    "username": "survival_host_2",
+    "is_winner": true,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "33",
+    "end_date": "2026-06-11T21:12:47.217Z",
+    "lobby_id": "0be7"
+  },
+  {
+    "username": "start_multi_joiner_16",
+    "is_winner": true,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "classic",
+    "total_time": "1",
+    "end_date": "2026-06-11T21:12:47.181Z",
+    "lobby_id": "2900"
+  },
+  {
+    "username": "solo_dead_1",
+    "is_winner": false,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "solo",
+    "total_time": "32",
+    "end_date": "2026-06-11T21:12:47.158Z",
+    "lobby_id": "7aed"
+  },
+  {
+    "username": "start_multi_joiner_16",
+    "is_winner": true,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "classic",
+    "total_time": "1",
+    "end_date": "2026-06-11T21:06:48.064Z",
+    "lobby_id": "eeb6"
+  },
+  {
+    "username": "solo_dead_1",
+    "is_winner": false,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "solo",
+    "total_time": "32",
+    "end_date": "2026-06-11T21:06:48.029Z",
+    "lobby_id": "96ae"
+  },
+  {
     "username": "start_multi_joiner_16",
     "is_winner": true,
     "score": 0,

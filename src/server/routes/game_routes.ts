@@ -61,7 +61,7 @@ export const game_routes = async (fastify: FastifyInstance) => {
                         tickMs: { type: 'integer', minimum: 1 },
                         lockDelayMs: { type: 'integer', minimum: 0 },
                         maxLock: { type: 'integer', minimum: 0 },
-                        softDropMultiplier: { type: 'number', minimum: 1 },
+                        softDropMultiplier: { type: 'number', minimum: 0.01 },
                         fallAfterClear: { type: 'boolean' },
                         speedOnLock: { type: 'boolean' },
                     },
