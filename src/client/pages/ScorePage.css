@@ -1,0 +1,17 @@
+.score-card{
+    display:flex;
+    flex-direction: column;
+    width: 20%;
+    align-items: center;
+    justify-self: center;
+    color: rgba(220, 255, 245, 0.95);
+}
+.game-state{
+    justify-self: center;
+}
+.score-page{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}

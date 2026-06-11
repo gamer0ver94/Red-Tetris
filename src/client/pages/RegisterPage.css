@@ -11,8 +11,12 @@
 .about-container {
     border-radius: 10px;
     box-shadow: 
-        0 0 20px rgb(244, 244, 244),0 0 40px rgb(244, 244, 244);
+        0 0 0 1px rgba(0,0,0,0.2), 0 10px 30px rgba(0,0,0,0.35);
     font-size: 90%;
     padding: 20px;
-    
+    background-color: rgba(10, 14, 25, 0.55);
+    color: rgba(220, 255, 245, 0.92);
+    border: 1px solid rgba(120, 255, 220, 0.18);
+    /* rgba(220, 255, 245, 0.95); */
+    /* rgba(0, 200, 160, 0.12); */
 }

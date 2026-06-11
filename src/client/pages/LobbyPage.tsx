@@ -204,7 +204,7 @@ export default function LobbyPage() {
                   username={player.username}
                   ready={player.status === "ready"}
                   onReady={() => {}}
-                  onReturn={leaveLobby}
+                  onReturn={() => {}}
                 />
               ))}
           </div>

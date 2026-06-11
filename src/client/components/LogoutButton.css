@@ -6,6 +6,7 @@
     background-color: red;
     color: white;
     font-size: 80%;
+    width: 15%;
 }
 
 .logout-button:hover {

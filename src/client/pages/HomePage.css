@@ -1,114 +1,76 @@
-.home-page {
+.home-page{
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  gap:10px;
+  color: rgba(220,255,245,0.95);
+}
+
+.welcome-container {
+  width: 80%;
+  align-self: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mode-create-container{
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    height: 100vh;
-    gap: 3%;
-}
-
-
-.home-container {
-    display: flex;
-    flex-direction: column;
-    gap: 50%;
-}
-
-.game-mode-container {
-    align-self: flex-start;
-    text-align: center;
-    height: 5%;
-    width: 20%;
-}
-
-.game-mode-container:hover {
-    align-self: flex-start;
-    animation: neonPulse 10s linear infinite;
-}
-
-.home-options {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
-    width: 50%;
-    height: 30%;
-}
-
-.home-options:hover {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
-    width: 50%;
-    height: 30%;
-    animation: neonPulse 10s linear infinite;
-}
-
-.home-button {
-    padding: 10px 20px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    border-radius: 40px;
-    width: 50%;
-    color: rgb(255, 251, 251);
-    background-color: #4CAF50;
-}
-
-.home-button:hover {
-    padding: 10px 20px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    border-radius: 40px;
-    animation: neonPulse 10s linear infinite;
-}
-
-.mode {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-self: flex-start;
-    width: 20%;
-    text-align: center;
     height: 15%;
 }
 
-.mode:hover {
-    align-self: flex-start;
-    animation: neonPulse 10s linear infinite;
+.mode{
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  justify-content: center;
+  align-items: center;
 }
 
-.home-input {
-    padding: 10px 20px;
-    font-size: 1.5rem;
-    cursor: cursor;
-    width: 50%;
-    border-radius: 40px;
-    color: rgb(114, 114, 114);
+.home-options{
+  display:flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20%;
 }
 
-.home-input:hover {
-    padding: 10px 20px;
-    font-size: 1.5rem;
-    cursor: cursor;
-    border-radius: 40px;
-    color: rgb(114, 114, 114);
-    animation: neonPulse 10s linear infinite;
+.home-button{
+  padding: 10px 14px;
+  border-radius: 12px;
+  width: 50%;
+  border: 1px solid rgba(120, 255, 220, 0.18);
+  background: rgba(0, 200, 160, 0.18);
+  color: rgba(220,255,245,0.95);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .12s ease, background .2s ease, border-color .2s ease;
+}
+.home-button:hover{
+  padding: 10px 14px;
+  border-radius: 12px;
+  width: 50%;
+  border: 1px solid rgba(120, 255, 220, 0.18);
+  background: rgba(0, 200, 160, 0.507);
+  color: rgba(5, 233, 168, 0.95);
+  font-weight: 700;
+  cursor: pointer;
 }
 
-select {
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 20px;
-    color: rgb(114, 114, 114);
-    width: 70%;
-    align-self: center;
+.home-input{
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(120, 255, 220, 0.18);
+  background: rgba(7, 10, 18, 0.35);
+  color: rgba(220,255,245,0.95);
+  outline: none;
+  width: 40%;
 }
 
-select:hover {
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 20px;
-    color: rgb(0, 0, 0);
+.logout-space{
+  margin-top: 26px;
+}
+
+.mode{
+  height: 10%;
 }

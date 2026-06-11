@@ -12,6 +12,8 @@ import Logo from "../components/Logo";
 import { config } from "../conf";
 import CustomOptionForm from "../components/CustomOptionForm";
 import type { GameOptions } from "../components/CustomOptionForm";
+import HistorySection from "../components/HistorySection";
+import "./HistorySection.css";
 
 export default function HomePage() {
   const goTo = useNavigate();
@@ -80,13 +82,9 @@ export default function HomePage() {
     if (gameMode === "custom") {
       payload.options = customOptions;
     }
-    console.log("HERE")
-    console.log(payload)
-    const res = await fetchDataJson(
-      config.createLobby,
-      payload,
-      csrf_token
-    );
+    console.log("HERE");
+    console.log(payload);
+    const res = await fetchDataJson(config.createLobby, payload, csrf_token);
 
     if (!res.ok) {
       console.error("/game/create failed", await res.text().catch(() => ""));
@@ -167,17 +165,18 @@ export default function HomePage() {
 
   return (
     <div className="home-page">
-      <div className="game-mode-container neon">
-        <h1>Welcome, {username ? username : "No Player"}</h1>
+      <div className="welcome-container">
+        <div>
+          <h1 className="neon">Welcome, {username ? username : "No Player"}</h1>
+        </div>
+        <Logo text="" imagePath={logo} />
+        <LogoutButton />
       </div>
-        
-      <div className="mode neon">
+      
+      <div className="mode-create-container">
+      <div className="mode">
         <h1>Mode: {gameMode}</h1>
-
-        <select
-          value={gameMode}
-          onChange={(e) => setGameMode(e.target.value)}
-        >
+        <select value={gameMode} onChange={(e) => setGameMode(e.target.value)}>
           <option value="classic">Classic</option>
           <option value="easy">Easy</option>
           <option value="hard">Hard</option>
@@ -185,39 +184,33 @@ export default function HomePage() {
           <option value="custom">Custom</option>
         </select>
       </div>
-
       {gameMode === "custom" && (
         <CustomOptionForm
           options={customOptions}
           setOptions={setCustomOptions}
         />
       )}
+        <div className="home-options neon">
+          <button className="home-button" onClick={createLobbyAndGo}>
+            Create
+          </button>
 
-      <Logo text="" imagePath={logo} />
+          <input
+            className="home-input"
+            type="text"
+            placeholder="game_id"
+            value={gameIdInput}
+            onChange={(e) => setGameIdInput(e.target.value)}
+          />
 
-      <div className="home-options neon">
-        <button className="home-button" onClick={createLobbyAndGo}>
-          Create
-        </button>
+          <button className="home-button" onClick={joinLobbyAndGo}>
+            Join
+          </button>
 
-        <input
-          className="home-input"
-          type="text"
-          placeholder="game_id"
-          value={gameIdInput}
-          onChange={(e) => setGameIdInput(e.target.value)}
-        />
-
-        <button className="home-button" onClick={joinLobbyAndGo}>
-          Join
-        </button>
-
-        <h1>{error}</h1>
+          <h1>{error}</h1>
+        </div>
       </div>
-
-      <div className="logout-space">
-        <LogoutButton />
-      </div>
+      <HistorySection />
     </div>
   );
 }
