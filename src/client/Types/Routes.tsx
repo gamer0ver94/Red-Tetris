@@ -3,4 +3,5 @@ export const ROUTES = {
     HOME: '/home',
     LOBBY: '/lobby',
     GAME: '/game',
+    SCORE: '/score',
 } as const;

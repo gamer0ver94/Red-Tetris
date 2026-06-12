@@ -1,19 +1,24 @@
-.custom{
+.custom {
     display: flex;
     flex-direction: column;
     align-items: center;
     color: white;
     font-size: 80%;
-}
-input{
-    width:50px
+    width: 20%;
+    max-height: 100%;
+    overflow-y: auto;
+    font-size: 100%;
 }
 
-.field{
-    display:flex;
+input {
+    width: 50px;
+}
+
+.field {
+    display: flex;
     justify-content: space-between;
 }
 
-h3{
+h3 {
     color: green;
 }

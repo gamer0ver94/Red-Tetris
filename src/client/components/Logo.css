@@ -1,13 +1,10 @@
-.slogan{
-    display: block;
-    justify-self: center;
-    width: 10%;
+.slogan {
+    width: 5%;
     border-radius: 50%;
 }
 
-.slogan:hover{
-    display: block;
-    justify-self: center;
+.slogan:hover {
+    width: 5%;
     border-radius: 50%;
     animation: neonPulse 10s linear infinite;
 }

@@ -1,0 +1,48 @@
+/* Intentionally mirrors HistorySection palette.
+   This file is imported by pages/HomePage.tsx */
+
+.history-section{
+  width: 100%;
+  margin-top: 24px;
+  padding: 18px;
+  border-radius: 16px;
+  background: rgba(10, 14, 25, 0.55);
+  border: 1px solid rgba(120, 255, 220, 0.18);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.2), 0 10px 30px rgba(0,0,0,0.35);
+  backdrop-filter: blur(10px);
+
+  /* Make it scrolable/responsive while keeping the same palette */
+  max-height: 70vh;
+  overflow: auto;
+}
+
+
+.history-section__header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom: 14px;
+}
+
+.history-section__title{
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0.2px;
+  color: rgba(220, 255, 245, 0.95);
+}
+
+.history-chip{
+  cursor:pointer;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 255, 220, 0.25);
+  background: rgba(7, 10, 18, 0.35);
+  color: rgba(220, 255, 245, 0.92);
+  transition: transform 0.08s ease, background 0.2s ease, border-color 0.2s ease;
+  user-select:none;
+}
+
+.history-chip:hover{ transform: translateY(-1px); border-color: rgba(120, 255, 220, 0.45); }
+.history-chip--active{ background: rgba(0, 200, 160, 0.18); border-color: rgba(0, 200, 160, 0.65); }
+

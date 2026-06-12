@@ -4,7 +4,7 @@
   justify-content: space-between;
   align-items: center;
   height: 90vh;
-  color: white;
+  color: rgba(220, 255, 245, 0.95);
 }
 
 .lobby-players{

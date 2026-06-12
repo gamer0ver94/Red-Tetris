@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
 import { setBoard } from "../store/gameSlice";
@@ -7,6 +7,7 @@ import GameBoard from "../components/game/Board";
 
 import { InputHandler } from "../components/game/InputHandler";
 import type { RenderPayload } from "../Types/RenderPayload";
+import { ROUTES } from "../Types/Routes";
 
 type OpponentEntry = RenderPayload["opponents"][string];
 
@@ -25,25 +26,43 @@ export default function GamePage() {
 
   const [latestRender, setLatestRender] = useState<RenderPayload | null>(null);
   const [gameOutcome, setGameOutcome] = useState<"win" | "lose" | null>(null);
+  const scoreRef = useRef(0);
+
 
   useEffect(() => {
     if (!socket) return;
 
     const onRender = (payload: RenderPayload) => {
       dispatch(setBoard(payload.self.board));
-      console.log("Received render payload:", payload);
-
       setLatestRender(payload);
+
+      const newScore = payload.self?.score ?? 0;
+
+      scoreRef.current = newScore;
     };
 
     const onWin = () => {
       setGameOutcome("win");
-      console.log("[socket] game ended: win");
+
+      goTo(ROUTES.SCORE, {
+        state: {
+          score: scoreRef.current, // ✅ always correct
+          result: "win",
+          matchHistory: ["win vs A", "lose vs B"],
+        },
+      });
     };
 
     const onLose = () => {
       setGameOutcome("lose");
-      console.log("[socket] game ended: lose");
+
+      goTo(ROUTES.SCORE, {
+        state: {
+          score: scoreRef.current, // ✅ always correct
+          result: "lose",
+          matchHistory: ["win vs A", "lose vs B"],
+        },
+      });
     };
 
     socket.on("game:render", onRender);
@@ -77,7 +96,8 @@ export default function GamePage() {
           const opponents = latestRender?.opponents ?? {};
 
           const opponentEntries = Object.entries(opponents).filter(
-            ([, opponent]) => !!getOpponentBoard(opponent as OpponentEntry | undefined),
+            ([, opponent]) =>
+              !!getOpponentBoard(opponent as OpponentEntry | undefined),
           );
 
           const allUsernames = [
@@ -92,7 +112,9 @@ export default function GamePage() {
 
           return (
             <>
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 14 }}
+              >
                 {before.map((u) => {
                   const opponent = opponents[u] as OpponentEntry | undefined;
                   const board = getOpponentBoard(opponent);
@@ -108,11 +130,10 @@ export default function GamePage() {
               <div>
                 {before.map((u) => {
                   const opponent = opponents[u] as OpponentEntry | undefined;
-                  const board = getOpponentBoard(opponent);
+                  void opponent; // board not used in this column
                   return (
                     <div key={u} style={{ minWidth: 420 }}>
                       <div>{u}</div>
-                      {board ? <h1 style={{ color: "white" }}>{String(board)}</h1> : null}
                     </div>
                   );
                 })}
@@ -130,7 +151,9 @@ export default function GamePage() {
                 <GameBoard board={latestRender?.self?.board ?? null} />
               </div>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 14 }}
+              >
                 {after.map((u) => {
                   const opponent = opponents[u] as OpponentEntry | undefined;
                   const board = getOpponentBoard(opponent);
@@ -152,10 +175,8 @@ export default function GamePage() {
       {gameOutcome !== null && (
         <div style={{ textAlign: "center", marginTop: 16 }}>
           <div>{gameOutcome === "win" ? "YOU WIN" : "YOU LOSE"}</div>
-          <button onClick={() => goTo("/lobby")}>Return to Lobby</button>
         </div>
       )}
     </div>
   );
 }
-

@@ -5,10 +5,12 @@ Game
 -show players cards
 
 Register
--Go to home if already connected
+-Go to home if already connected done
 
 Home
--put new modes
--custum modes
+-put new modes done
+-custum modes done
 
 Lobby
+
+fix bugg ready

@@ -1,4 +1,6 @@
-- [ ] Update Game layout to center and enlarge the game board
-- [ ] Move/position GameCard directly above the game board
-- [ ] Update GameCard to display actual current/next piece previews (not just text)
-
+- [x] Read existing HistoryCard component and styling files
+- [x] Inspect HomePage and routing usage
+- [x] Design props for HistoryCard: showOption (only user vs all users) + history data
+- [x] Insert HistoryCard into HomePage
+- [x] Create/update modern CSS for HistoryCard (HistoriyCard.css)
+- [ ] Ensure build passes (tsc/vite)
