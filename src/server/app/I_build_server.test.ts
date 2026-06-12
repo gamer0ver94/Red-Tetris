@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import Fastify from 'fastify';
 import type { FastifyInstance } from 'fastify';
 
-import * as BUILD from './build_server.ts';
+import * as BUILD from './build_server.js';
 
 describe('build_server', () => {
 

@@ -5,7 +5,8 @@ import { tick_board } from "./game_core_services.js";
 import { ActiveGame } from "../models/active_game_model.js";
 import { CodeType, ModelResult } from "../types/error_code_types.js";
 import { EndGameProvider } from "../models/end_game_provider.js";
-import { PlayerInGame } from "../models/player_in_game_model.js";
+import { PlayerInGame, PlayerGravityState } from "../models/player_in_game_model.js";
+
 
 const active_loops = new Map<string, NodeJS.Timeout>();
 
@@ -70,11 +71,13 @@ export function tick_game(active_game: ActiveGame) : {winners_id:string[], loser
 
         const gravity = player.get_gravity();
         const ticks_ms = get_player_tick_ms(active_game, player);
-        const drop_multiplier = 1 + active_game.get_config().get_drop_multiplier();
+        const drop_multiplier = active_game.get_config().get_drop_multiplier();
 
         let fall_every_ms:number;
-        if(gravity.hard_drop)
-            fall_every_ms = 0;
+        if(gravity.hard_drop){
+            instant_lock(player, gravity, active_game);
+            continue;
+        }
         else if (gravity.soft_drop)
             fall_every_ms = ticks_ms * drop_multiplier;
         else
@@ -83,7 +86,7 @@ export function tick_game(active_game: ActiveGame) : {winners_id:string[], loser
         const gravity_due = now - gravity.last_fall_at >= fall_every_ms;
         const lock_check_due = player.is_lock_delay_active();
 
-        if(gravity_due || lock_check_due){
+        if(gravity_due || lock_check_due || gravity.hard_drop){
             const tick_res = tick_board(
               player.get_board(),
               player.get_player_id(),
@@ -117,4 +120,30 @@ function get_player_tick_ms(active_game:ActiveGame, player:PlayerInGame):number{
 
   const level = Math.floor(locks/trigger_count);
   return Math.max(max_speed, base - level * speed_ms);
+}
+
+function instant_lock(player:PlayerInGame, gravity:PlayerGravityState, active_game:ActiveGame){
+  let guard = player.get_board().get_board().length + 5;
+
+    while (guard > 0 && player.get_board().get_current_piece()) {
+        const tick_res = tick_board(
+            player.get_board(),
+            player.get_player_id(),
+            active_game,
+            Date.now(),
+            true,
+            true,
+        );
+
+        if (!tick_res.success)
+            break;
+
+        if (tick_res.data.lock_waiting)
+            break;
+
+        guard -= 1;
+    }
+
+    gravity.hard_drop = false;
+    gravity.last_fall_at = Date.now();
 }

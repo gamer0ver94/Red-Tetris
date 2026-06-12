@@ -74,7 +74,9 @@ export class HistoryProvider{
         const history = this.read_history();
 
         return this.slice_history(
-            history.sort((a, b) => b.score - a.score),
+            history
+            .filter((entry) => !entry.is_hidden)
+            .sort((a, b) => b.score - a.score),
             start,
             end,
         );

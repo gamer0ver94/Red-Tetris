@@ -92,7 +92,7 @@ export type StartGameData = {
     game_status:GameStatus;
     sids:string[];
     socket_ids:string[];
-}
+};
 
 export type FinishGameData = {
     lobby_id: string;
@@ -101,4 +101,16 @@ export type FinishGameData = {
     loser_ids: string[];
     socket_ids: string[];
     new_entries:HistoryEntry[];
-}
+};
+
+export const ERROR_RESPONSE_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['success', 'code', 'message'],
+  properties: {
+    success: { type: 'boolean', const: false },
+    code: { type: 'string' },
+    message: { type: 'string' },
+    details: {},
+  },
+};

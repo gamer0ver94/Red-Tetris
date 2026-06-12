@@ -2,7 +2,7 @@ import { Piece } from "./piece_model.js";
 import { Board } from "./board_model.js";
 import { PieceType } from "../types/game_types.js";
 
-type PlayerGravityState = {
+export type PlayerGravityState = {
   last_fall_at: number;
   fall_every_ms: number;
   soft_drop: boolean;

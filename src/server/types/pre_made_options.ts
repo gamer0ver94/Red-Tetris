@@ -33,7 +33,7 @@ export const CLASSIC_OPTS:GameOptions = {
         backToBackBonus:false,
     },
     win:{
-        condition:'lines',
+        condition:'blob',
         limit:1,
     },
     multiplayer:{

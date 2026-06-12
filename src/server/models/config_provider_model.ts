@@ -28,7 +28,7 @@ export class ConfigProvider{
         if(drop.hard)
             return 0;
         if(drop.soft)
-            return this.opts.gravity.tickMs * (1 + this.opts.gravity.softDropMultiplier);
+            return this.opts.gravity.tickMs * this.opts.gravity.softDropMultiplier;
         return this.opts.gravity.tickMs;
     }
 

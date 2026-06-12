@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify'
 
 import * as game_controller from '../controllers/game_lobby_controller.ts'
-import { GameOptions } from '../types/game_options_types.js';
+import { ERROR_RESPONSE_SCHEMA } from '../types/error_code_types.js';
 
 const GAME_MODE_ENUM = ['classic', 'hard', 'easy', 'solo', 'battle', 'custom'];
 
@@ -136,21 +136,9 @@ export const game_routes = async (fastify: FastifyInstance) => {
             game_id: { type: 'string' },
             }
         },
-        400: {
-            type: 'object',
-            properties: { success: { type: 'boolean' }, code: { type: 'string' }, message: { type: 'string' } },
-            required: ['success', 'code', 'message']
-        },
-        403: {
-            type: 'object',
-            properties: { success: { type: 'boolean' }, code: { type: 'string' }, message: { type: 'string' } },
-            required: ['success', 'code', 'message']
-        },
-        409: {
-            type: 'object',
-            properties: { success: { type: 'boolean' }, code: { type: 'string' }, message: { type: 'string' } },
-            required: ['success', 'code', 'message']
-        }
+        400: ERROR_RESPONSE_SCHEMA,
+        403: ERROR_RESPONSE_SCHEMA,
+        409: ERROR_RESPONSE_SCHEMA,
         }
     }
     }, game_controller.post_create);
@@ -191,42 +179,10 @@ export const game_routes = async (fastify: FastifyInstance) => {
                     is_host: { type: 'boolean' },
                     },
                 },
-                400: {
-                    type: 'object',
-                    additionalProperties: false,
-                    required: ['success', 'reason'],
-                    properties: {
-                    success: { type: 'boolean', const: false },
-                    reason: { type: 'string' },
-                    },
-                },
-                403: {
-                    type: 'object',
-                    additionalProperties: false,
-                    required: ['success', 'reason'],
-                    properties: {
-                    success: { type: 'boolean', const: false },
-                    reason: { type: 'string' },
-                    },
-                },
-                404: {
-                    type: 'object',
-                    additionalProperties: false,
-                    required: ['success', 'reason'],
-                    properties: {
-                    success: { type: 'boolean', const: false },
-                    reason: { type: 'string' },
-                    },
-                },
-                409: {
-                    type: 'object',
-                    additionalProperties: false,
-                    required: ['success', 'reason'],
-                    properties: {
-                    success: { type: 'boolean', const: false },
-                    reason: { type: 'string' },
-                    },
-                },
+                400: ERROR_RESPONSE_SCHEMA,
+                403: ERROR_RESPONSE_SCHEMA,
+                404: ERROR_RESPONSE_SCHEMA,
+                409: ERROR_RESPONSE_SCHEMA,
             },
         },
     }, game_controller.get_join);

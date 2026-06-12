@@ -22,7 +22,7 @@ export function InputHandler() {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (['ArrowLeft', 'ArrowRight', 'ArrowDown'].includes(e.key)) e.preventDefault();
+      if (['ArrowLeft', 'ArrowRight', 'ArrowDown', ' '].includes(e.key)) e.preventDefault();
 
       switch (e.key) {
         case 'ArrowLeft':
@@ -38,11 +38,18 @@ export function InputHandler() {
         case 'ArrowDown':
           if (active.current.down) return;
           active.current.down = true;
+          socket.emit('game:soft:press');
+          return;
+        case ' ':
           socket.emit('game:hard:press');
           return;
         case 'r':
         case 'R':
           socket.emit('game:rotate');
+          return;
+        case 'h':
+        case'H':
+          socket.emit('game:hold');
           return;
       }
 
@@ -50,7 +57,7 @@ export function InputHandler() {
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (['ArrowLeft', 'ArrowRight', 'ArrowDown'].includes(e.key)) e.preventDefault();
+      if (['ArrowLeft', 'ArrowRight', 'ArrowDown', ' '].includes(e.key)) e.preventDefault();
 
       switch (e.key) {
         case 'ArrowLeft':
@@ -66,7 +73,11 @@ export function InputHandler() {
         case 'ArrowDown':
           if (!active.current.down) return;
           active.current.down = false;
-          emitPressRelease('game:hard', false);
+          //emitPressRelease('game:hard', false);
+          socket.emit('game:soft:release');
+          return;
+        case ' ':
+          socket.emit('game:hard:release');
           return;
       }
     };
