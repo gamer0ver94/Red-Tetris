@@ -2,32 +2,48 @@ import './PlayerCard.css';
 
 type Props = {
   username: string;
-  ready: boolean;
-  onReady: () => void;
-  onReturn: () => void;
+  isOwner: boolean;
+  status: "ready" | "not-ready" | string;
+
+  onReady?: () => void;
+  onReturn?: () => void;
 };
 
-export default function PlayerCard({ username, ready, onReady, onReturn }: Props) {
+export default function PlayerCard({
+  username,
+  isOwner,
+  status,
+  onReady,
+  onReturn,
+}: Props) {
   return (
     <div className="player-card neon">
-      <div>
-        <div>
-        </div>
-      </div>
-      <div>{username}</div>
-      <div>
-        Status: <span>{ready ? 'READY' : 'NOT READY'}</span>
+      <div className="player-header">
+        <div>{username}</div>
+
+        {isOwner && <span className="owner-badge">OWNER</span>}
       </div>
 
       <div>
-        <button onClick={onReady}>
-          {ready ? 'Unready' : 'Ready'}
-        </button>
-        <button onClick={onReturn}>
-          Return
-        </button>
+        Status:{" "}
+        <span style={{ color: status === "ready" ? "green" : "orange" }}>
+          {status}
+        </span>
+      </div>
+
+      <div>
+        {onReady && (
+          <button onClick={onReady}>
+            {status === "ready" ? "Unready" : "Ready"}
+          </button>
+        )}
+
+        {onReturn && (
+          <button onClick={onReturn}>
+            Leave
+          </button>
+        )}
       </div>
     </div>
   );
 }
-

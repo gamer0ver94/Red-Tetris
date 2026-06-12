@@ -17,7 +17,7 @@ import { setCsrfToken, setUsername } from "../store/userSlice";
 type LobbyPlayer = {
   username: string;
   status: string;
-  isOwner: boolean;
+  is_owner: boolean;
 };
 export default function LobbyPage() {
   const dispatch = useAppDispatch();
@@ -34,7 +34,9 @@ export default function LobbyPage() {
   const [lobbyPlayers, setLobbyPlayers] = useState<Record<string, LobbyPlayer>>(
     {},
   );
-
+  useEffect(() => {
+    console.log("lobbyPlayers changed:", lobbyPlayers);
+  }, [lobbyPlayers]);
   const onNewOwner = () => {
     setHostUsername(username ? username : "");
   };
@@ -52,21 +54,39 @@ export default function LobbyPage() {
     }
     return true;
   };
-  const onPlayerReady = () => {
-    setStatus(status === "ready" ? "not-ready" : "ready");
-    console.log("READY TO START");
-    socket?.emit("lobby:ready");
-    if (allPlayersReady() && hostUsername) {
+const onPlayerReady = () => {
+  const isReadyNow = lobbyPlayers[username]?.status === "ready";
+  const nextStatus = isReadyNow ? "not-ready" : "ready";
+
+  // 1. optimistic update
+  setLobbyPlayers((prev) => {
+    const updated = {
+      ...prev,
+      [username]: {
+        ...prev[username],
+        username,
+        status: nextStatus,
+        is_owner: prev[username]?.is_owner ?? false,
+      },
+    };
+
+    // 2. check AFTER update is computed
+    const isOwner = updated[username]?.is_owner;
+
+    const allReady = Object.values(updated).every(
+      (p) => p.status === "ready"
+    );
+
+    if (isOwner && allReady) {
       socket?.emit("lobby:start");
     }
-    socket?.emit("lobby:start", { username });
-    dispatch(
-      setPlayerReadyStatus({
-        username,
-        status: status === "ready" ? "not-ready" : "ready",
-      }),
-    );
-  };
+
+    return updated;
+  });
+
+  // 3. notify server
+  socket?.emit("lobby:ready");
+};
 
   useEffect(() => {
     async function loadUser() {
@@ -85,12 +105,6 @@ export default function LobbyPage() {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log(
-      "[Lobby] connect-effect: socket.connected=",
-      socket?.connected,
-      "csrf_token=",
-      !!csrf_token,
-    );
     if (!socket) return;
     if (!csrf_token) return;
     socket.auth = { csrf_token };
@@ -98,18 +112,11 @@ export default function LobbyPage() {
     if (!socket.connected) {
       socket.connect();
     } else {
-      console.log("[Lobby] socket already connected, not calling connect()");
     }
   }, [socket, csrf_token]);
 
   useEffect(() => {
     if (!socket) return;
-
-    console.log(
-      "[Lobby] listeners effect mounted. socket.connected=",
-      socket.connected,
-    );
-
     dispatch(playerJoined({ username }));
 
     if (gameIdFromSession) {
@@ -125,17 +132,35 @@ export default function LobbyPage() {
       console.error("[Lobby] Socket connection error:", err.message);
     });
 
-    const onPlayerJoinUpdate = (payload: any) => {
-      const players: Record<string, LobbyPlayer> = Object.fromEntries(
-        payload.players.map((player: LobbyPlayer) => [player.username, player]),
-      );
-      setLobbyPlayers(players);
-      console.log("loby players", lobbyPlayers);
-    };
+    const onPlayerJoinUpdate = (payload: {
+      all_ready: boolean;
+      owner_name: string;
+      players: LobbyPlayer[];
+    }) => {
+      setHostUsername(payload.owner_name);
 
+      const players: Record<string, LobbyPlayer> = Object.fromEntries(
+        payload.players.map((p) => [p.username, p]),
+      );
+
+      setLobbyPlayers(players);
+    };
+    const onPlayerReadyUpdate = (payload: {
+      players: LobbyPlayer[];
+      owner_name?: string;
+    }) => {
+      const players: Record<string, LobbyPlayer> = Object.fromEntries(
+        payload.players.map((p) => [p.username, p]),
+      );
+
+      setLobbyPlayers(players);
+
+      if (payload.owner_name) {
+        setHostUsername(payload.owner_name);
+      }
+    };
     const onPlayerLeave = (payload: any) => {
       const leaverUsername = payload?.username;
-      console.log("Player leave:", payload);
       const players: Record<string, LobbyPlayer> = Object.fromEntries(
         payload.players.map((player: LobbyPlayer) => [player.username, player]),
       );
@@ -143,7 +168,6 @@ export default function LobbyPage() {
       if (leaverUsername) {
         dispatch(playerLeft({ username: leaverUsername }));
       }
-      console.log(payload);
 
       if (leaverUsername && leaverUsername === username) {
         sessionStorage.removeItem("game_id");
@@ -152,8 +176,6 @@ export default function LobbyPage() {
     };
 
     const onSessionResume = (payload: any) => {
-      console.log("session:resume", payload);
-
       const gameId = payload?.game?.game_id;
       if (gameId) {
         sessionStorage.setItem("game_id", gameId);
@@ -165,8 +187,6 @@ export default function LobbyPage() {
     });
 
     const onLobbyStarted = () => {
-      console.log("HELLO WORLD", readyByUsername);
-
       goTo(ROUTES.GAME);
     };
 
@@ -175,6 +195,7 @@ export default function LobbyPage() {
     socket.on("lobby:leave:update", onPlayerLeave);
     socket.on("lobby:new_owner", onNewOwner);
     socket.on("session:resume", onSessionResume);
+    socket.on("lobby:ready:update", onPlayerReadyUpdate);
 
     return () => {
       socket.off("connect");
@@ -184,44 +205,43 @@ export default function LobbyPage() {
       socket.off("lobby:leave:update", onPlayerLeave);
       socket.off("session:resume", onSessionResume);
       socket.off("lobby:start:success", onLobbyStarted);
+      socket.off("lobby:ready:update", onPlayerReadyUpdate);
       socket.offAny();
     };
   }, [socket]);
-  useEffect(() => {
-    console.log("lobbyPlayers updated:", lobbyPlayers);
-  }, ["nana", lobbyPlayers]);
-  return (
-    <div className="lobby-container">
-      <h1>Lobby</h1>
-      <div className="lobby-players">
-        <div className="oponent-players">
-          <div className="oponent-players">
-            {Object.entries(lobbyPlayers)
-              .filter(([playerName]) => playerName !== username)
-              .map(([playerName, player]) => (
-                <PlayerCard
-                  key={playerName}
-                  username={player.username}
-                  ready={player.status === "ready"}
-                  onReady={() => {}}
-                  onReturn={() => {}}
-                />
-              ))}
-          </div>
-        </div>
-        <div className="player">
-          <PlayerCard
-            username={username}
-            ready={(readyByUsername[username] ?? "not-ready") === "ready"}
-            onReady={onPlayerReady}
-            onReturn={leaveLobby}
-          />
-        </div>
+return (
+  <div className="lobby-container">
+    <h1>Lobby</h1>
+
+    <div className="lobby-players">
+      <div className="oponent-players">
+        {Object.entries(lobbyPlayers)
+          .filter(([playerName]) => playerName !== username)
+          .map(([playerName, player]) => (
+            <PlayerCard
+              key={playerName}
+              username={player.username}
+              isOwner={player.is_owner}
+              status={player.status}
+            />
+          ))}
       </div>
-      <div className="logout-space">
-        <div>{gameIdFromSession}</div>
-        <LogoutButton />
+
+      <div className="player">
+        <PlayerCard
+          username={username}
+          isOwner={lobbyPlayers[username]?.is_owner ?? false}
+          status={lobbyPlayers[username]?.status ?? "not-ready"}
+          onReady={onPlayerReady}
+          onReturn={leaveLobby}
+        />
       </div>
     </div>
-  );
+
+    <div className="logout-space">
+      <div>{gameIdFromSession}</div>
+      <LogoutButton />
+    </div>
+  </div>
+);
 }
