@@ -122,6 +122,7 @@ async function start_lobby_event(
                 store,
                 finish_res.data.winner_ids,
                 finish_res.data.loser_ids,
+                finish_res.data.new_entries,
             );
             
             await emit_history_updates(io, store, finish_res.data.new_entries);
@@ -236,13 +237,14 @@ async function emit_win_lose(
     store:Store,
     winner_ids:string[],
     loser_ids:string[],
+    new_entries:HistoryEntry[],
 ) {
     
     for(const id of winner_ids){
         const res = store.get_player_store().get_player_by_id(id);
         if(!res.success)
             continue;
-        await io.to(res.data.get_socket()).emit('game:win');
+        await io.to(res.data.get_socket()).emit('game:win', new_entries);
         await change_player_status(io, playerStatusType.waiting, res.data.get_sid(), store.get_player_store());
     }
 
@@ -250,7 +252,7 @@ async function emit_win_lose(
         const res = store.get_player_store().get_player_by_id(id);
         if(!res.success)
             continue;
-        await io.to(res.data.get_socket()).emit('game:lose');
+        await io.to(res.data.get_socket()).emit('game:lose', new_entries);
         await change_player_status(io, playerStatusType.waiting, res.data.get_sid(), store.get_player_store());
     }
 }

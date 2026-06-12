@@ -74,8 +74,8 @@ export interface ServerToClientEvents{
     'lobby:new_owner': () => void;
 
     'game:render': (p: RenderPayload) => void;
-    'game:win': () => void;
-    'game:lose': () => void;
+    'game:win': (p: HistoryEntry[]) => void;
+    'game:lose': (p: HistoryEntry[]) => void;
     'game:error': (p: {reason: string}) => void;
 
     'history:update': () => void;
