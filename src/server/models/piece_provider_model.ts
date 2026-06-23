@@ -1,5 +1,11 @@
 import { pieceType, PieceType } from "../types/game_types.ts";
 import { CodeType, ModelResult } from "../types/error_code_types.ts";
+import {
+    advance_piece_sequence,
+    create_piece_sequence,
+    peek_pieces,
+    should_extend_sequence_for_peek,
+} from "../core/piece_sequence.js";
 
 
 
@@ -68,41 +74,52 @@ export class PieceProvider{
 
     public peek_for_player(player_id:string, count:number):ModelResult<PieceType[], CodeType>{
         
-        const pieces:PieceType[] = [];
         const res = this.validate_for_player(player_id);
         if (!res.success)
             return res;
         const sequence = res.data.sequence;
         const index = res.data.index;
-        
-        for(let offset = 0; offset < count; offset ++)
-            pieces.push(this.peek_one_for_player(sequence, index, offset))
 
-        return {success:true, data:pieces};
+        this.ensure_preview_sequence(sequence, index, count);
+        return {success:true, data:peek_pieces(sequence, index, count)};
     }
 
-    private peek_one_for_player(sequence:PieceType[], index:number, offset:number){
+    private ensure_preview_sequence(sequence:PieceType[], index:number, count:number):void{
+        if(!this.random_sequence)
+            return;
 
-        return sequence[(index+offset) % sequence.length];
+        while(should_extend_sequence_for_peek(index, sequence.length, count))
+            sequence.push(...this.create_sequence());
     }
 
     private advance_player(player_id:string, sequence:PieceType[]){
 
         const index = this.player_index.get(player_id)!;
-        const next_index = index + 1;
+        const next_sequence =
+            this.random_sequence && index + 1 >= sequence.length
+                ? this.create_sequence()
+                : [];
+        const advance = advance_piece_sequence(
+            index,
+            sequence.length,
+            this.random_sequence,
+            this.shared_sequence_enabled,
+            next_sequence,
+        );
 
-        if(next_index < sequence.length){
-            this.player_index.set(player_id, next_index);
+        if(advance.type === 'next_index' || advance.type === 'loop_sequence'){
+            this.player_index.set(player_id, advance.index);
             return;
         }
-        if(this.random_sequence && this.shared_sequence_enabled){
-            this.shared_sequence.push(...this.create_sequence());
-            this.player_index.set(player_id, next_index);
+
+        if(advance.type === 'append_sequence'){
+            this.shared_sequence.push(...advance.sequence_to_append);
+            this.player_index.set(player_id, advance.index);
             return;
         }
-        if(this.random_sequence)
-            this.replace_sequence_for_player(player_id, this.create_sequence());
-        this.player_index.set(player_id, 0);
+
+        this.replace_sequence_for_player(player_id, advance.sequence);
+        this.player_index.set(player_id, advance.index);
     }
 
     private get_sequence_for_player(player_id:string):PieceType[]|undefined{
@@ -124,18 +141,10 @@ export class PieceProvider{
     }
 
     private create_sequence():PieceType[]{
-        if(this.random_sequence){
-            return this.shuffle([...this.pieces])
-        }
-        return [... this.pieces]
-    }
-
-    private shuffle(sequence:PieceType[]):PieceType[]{
-        for (let i = sequence.length - 1; i > 0; i --){
-            const j = Math.floor(Math.random() * (i + 1));
-            [sequence[i], sequence[j]] = [sequence[j], sequence[i]];
-        }
-        return sequence;
+        return create_piece_sequence(
+            (max) => Math.floor(Math.random() * max),
+            this.pieces,
+        );
     }
 
     private validate_for_player(player_id:string):ModelResult<{sequence:PieceType[], index:number}, CodeType>{

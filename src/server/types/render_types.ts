@@ -15,3 +15,15 @@ export type OpponentRender =
 | {view:'full'; board:BoardType}
 | {view:'grid'; board:BoardType}
 | {view:'highest'; board:BoardType};
+
+export type ClearPhaseMode = "regular" | "cell_gravity";
+
+export type ClearPhaseState = {
+  mode: ClearPhaseMode;
+  frames: BoardType[];
+  frame_index: number;
+  next_frame_at: number;
+  final_board: BoardType;
+  cleared_lines: number;
+  cleared_garbage: number;
+}

@@ -5,7 +5,8 @@ export const CLASSIC_OPTS:GameOptions = {
         width: 10 ,
         height: 20,
         invisible:false,
-        revealOnClearMs:0
+        revealOnClearMs:0,
+        showLockHighlight:true,
     },
     pieces:{
         randomSequence:true,
@@ -18,7 +19,7 @@ export const CLASSIC_OPTS:GameOptions = {
         lockDelayMs:100,
         maxLock:15,
         softDropMultiplier:0.3,
-        fallAfterClear:false,
+        fallAfterClear:true,
         speedOnLock:true,
     },
     garbage:{
@@ -29,12 +30,12 @@ export const CLASSIC_OPTS:GameOptions = {
 
     },
     scoring:{
-        enabled:true,
+        enabled:false,
         backToBackBonus:false,
     },
     win:{
-        condition:'blob',
-        limit:1,
+        condition:'survival',
+        limit:null,
     },
     multiplayer:{
         enabled:true,
@@ -49,6 +50,7 @@ export const HARD_OPTS:GameOptions = {
         height: 30,
         invisible:true,
         revealOnClearMs:100,
+        showLockHighlight:false,
     },
     pieces:{
         randomSequence:true,
@@ -91,6 +93,7 @@ export const EASY_OPTS:GameOptions={
         height:20,
         invisible:false,
         revealOnClearMs:0,
+        showLockHighlight:false,
     },
     pieces:{
         randomSequence:false,
@@ -133,6 +136,7 @@ export const SOLO_OPTS:GameOptions={
         height:20,
         invisible:false,
         revealOnClearMs:0,
+        showLockHighlight:false,
     },
     pieces:{
         randomSequence:true,
@@ -175,6 +179,7 @@ export const BATTLE_OPTS:GameOptions = {
         height: 30,
         invisible:false,
         revealOnClearMs:0,
+        showLockHighlight:false,
     },
     pieces:{
         randomSequence:true,

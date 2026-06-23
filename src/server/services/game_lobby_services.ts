@@ -14,8 +14,7 @@ import { GameOptions } from '../types/game_options_types.js'
 import { CodeType, LeaveGameData, JoinLobbyData, ModelResult, StartGameData } from '../types/error_code_types.js'
 import { gameStatusType, PlayerInLobbyStatus, PlayerStatus, playerStatusType } from '../types/status_types.ts'
 import { LobbyPlayerState, LobbyReadyPayload } from '../types/socket_event_types.js'
-import { EndGameProvider } from '../models/end_game_provider.js'
-import { finish_active_game } from './game_end_services.js'
+import { evaluate_active_end_game, finish_active_game } from './game_end_services.js'
 
 export function join_game(
     sid:string,
@@ -254,14 +253,8 @@ function leave_game_started(player: Player, lobby: Lobby, store: Store):ModelRes
         ended_match = true;
     }
     else{
-        const condition = active_game.get_config().get_win_condition();
-        const limit = active_game.get_config().get_win_limit();
 
-        const end_res = EndGameProvider.evaluateEndGame(
-            active_game,
-            condition,
-            limit,
-        );
+        const end_res = evaluate_active_end_game(active_game);
 
         if (end_res.finished) {
             ended_match = true;

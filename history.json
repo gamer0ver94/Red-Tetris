@@ -3,370 +3,80 @@
     "username": "tie_2_11",
     "is_winner": true,
     "score": 200,
-    "is_hidden": false,
+    "is_hidden": true,
     "game_mode": "custom",
-    "total_time": "32",
-    "end_date": "2026-06-11T21:12:47.465Z",
-    "lobby_id": "4e47"
+    "total_time": "30",
+    "end_date": "2026-06-19T10:56:57.061Z",
+    "lobby_id": "2030"
   },
   {
     "username": "tie_host_10",
     "is_winner": true,
     "score": 200,
-    "is_hidden": false,
+    "is_hidden": true,
     "game_mode": "custom",
-    "total_time": "32",
-    "end_date": "2026-06-11T21:12:47.465Z",
-    "lobby_id": "4e47"
+    "total_time": "30",
+    "end_date": "2026-06-19T10:56:57.061Z",
+    "lobby_id": "2030"
   },
   {
     "username": "lines_limit_9",
     "is_winner": true,
     "score": 0,
-    "is_hidden": false,
+    "is_hidden": true,
     "game_mode": "custom",
-    "total_time": "33",
-    "end_date": "2026-06-11T21:12:47.427Z",
-    "lobby_id": "c2b1"
+    "total_time": "32",
+    "end_date": "2026-06-19T10:56:57.021Z",
+    "lobby_id": "8c0d"
   },
   {
     "username": "score_limit_8",
     "is_winner": true,
     "score": 100,
-    "is_hidden": false,
+    "is_hidden": true,
     "game_mode": "custom",
     "total_time": "31",
-    "end_date": "2026-06-11T21:12:47.390Z",
-    "lobby_id": "bd68"
+    "end_date": "2026-06-19T10:56:56.982Z",
+    "lobby_id": "6bc6"
   },
   {
     "username": "time_limit_7",
     "is_winner": true,
     "score": 0,
-    "is_hidden": false,
+    "is_hidden": true,
     "game_mode": "custom",
     "total_time": "94",
-    "end_date": "2026-06-11T21:12:47.355Z",
-    "lobby_id": "6a74"
+    "end_date": "2026-06-19T10:56:56.940Z",
+    "lobby_id": "38dd"
   },
   {
     "username": "all_dead_2_6",
     "is_winner": false,
     "score": 10,
-    "is_hidden": false,
+    "is_hidden": true,
     "game_mode": "custom",
-    "total_time": "32",
-    "end_date": "2026-06-11T21:12:47.257Z",
-    "lobby_id": "011d"
+    "total_time": "33",
+    "end_date": "2026-06-19T10:56:56.825Z",
+    "lobby_id": "34eb"
   },
   {
     "username": "all_dead_host_5",
     "is_winner": true,
     "score": 20,
-    "is_hidden": false,
+    "is_hidden": true,
     "game_mode": "custom",
-    "total_time": "32",
-    "end_date": "2026-06-11T21:12:47.257Z",
-    "lobby_id": "011d"
+    "total_time": "33",
+    "end_date": "2026-06-19T10:56:56.825Z",
+    "lobby_id": "34eb"
   },
   {
     "username": "survival_3_4",
     "is_winner": false,
     "score": 0,
-    "is_hidden": false,
+    "is_hidden": true,
     "game_mode": "custom",
-    "total_time": "33",
-    "end_date": "2026-06-11T21:12:47.217Z",
-    "lobby_id": "0be7"
-  },
-  {
-    "username": "survival_2_3",
-    "is_winner": false,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "custom",
-    "total_time": "33",
-    "end_date": "2026-06-11T21:12:47.217Z",
-    "lobby_id": "0be7"
-  },
-  {
-    "username": "survival_host_2",
-    "is_winner": true,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "custom",
-    "total_time": "33",
-    "end_date": "2026-06-11T21:12:47.217Z",
-    "lobby_id": "0be7"
-  },
-  {
-    "username": "start_multi_joiner_16",
-    "is_winner": true,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "1",
-    "end_date": "2026-06-11T21:12:47.181Z",
-    "lobby_id": "2900"
-  },
-  {
-    "username": "solo_dead_1",
-    "is_winner": false,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "solo",
     "total_time": "32",
-    "end_date": "2026-06-11T21:12:47.158Z",
-    "lobby_id": "7aed"
-  },
-  {
-    "username": "start_multi_joiner_16",
-    "is_winner": true,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "1",
-    "end_date": "2026-06-11T21:06:48.064Z",
-    "lobby_id": "eeb6"
-  },
-  {
-    "username": "solo_dead_1",
-    "is_winner": false,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "solo",
-    "total_time": "32",
-    "end_date": "2026-06-11T21:06:48.029Z",
-    "lobby_id": "96ae"
-  },
-  {
-    "username": "start_multi_joiner_16",
-    "is_winner": true,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "0",
-    "end_date": "2026-06-10T20:56:26.797Z",
-    "lobby_id": "d06e"
-  },
-  {
-    "username": "TESTEUR2FOUFOU",
-    "is_winner": false,
-    "score": 400,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "111160",
-    "end_date": "2026-06-10T20:51:11.743Z",
-    "lobby_id": "5158"
-  },
-  {
-    "username": "TEST@FOFOU",
-    "is_winner": false,
-    "score": 300,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "117357",
-    "end_date": "2026-06-10T20:43:26.175Z",
-    "lobby_id": "9c04"
-  },
-  {
-    "username": "TEST@FOFOU",
-    "is_winner": false,
-    "score": 100,
-    "is_hidden": false,
-    "game_mode": "battle",
-    "total_time": "130036",
-    "end_date": "2026-06-10T20:40:58.334Z",
-    "lobby_id": "65d5"
-  },
-  {
-    "username": "TTT",
-    "is_winner": false,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "66466",
-    "end_date": "2026-06-10T20:26:28.100Z",
-    "lobby_id": "ec7f"
-  },
-  {
-    "username": "TT",
-    "is_winner": false,
-    "score": 900,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "116428",
-    "end_date": "2026-06-10T20:18:47.499Z",
-    "lobby_id": "aeec"
-  },
-  {
-    "username": "start_multi_joiner_16",
-    "is_winner": true,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "1",
-    "end_date": "2026-06-10T15:33:01.239Z",
-    "lobby_id": "eb2d"
-  },
-  {
-    "username": "history_user",
-    "is_winner": true,
-    "score": 1,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "62431",
-    "end_date": "2026-06-10T16:42:15.120Z",
-    "lobby_id": "hist"
-  },
-  {
-    "username": "history_rival",
-    "is_winner": false,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "62431",
-    "end_date": "2026-06-10T16:42:15.120Z",
-    "lobby_id": "hist"
-  },
-  {
-    "username": "history_user",
-    "is_winner": false,
-    "score": 240,
-    "is_hidden": false,
-    "game_mode": "battle",
-    "total_time": "91804",
-    "end_date": "2026-06-10T16:14:02.804Z",
-    "lobby_id": "hist2"
-  },
-  {
-    "username": "history_champion",
-    "is_winner": true,
-    "score": 520,
-    "is_hidden": false,
-    "game_mode": "battle",
-    "total_time": "91804",
-    "end_date": "2026-06-10T16:14:02.804Z",
-    "lobby_id": "hist2"
-  },
-  {
-    "username": "history_hidden_score",
-    "is_winner": true,
-    "score": 9999,
-    "is_hidden": true,
-    "game_mode": "easy",
-    "total_time": "45210",
-    "end_date": "2026-06-10T15:58:44.410Z",
-    "lobby_id": "hist3"
-  },
-  {
-    "username": "history_user",
-    "is_winner": true,
-    "score": 310,
-    "is_hidden": false,
-    "game_mode": "custom",
-    "total_time": "73492",
-    "end_date": "2026-06-10T15:36:29.912Z",
-    "lobby_id": "hist4"
-  },
-  {
-    "username": "start_multi_joiner_16",
-    "is_winner": true,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "1",
-    "end_date": "2026-06-10T14:55:18.976Z",
-    "lobby_id": "50a9"
-  },
-  {
-    "username": "start_multi_joiner_16",
-    "is_winner": true,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "0",
-    "end_date": "2026-06-10T14:14:36.286Z",
-    "lobby_id": "b55b"
-  },
-  {
-    "username": "start_multi_joiner_16",
-    "is_winner": true,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "1",
-    "end_date": "2026-06-10T14:01:11.867Z",
-    "lobby_id": "3e61"
-  },
-  {
-    "username": "re",
-    "is_winner": false,
-    "score": 1000,
-    "is_hidden": true,
-    "game_mode": "easy",
-    "total_time": "101474",
-    "end_date": "2026-06-10T13:11:29.049Z",
-    "lobby_id": "c49d"
-  },
-  {
-    "username": "tt",
-    "is_winner": false,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "battle",
-    "total_time": "33002",
-    "end_date": "2026-06-10T13:01:51.737Z",
-    "lobby_id": "a290"
-  },
-  {
-    "username": "qq",
-    "is_winner": true,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "battle",
-    "total_time": "33002",
-    "end_date": "2026-06-10T13:01:51.737Z",
-    "lobby_id": "a290"
-  },
-  {
-    "username": "ttt",
-    "is_winner": false,
-    "score": 1000,
-    "is_hidden": true,
-    "game_mode": "easy",
-    "total_time": "110945",
-    "end_date": "2026-06-10T11:25:06.432Z",
-    "lobby_id": "b316"
-  },
-  {
-    "username": "ttt",
-    "is_winner": false,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "custom",
-    "total_time": "12795",
-    "end_date": "2026-06-10T11:22:59.420Z",
-    "lobby_id": "95d0"
-  },
-  {
-    "username": "yy",
-    "is_winner": true,
-    "score": 100,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "27847",
-    "end_date": "2026-06-10T09:42:10.938Z",
-    "lobby_id": "f5de"
-  },
-  {
-    "username": "TT",
-    "is_winner": false,
-    "score": 0,
-    "is_hidden": false,
-    "game_mode": "classic",
-    "total_time": "7956",
-    "end_date": "2026-06-09T23:07:31.704Z",
-    "lobby_id": "c1cf"
+    "end_date": "2026-06-19T10:56:56.766Z",
+    "lobby_id": "017c"
   }
 ]

@@ -6,6 +6,8 @@ import type { CodeType, ModelResult, FinishGameData } from "../types/error_code_
 import { ActiveGame } from "../models/active_game_model.js";
 import { HistoryProvider } from "../models/history_provider.js";
 import { HistoryEntry } from "../types/history_types.js";
+import { EndGameCondition, EndGamePlayerState, EndGameResult } from "../types/game_types.js";
+import { evaluate_end_game } from "../core/end_game.js";
 
 
 export function finish_active_game(
@@ -103,4 +105,27 @@ function save_history_entries(
     }
     console.log('[history saved]', new_entries);
     return {success:true, data:new_entries};
+}
+
+export function evaluate_active_end_game(
+    active_game:ActiveGame,
+):EndGameResult{
+
+    const condition = active_game.get_config().get_win_condition();
+    const limit = active_game.get_config().get_win_limit();
+
+    const players:EndGamePlayerState[] = active_game.get_players()
+        .map((player) => ({
+            player_id:player.get_player_id(),
+            alive: player.is_alive(),
+            score: player.get_score(),
+            lines: player.get_lines(),
+        }));
+    return evaluate_end_game(
+        players,
+        condition,
+        limit,
+        Date.now(),
+        active_game.get_start_time()
+    );
 }

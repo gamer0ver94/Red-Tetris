@@ -34,12 +34,13 @@ export const game_routes = async (fastify: FastifyInstance) => {
                     grid: {
                     type: 'object',
                     additionalProperties: false,
-                    required: ['width', 'height', 'invisible', 'revealOnClearMs'],
+                    required: ['width', 'height', 'invisible', 'revealOnClearMs', 'showLockHighlight'],
                     properties: {
                         width: { type: 'integer', minimum: 1 },
                         height: { type: 'integer', minimum: 1 },
                         invisible: { type: 'boolean' },
                         revealOnClearMs: { type: 'integer', minimum: 0 },
+                        showLockHighlight: { type: 'boolean' },
                     },
                     },
                     pieces: {

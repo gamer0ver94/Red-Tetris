@@ -6,6 +6,7 @@ export type GameOptions = {
     height: number;
     invisible: boolean;
     revealOnClearMs: number;
+    showLockHighlight: boolean;
   };
 
   pieces: {
@@ -126,6 +127,30 @@ export default function CustomOptionForm({
                           <option value="none">none</option>
                         </select>
                       )}
+                      {/*START: ADDEDBY YSEBBAN TO TEST CUSTOM END GAME */}
+                      {sectionKey === "win" &&
+                      fieldKey === "condition" && (
+                        <select
+                          value={fieldValue}
+                          onChange={(e) => {
+                            setOptions((prev) => ({
+                              ...prev,
+                              win: {
+                                ...prev.win,
+                                condition:
+                                  e.target.value as GameOptions["win"]["condition"],
+                              },
+                            }));
+                          }}
+                        >
+                          <option value="survival">survival</option>
+                          <option value="first_lost">first_lost</option>
+                          <option value="score">score</option>
+                          <option value="lines">lines</option>
+                          <option value="time">time</option>
+                        </select>
+                      )}
+                      {/*END: ADDEDBY YSEBBAN TO TEST CUSTOM END GAME */}
                   </div>
                 );
               })}

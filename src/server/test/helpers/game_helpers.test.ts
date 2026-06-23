@@ -5,6 +5,7 @@ import * as test_types from "../types.test.js";
 import * as test_sockets from "../helpers/socket_helpers.test.js";
 import * as test_auth from "../helpers/auth_helpers.test.js";
 
+
 import type { FastifyInstance } from 'fastify';
 import { expect } from 'vitest';
 
@@ -152,6 +153,15 @@ export async function create_and_start_game(
     return game_id;
 }
 
+export async function register_player(
+    prefix: string,
+    app:FastifyInstance,
+    baseUrl:string,
+): Promise<{ user: test_types.TestAuthUser; socket: test_types.TestSocketClient }> {
+    const user = await test_auth.register_user(app, test_auth.unique_username(prefix));
+    const { socket } = await test_sockets.register_ready_socket_client(baseUrl, user);
+    return { user, socket };
+}
 function assert_valid_board(board: BoardType): void {
     expect(board.length).toBeGreaterThan(0);
 

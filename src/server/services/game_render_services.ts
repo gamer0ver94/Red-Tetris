@@ -1,11 +1,16 @@
 //Maps backend state into frontend state
 import { Store } from "../stores/store.js";
 
-import { Board } from "../models/board_model.js";
-import { BoardType } from "../types/game_types.js";
 import type { OpponentRender, RenderPayload } from '../types/render_types.js';
 import { ActiveGame } from "../models/active_game_model.js";
 import { CodeType, ModelResult } from "../types/error_code_types.js";
+import { get_current_phase_frame } from "../core/clear_frames.js";
+import { PlayerInGame } from "../models/player_in_game_model.js";
+import {
+    build_empty_board,
+    build_highest_board,
+    build_visible_board,
+} from "../core/render.js";
 
 export function build_render_payload(active_game:ActiveGame, player_id:string, store:Store):ModelResult<RenderPayload, CodeType>{
     
@@ -24,8 +29,15 @@ export function build_render_payload(active_game:ActiveGame, player_id:string, s
 
 
     const show_grid = !active_game.get_config().is_invisible() || self_res.data.is_grid_visible();
-    
-    const render_board = show_grid ? build_visible_board(self_board, true) : build_empty_board(self_board);
+    const phase = self_res.data.get_clear_phase();
+    const current_piece = self_board.get_current_piece()?.to_state() ?? null;
+    const show_lock_highlight = active_game.get_config().is_lock_highlight_enabled();
+
+    const render_board = phase
+        ? get_current_phase_frame(phase)
+        : show_grid
+            ? build_visible_board(current_piece, self_board.get_board(), true, show_lock_highlight)
+            : build_empty_board(current_piece, self_board.get_board(), true, show_lock_highlight);
     
     const score = active_game.get_config().is_score_enable() ? self_res.data.get_score() : null;
 
@@ -41,36 +53,35 @@ export function build_render_payload(active_game:ActiveGame, player_id:string, s
     };
 }
 
-function build_opponent_view(board:Board, mode:'full'|'grid'|'highest'|'none'):OpponentRender|null{
+function build_opponent_view(
+    opponent:PlayerInGame,
+    mode:'full'|'grid'|'highest'|'none'):OpponentRender|null{
 
-
+    let board = opponent.get_board().get_board();
+    const phase = opponent.get_clear_phase();
+    const current_piece = phase
+        ? null
+        : opponent.get_board().get_current_piece()?.to_state() ?? null;
+    if (phase)
+        board = get_current_phase_frame(phase);
     if(mode === 'highest')
         return{
             view:'highest',
-            board:build_highest_board(board)
+            board:build_highest_board(current_piece, board, false, false),
         };
     if(mode === 'grid')
         return {
             view:'grid',
-            board:build_visible_board(board, false)
+            board:build_visible_board(current_piece, board, false, false),
         };
     if(mode === 'full')
         return{
             view:'full',
-            board:build_visible_board(board, true)
+            board:build_visible_board(current_piece, board, true, false)
         };
     return null
 }
 
-function get_highest_occupied_row(board:Board):number{
-    const grid = board.get_board();
-
-    for(let y = 0; y < grid.length; y++){
-        if(grid[y].some((cell) => cell !== '.'))
-            return y;
-    }
-    return 0;
-}
 
 function build_opponent_payload(
     active_game: ActiveGame,
@@ -90,71 +101,10 @@ function build_opponent_payload(
         else
             username = user_res.data.get_username();
 
-        const render = build_opponent_view(opponent.get_board(), mode)
+        const render = build_opponent_view(opponent, mode)
         if(render !== null)
             opponent_render[username] = render;
     }
 
     return opponent_render;
-}
-
-function build_visible_board(board:Board, cur_piece_visible:boolean):BoardType{
-
-    const visible = board.get_board().map((row) => [...row]);
-    const current_piece = board.get_current_piece();
-
-
-    if (!current_piece || !cur_piece_visible)
-        return visible;
-
-    for (const cell of current_piece.get_cells()) {
-        if (
-            cell.y >= 0 &&
-            cell.y < visible.length &&
-            cell.x >= 0 &&
-            cell.x < visible[0].length
-        ) {
-            visible[cell.y][cell.x] = cell.type;
-        }
-    }
-
-    return visible;
-}
-
-function build_empty_board(board:Board, show_cur:boolean=true):BoardType{
-
-    const empty = board.get_board().map((row) => row.map(() => '.'));
-    const current_piece = board.get_current_piece();
-    
-    if (!current_piece || !show_cur)
-        return empty as BoardType;
-
-    for (const cell of current_piece.get_cells()) {
-        if (
-            cell.y >= 0 &&
-            cell.y < empty.length &&
-            cell.x >= 0 &&
-            cell.x < empty[0].length
-        ) {
-            empty[cell.y][cell.x] = cell.type;
-        }
-    }
-
-    return empty as BoardType;
-}
-
-function build_highest_board(board:Board):BoardType{
-    const empty = build_empty_board(board, false);
-    const grid = board.get_board();
-
-    for (let x = 0; x < grid[0].length; x++) {
-        for (let y = 0; y < grid.length; y++) {
-            if (grid[y][x] !== '.') {
-                for(let fill_y = y; fill_y < grid.length; fill_y ++)
-                    empty[fill_y][x] = 'X';
-                break;
-            }
-        }
-    }
-    return empty as BoardType;
 }
