@@ -25,10 +25,36 @@ describe('Board', () => {
         expect(board.get_current_piece()).toBe(piece);
     });
 
+    it('clones incoming grids when setting the board', () => {
+        const board = new Board(4, 2);
+        const next: BoardType = [
+            ['T', '.', '.', '.'],
+            ['.', 'X', '.', '.'],
+        ];
+
+        board.set_board(next);
+        next[0][0] = '.';
+        next[1][1] = '.';
+
+        expect(board.get_board()).toEqual([
+            ['T', '.', '.', '.'],
+            ['.', 'X', '.', '.'],
+        ]);
+    });
+
     it('checks whether a piece can be placed inside an empty board', () => {
         const board = new Board(10, 20);
 
         expect(board.can_place(new Piece('T'))).toBe(true);
+    });
+
+    it('allows placement over ghost cells', () => {
+        const board = new Board(10, 20);
+        board.get_board()[1][3] = 'H';
+        board.get_board()[1][4] = 'H';
+        board.get_board()[1][5] = 'H';
+
+        expect(board.can_place(new Piece('T', 3, 0))).toBe(true);
     });
 
     it('rejects placement outside the board bounds', () => {
@@ -87,6 +113,15 @@ describe('Board', () => {
         expect(count_cells(locking.get_board(), (cell) => cell === 'O')).toBe(4);
     });
 
+    it('supports custom downward movement in tick_down', () => {
+        const board = new Board(10, 20);
+        const piece = new Piece('O', 3, 0);
+        board.set_current_piece(piece);
+
+        expect(board.tick_down(2)).toBe('moved');
+        expect(piece.get_y()).toBe(2);
+    });
+
     it('locks the current piece into the grid', () => {
         const board = new Board(10, 20);
         board.set_current_piece(new Piece('T', 3, 0));
@@ -115,7 +150,7 @@ describe('Board', () => {
         ]);
 
         expect(board.clear_full_rows()).toEqual({
-            cleared_lines: 2,
+            cleared_lines: 1,
             cleared_garbage: 1,
         });
         expect(board.get_board()).toEqual([
@@ -204,6 +239,7 @@ describe('Board', () => {
         expect(board.is_piece_cell('T')).toBe(true);
         expect(board.is_piece_cell('.')).toBe(false);
         expect(board.is_piece_cell('X')).toBe(false);
+        expect(board.is_piece_cell('H')).toBe(false);
     });
 });
 

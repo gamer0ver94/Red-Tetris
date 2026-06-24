@@ -21,6 +21,36 @@ describe('Piece', () => {
         expect(piece.get_y()).toBe(7);
     });
 
+    it('exports its current state snapshot', () => {
+        const piece = new Piece('S', 5, 6);
+
+        piece.add_rotation();
+
+        expect(piece.to_state()).toEqual({
+            type: 'S',
+            x: 5,
+            y: 6,
+            rotation: 1,
+        });
+    });
+
+    it('applies an incoming state to all piece fields', () => {
+        const piece = new Piece('T', 1, 2);
+
+        piece.apply_state({
+            type: 'L',
+            x: 7,
+            y: 8,
+            rotation: 3,
+        });
+
+        expect(piece.get_type()).toBe('L');
+        expect(piece.get_x()).toBe(7);
+        expect(piece.get_y()).toBe(8);
+        expect(piece.get_rotation()).toBe(3);
+        expect(piece.get_next_rotation()).toBe(0);
+    });
+
     it('updates position with setters and relative movement', () => {
         const piece = new Piece('L');
 
@@ -30,6 +60,18 @@ describe('Piece', () => {
 
         expect(piece.get_x()).toBe(4);
         expect(piece.get_y()).toBe(6);
+    });
+
+    it('keeps type and rotation when moving by offsets', () => {
+        const piece = new Piece('J', 2, 3);
+
+        piece.add_rotation();
+        piece.move_by(-1, 2);
+
+        expect(piece.get_type()).toBe('J');
+        expect(piece.get_x()).toBe(1);
+        expect(piece.get_y()).toBe(5);
+        expect(piece.get_rotation()).toBe(1);
     });
 
     it('rotates through all four states', () => {

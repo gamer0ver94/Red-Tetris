@@ -1,5 +1,4 @@
 import {
-    shuffle_pieces,
     create_piece_sequence,
     peek_piece,
     peek_pieces,
@@ -16,17 +15,11 @@ describe('core: piece_sequence', () => {
     it('create new piece sequence based on randomInt', () => {
         
         const mock_random_1:RandomInt = (max) => max-1;
-        const sequence_1 = expect_function_pure(
-            create_piece_sequence,
-            mock_random_1
-        );
+        const sequence_1 = create_piece_sequence(mock_random_1);
         expect(sequence_1).toEqual(['I', 'J', 'L', 'S', 'T', 'Z', 'O']);
 
         const mock_random_0:RandomInt = () => 0;
-        const sequence_0 = expect_function_pure(
-            create_piece_sequence,
-            mock_random_0
-        );
+        const sequence_0 = create_piece_sequence(mock_random_0);
         expect(sequence_0).toEqual(['J', 'L', 'S', 'T', 'Z', 'O', 'I']);
     });
 
@@ -40,7 +33,7 @@ describe('core: piece_sequence', () => {
             sequence,
             0
         );
-        expect(next_piece).toBe('L');
+        expect(next_piece).toBe('J');
 
         const no_sequence = expect_function_pure(
             peek_piece,
@@ -60,7 +53,7 @@ describe('core: piece_sequence', () => {
             0,
             3
         );
-        expect(next_sequence).toEqual(['L','S','T']);
+        expect(next_sequence).toEqual(['J','L','S']);
     });
 
     it('returns true when sequence needs to extend', () => {

@@ -1,5 +1,4 @@
 import { 
-    get_kicks,
     get_next_rotation,
     get_shape,
 } from "./rotation.js";
@@ -7,7 +6,6 @@ import {
 
 import {
     BoardCell,
-    BoardType,
     PieceCell,
     PieceState,
     PieceType,
