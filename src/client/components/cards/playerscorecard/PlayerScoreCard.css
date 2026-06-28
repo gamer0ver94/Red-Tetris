@@ -1,0 +1,156 @@
+.playerscorecard {
+  width: min(95%, 420px);
+
+  padding: 12px;
+  border-radius: 14px;
+
+  background: rgba(30, 30, 30, 0.92);
+  border: 1px solid rgba(220, 255, 245, 0.08);
+
+  color: rgba(220, 255, 245, 0.95);
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  overflow: hidden;
+}
+
+.playerscorecard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.playerscorecard__title {
+  margin: 0;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerscorecard__record {
+  padding: 4px 8px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(220, 255, 245, 0.15);
+
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  flex-shrink: 0;
+}
+
+.playerscorecard__record.is-record {
+  color: rgba(52, 252, 2, 0.95);
+  border-color: rgba(52, 252, 2, 0.5);
+}
+
+.playerscorecard__score {
+  display: flex;
+  gap: 8px;
+}
+
+.playerscorecard__score > div {
+  flex: 1;
+
+  padding: 8px;
+
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(220, 255, 245, 0.08);
+
+  min-width: 0;
+}
+
+.playerscorecard__label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  opacity: 0.65;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerscorecard__value {
+  margin-top: 4px;
+
+  font-size: 1.1rem;
+  font-weight: 800;
+
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.playerscorecard__status,
+.playerscorecard__hint {
+  padding: 8px 10px;
+
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+
+  font-size: 0.75rem;
+
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.playerscorecard__status--error {
+  color: #ff7777;
+}
+
+.playerscorecard__list-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.playerscorecard__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.playerscorecard__row {
+  display: grid;
+  grid-template-columns: 24px 1fr 60px;
+
+  gap: 8px;
+  align-items: center;
+
+  padding: 8px;
+
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+
+  min-width: 0;
+}
+
+.playerscorecard__row.is-you {
+  border: 1px solid rgba(52, 252, 2, 0.4);
+}
+
+.playerscorecard__pos,
+.playerscorecard__score {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.playerscorecard__user {
+  font-size: 0.75rem;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerscorecard__empty {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  text-align: center;
+}

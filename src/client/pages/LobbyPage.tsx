@@ -46,47 +46,42 @@ export default function LobbyPage() {
     goTo("/home");
   };
 
-  const allPlayersReady = () => {
-    for (const [, ready] of Object.entries(readyByUsername)) {
-      if (ready != "ready") {
-        return false;
-      }
-    }
-    return true;
+  const onPlayerReady = () => {
+    const isReadyNow = lobbyPlayers[username]?.status === "ready";
+    const nextStatus = isReadyNow ? "not-ready" : "ready";
+
+    setLobbyPlayers((prev) => {
+      const updated = {
+        ...prev,
+        [username]: {
+          ...prev[username],
+          username,
+          status: nextStatus,
+          is_owner: prev[username]?.is_owner ?? false,
+        },
+      };
+      return updated;
+    });
+
+    socket?.emit("lobby:ready");
   };
-const onPlayerReady = () => {
-  const isReadyNow = lobbyPlayers[username]?.status === "ready";
-  const nextStatus = isReadyNow ? "not-ready" : "ready";
 
-  // 1. optimistic update
-  setLobbyPlayers((prev) => {
-    const updated = {
-      ...prev,
-      [username]: {
-        ...prev[username],
-        username,
-        status: nextStatus,
-        is_owner: prev[username]?.is_owner ?? false,
-      },
-    };
+  const startGame = () => {
+    const me = lobbyPlayers[username];
 
-    // 2. check AFTER update is computed
-    const isOwner = updated[username]?.is_owner;
+    if (!me?.is_owner) {
+      return;
+    }
 
-    const allReady = Object.values(updated).every(
-      (p) => p.status === "ready"
+    const allReady = Object.values(lobbyPlayers).every(
+      (player) => player.status === "ready",
     );
 
-    if (isOwner && allReady) {
+    if (allReady) {
       socket?.emit("lobby:start");
     }
-
-    return updated;
-  });
-
-  // 3. notify server
-  socket?.emit("lobby:ready");
-};
+    console.log(allReady)
+  };
 
   useEffect(() => {
     async function loadUser() {
@@ -209,39 +204,40 @@ const onPlayerReady = () => {
       socket.offAny();
     };
   }, [socket]);
-return (
-  <div className="lobby-container">
-    <h1>Lobby</h1>
+  return (
+    <div className="lobby-container">
+      <h1>Lobby</h1>
 
-    <div className="lobby-players">
-      <div className="oponent-players">
-        {Object.entries(lobbyPlayers)
-          .filter(([playerName]) => playerName !== username)
-          .map(([playerName, player]) => (
-            <PlayerCard
-              key={playerName}
-              username={player.username}
-              isOwner={player.is_owner}
-              status={player.status}
-            />
-          ))}
+      <div className="lobby-players">
+        <div className="oponent-players">
+          {Object.entries(lobbyPlayers)
+            .filter(([playerName]) => playerName !== username)
+            .map(([playerName, player]) => (
+              <PlayerCard
+                key={playerName}
+                username={player.username}
+                isOwner={player.is_owner}
+                status={player.status}
+              />
+            ))}
+        </div>
+
+        <div className="player">
+          <PlayerCard
+            username={username}
+            isOwner={lobbyPlayers[username]?.is_owner ?? false}
+            status={lobbyPlayers[username]?.status ?? "not-ready"}
+            onReady={onPlayerReady}
+            onReturn={leaveLobby}
+          />
+        </div>
       </div>
+      <button onClick={startGame}></button>
 
-      <div className="player">
-        <PlayerCard
-          username={username}
-          isOwner={lobbyPlayers[username]?.is_owner ?? false}
-          status={lobbyPlayers[username]?.status ?? "not-ready"}
-          onReady={onPlayerReady}
-          onReturn={leaveLobby}
-        />
+      <div className="logout-space">
+        <div>{gameIdFromSession}</div>
+        <LogoutButton />
       </div>
     </div>
-
-    <div className="logout-space">
-      <div>{gameIdFromSession}</div>
-      <LogoutButton />
-    </div>
-  </div>
-);
+  );
 }
