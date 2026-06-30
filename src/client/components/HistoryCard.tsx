@@ -24,7 +24,7 @@ function formatDate(iso: string) {
 
 export default function HistoryCard({
   scope,
-  list = "score",
+  list = "date",
   title,
   start = 0,
   end = 10,
@@ -55,8 +55,8 @@ export default function HistoryCard({
           url = `/history/me?start=${start}&end=${end}`;
         } else {
           switch (list) {
-            case "date":
-              url = `/history/date?start=${start}&end=${end}&new_first=true`;
+            case "score":
+              url = `/history/score?start=${start}&end=${end}`;
               break;
             case "win":
               url = `/history/win?start=${start}&end=${end}`;
@@ -65,7 +65,8 @@ export default function HistoryCard({
               url = `/history/lose?start=${start}&end=${end}`;
               break;
             default:
-              url = `/history/score?start=${start}&end=${end}`;
+              url = `/history/date?start=${start}&end=${end}&new_first=true`;
+
           }
         }
 
