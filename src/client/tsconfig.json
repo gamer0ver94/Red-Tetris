@@ -3,9 +3,11 @@
   "compilerOptions": {
     "types": ["vitest/globals"]
   },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ]
 }
+
 

@@ -22,7 +22,6 @@ export async function fetchData(route: string, object: any, method:string,) {
           return data;
     
         } catch (err) {
-          console.error(err);
           return null;
         }
 }
@@ -39,6 +38,5 @@ export async function fetchDataJson(route: string, object: any,token:string) {
             },
             body: JSON.stringify(object),
         });
-        console.log(res)
         return res
 }

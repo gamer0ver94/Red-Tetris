@@ -13,7 +13,6 @@ import { config } from "../conf";
 import CustomOptionForm from "../components/CustomOptionForm";
 import type { GameOptions } from "../components/CustomOptionForm";
 import HistorySection from "../components/HistorySection";
-import "./HistorySection.css";
 
 export default function HomePage() {
   const goTo = useNavigate();

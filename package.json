@@ -3,23 +3,26 @@
     "dev": "concurrently -n client,server \"npm run dev:client\" \"npm run dev:server\"",
     "dev:client": "vite --config src/client/vite.config.ts",
     "dev:server": "tsx watch src/server/index.ts",
-
     "build": "npm run build:client && npm run build:server",
     "build:client": "tsc -p src/client/tsconfig.app.json && vite build --config src/client/vite.config.ts",
     "build:server": "tsc -p src/server/tsconfig.json",
-
     "preview": "vite preview --config src/client/vite.config.ts",
     "start": "node dist/src/server/index.js",
-
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p src/client/tsconfig.json",
-
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-
     "docs:asyncapi:validate": "asyncapi validate docs/asyncapi.yaml",
     "docs:asyncapi:build": "asyncapi generate fromTemplate docs/asyncapi.yaml @asyncapi/html-template -o docs/asyncapi-site --force-write",
     "docs:asyncapi:preview": "asyncapi start preview docs/asyncapi.yaml -B"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1"
+  },
+  "dependencies": {
+    "jsdom": "^29.1.1"
   }
 }

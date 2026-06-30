@@ -32,7 +32,7 @@ export default function HistoryCard({
   const username = useAppSelector((s) => s.user.username);
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState("");
   const [entries, setEntries] = useState<HistoryEntry[]>([]);
 
   const resolvedTitle = useMemo(() => {
@@ -43,9 +43,11 @@ export default function HistoryCard({
 
   useEffect(() => {
     let cancelled = false;
-    async function run() {
+
+    (async () => {
       setLoading(true);
       setError("");
+
       try {
         let url = "";
 
@@ -62,28 +64,26 @@ export default function HistoryCard({
             case "lose":
               url = `/history/lose?start=${start}&end=${end}`;
               break;
-            case "score":
             default:
               url = `/history/score?start=${start}&end=${end}`;
-              break;
           }
         }
 
-        // fetchData expects a route already appended to config.url
         const res = await fetchData(url, null, "GET");
         const data = res?.data;
 
         if (!cancelled) {
           setEntries(Array.isArray(data) ? data : []);
+          setLoading(false);
         }
-      } catch (e) {
-        if (!cancelled) setError("Failed to load history");
-      } finally {
-        if (!cancelled) setLoading(false);
+      } catch {
+        if (!cancelled) {
+          setError("Failed to load history");
+          setLoading(false);
+        }
       }
-    }
+    })();
 
-    run();
     return () => {
       cancelled = true;
     };
@@ -112,13 +112,7 @@ export default function HistoryCard({
           >
             <div className="history-card-row">
               <span className="card-history-user">{e.username}</span>
-              <span
-                className={
-                  e.is_winner
-                    ? "history-card-win"
-                    : "history-card-lose"
-                }
-              >
+              <span className={e.is_winner ? "history-card-win" : "history-card-lose"}>
                 {e.is_winner ? "WIN" : "LOSE"}
               </span>
             </div>
