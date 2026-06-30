@@ -43,6 +43,10 @@ export class ConfigProvider{
         return this.opts.grid.invisible;
     }
 
+    public is_lock_highlight_enabled():boolean{
+        return this.opts.grid.showLockHighlight === true;
+    }
+
     public is_random_sequence():boolean{
         return this.opts.pieces.randomSequence;
     }

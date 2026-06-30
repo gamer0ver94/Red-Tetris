@@ -31,6 +31,7 @@ export default function HomePage() {
       height: 10,
       invisible: true,
       revealOnClearMs: 15,
+      showLockHighlight: true,
     },
     pieces: {
       randomSequence: true,

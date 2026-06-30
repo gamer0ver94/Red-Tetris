@@ -1,6 +1,8 @@
 import { Piece } from "./piece_model.js";
 import { Board } from "./board_model.js";
 import { PieceType } from "../types/game_types.js";
+import { ClearPhaseState } from "../types/render_types.js";
+import { can_reset_lock_delay } from "../core/player_rules.js";
 
 export type PlayerGravityState = {
   last_fall_at: number;
@@ -19,6 +21,7 @@ export class PlayerInGame{
     private lines:number;
     private alive:boolean;
     private gravity_state:PlayerGravityState;
+    private clear_phase:ClearPhaseState|null;
     private grid_visible_until:number|null;
     private has_hold:boolean;
     private touching_ground_since:number|null;
@@ -36,6 +39,7 @@ export class PlayerInGame{
         this.lines = 0;
         this.hold_piece = null
         this.alive = true;
+        this.clear_phase = null;
         this.gravity_state = {
             last_fall_at: Date.now(),
             fall_every_ms:0,
@@ -95,7 +99,23 @@ export class PlayerInGame{
         return this.total_lock
     }
 
+    public get_clear_phase():ClearPhaseState|null{
+        return this.clear_phase
+    }
+
     //Setters
+    public set_clear_phase(phase:ClearPhaseState){
+        this.clear_phase = phase;
+    }
+
+    public unset_clear_phase(){
+        this.clear_phase = null;
+    }
+
+    public is_clear_phase_active():boolean{
+        return this.clear_phase != null;
+    }
+
     public set_hold_piece(piece:PieceType){
         this.hold_piece = piece;
     }
@@ -150,11 +170,9 @@ export class PlayerInGame{
 
     public try_reset_lock_delay(max_try:number):boolean{
         
-        if(this.touching_ground_since == null)
+        if(!can_reset_lock_delay(this.touching_ground_since, this.lock_reset_count, max_try))
             return false;
 
-        if(max_try !== 0 && this.lock_reset_count >= max_try)
-            return false;
         this.touching_ground_since = null;
         this.lock_reset_count += 1;
         return true;

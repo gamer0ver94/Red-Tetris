@@ -10,14 +10,30 @@ export const pieceType = {
 
 export type PieceType = typeof pieceType[keyof typeof pieceType];
 
-export type EmptyCell = '.';
+export type EmptyCell = '.' | 'H' ;
 
 export type GarbageCell = 'X';
+
+
 
 export type BoardCell = EmptyCell | GarbageCell | PieceType;
 
 export type BoardType = BoardCell[][];
 
+//Just one square
+export type PieceCell = {
+    x:number,
+    y:number,
+    type:PieceType
+};
+
+//Full Block of 4
+export type PieceState = {
+    type:PieceType;
+    x:number;
+    y:number;
+    rotation:RotationType
+};
 
 export const pieceShapes:Record<PieceType, BoardType> = {
     I:[
@@ -89,12 +105,42 @@ export type RotationTransition =
   | "3>2"
   | "0>3";
 
+
+
+
 export type KickType = [number, number];
 
+export type MovePieceResult =
+| {moved:false;}
+| {moved:true; piece:PieceState}
+
 export type EndGameCondition = 'survival'|'first_lost'|'score'|'lines'|'time';
+
+export type EndGamePlayerState = {
+    player_id:string;
+    alive:boolean;
+    score:number;
+    lines:number;
+};
+
+export type EndGameResult = {
+    finished:boolean;
+    winners_id?:string[];
+    losers_id?:string[];
+}
 
 export type ClearedRowsResult = {
     cleared_lines:number,
     cleared_garbage:number,
-}
+};
 
+export type ClearLinesResult = {
+    board:BoardType,
+    cleared_lines:number,
+    cleared_garbage:number,
+    cleared_indexes:number[],
+};
+
+export type HoldSwapResult =
+    | { success: false; reason: "NOT_ALLOWED" | "ONLY_HOLD_ONCE" | "PIECE_CANNOT_SPAWN" }
+    | { success: true; next_current_piece: PieceType | null; next_hold_piece: PieceType; needs_next_piece: boolean };

@@ -1,4 +1,4 @@
-import { EndGameCondtion } from "./game_types.js";
+import { EndGameCondition } from "./game_types.js";
 
 export type GameOptions = {
 
@@ -11,6 +11,8 @@ export type GameOptions = {
         invisible:boolean;
         // Time in milliseconds to briefly reveal invisible blocks after a clear.
         revealOnClearMs:number;
+        // Show where the current falling piece would lock.
+        showLockHighlight:boolean;
     },
 
     pieces:{
@@ -59,8 +61,8 @@ export type GameOptions = {
     },
 
     win:{
-        // Rule used by EndGameProvider to decide when the match finishes.
-        condition:EndGameCondtion;
+        // Rule used to decide when the match finishes.
+        condition:EndGameCondition;
         // Numeric threshold for limited win conditions; null means no explicit limit.
         limit:number|null;
     },
@@ -74,4 +76,3 @@ export type GameOptions = {
         seeOpponents:'full'| 'grid'| 'highest' | 'none';
     },
 }
-
