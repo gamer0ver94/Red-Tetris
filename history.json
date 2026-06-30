@@ -1,0 +1,22 @@
+[
+  {
+    "username": "fsaf",
+    "is_winner": false,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "hard",
+    "total_time": "30762",
+    "end_date": "2026-06-30T07:22:48.754Z",
+    "lobby_id": "1144"
+  },
+  {
+    "username": "Duarte",
+    "is_winner": false,
+    "score": 900,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "82704",
+    "end_date": "2026-06-30T07:20:12.242Z",
+    "lobby_id": "7504"
+  }
+]
