@@ -174,7 +174,6 @@ export default function LobbyPage() {
       }
     };
 
-    // ✅ FIXED safe onAny
     socket.onAny?.((event: string, ...args: any[]) => {
       console.log("SOCKET EVENT:", event, args);
     });
@@ -226,11 +225,12 @@ export default function LobbyPage() {
         </div>
       </div>
 
-      {/* ✅ FIXED: test can now find button */}
-      <button onClick={startGame}>Start Game</button>
+      {lobbyPlayers[username]?.is_owner && (
+        <button onClick={startGame}>Start Game</button>
+      )}
 
       <div className="logout-space">
-        <div>{gameIdFromSession}</div>
+        <div>Id Session: {gameIdFromSession}</div>
         <LogoutButton />
       </div>
     </div>

@@ -15,7 +15,7 @@ export default function GameBoard({ board: boardProp }: Props) {
   const board = (boardProp ?? boardFromStore) as BoardCell[][] | null;
 
   if (!board) {
-    return <div style={{ padding: 12 }}>Waiting for game render...</div>;
+    return <div className="waiting-message">Waiting for game render...</div>;
   }
 
   return (

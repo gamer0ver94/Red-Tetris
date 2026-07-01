@@ -12,7 +12,6 @@ const start = async () => {
         if (m) sessionManagerRaw = m[1].trim();
       }
     } catch (e) {
-      /* ignore */
     }
   }
 

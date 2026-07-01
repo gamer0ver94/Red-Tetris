@@ -3,6 +3,7 @@ import './HistorySection.css';
 import HistoryCard from "./HistoryCard"
 export default function HistorySection() {
   const [who, setWho] = useState<'me' | 'all'>('me');
+  const [searchName, setSearchName] = useState('');
 
   const cards = useMemo(
     () => [
@@ -30,24 +31,40 @@ export default function HistorySection() {
         <div>
           <h1 >Match History</h1>
         </div>
-        <div>
-          <button
-            className={`history-unselected ${who === 'me' ? 'history-selected' : ''}`}
-            onClick={() => setWho('me')}
-            type="button"
-          >
-            My History
-          </button>
-          <button
-            className={`history-unselected ${who === 'all' ? 'history-selected' : ''}`}
-            onClick={() => setWho('all')}
-            type="button"
-          >
-            All Histories
-          </button>
+        <div className='history-controls'>
+          <div className='history-buttons'>
+            <button
+              className={`history-unselected ${who === 'me' ? 'history-selected' : ''}`}
+              onClick={() => setWho('me')}
+              type="button"
+            >
+              My History
+            </button>
+            <button
+              className={`history-unselected ${who === 'all' ? 'history-selected' : ''}`}
+              onClick={() => setWho('all')}
+              type="button"
+            >
+              All Histories
+            </button>
+          </div>
+          <input
+            type="text"
+            className='history-search-input'
+            placeholder="Filter by player name..."
+            value={searchName}
+            onChange={(e) => setSearchName(e.target.value)}
+          />
         </div>
       </div>
-      <HistoryCard scope={active.who} list={active.list} title={active.title} start={0} end={10} />
+      <HistoryCard 
+        scope={active.who} 
+        list={active.list} 
+        title={active.title} 
+        start={0} 
+        end={10}
+        username={searchName || undefined}
+      />
     </div>
   );
 }

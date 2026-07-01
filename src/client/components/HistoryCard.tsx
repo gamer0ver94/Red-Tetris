@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useAppSelector } from "../hooks/reduxHooks";
+// import { useAppSelector } from "../hooks/reduxHooks";
 import { fetchData } from "../components/fetch/fetch";
 
 import type { HistoryEntry } from "../Types/HistoryEntry";
@@ -28,8 +28,9 @@ export default function HistoryCard({
   title,
   start = 0,
   end = 10,
+  username: filterUsername,
 }: HistoryCardProps) {
-  const username = useAppSelector((s) => s.user.username);
+  // const currentUser = useAppSelector((s) => s.user.username);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -51,7 +52,9 @@ export default function HistoryCard({
       try {
         let url = "";
 
-        if (scope === "me") {
+        if (filterUsername) {
+          url = `/history/users/${encodeURIComponent(filterUsername)}?start=${start}&end=${end}`;
+        } else if (scope === "me") {
           url = `/history/me?start=${start}&end=${end}`;
         } else {
           switch (list) {
@@ -88,14 +91,14 @@ export default function HistoryCard({
     return () => {
       cancelled = true;
     };
-  }, [scope, list, start, end, username]);
+  }, [scope, list, start, end, filterUsername]);
 
   return (
     <div className="card-container">
       <div className="card-top">
         <h2 className="history-card__title">{resolvedTitle}</h2>
         <div className="history-card__badge">
-          {loading ? "Loading..." : `${entries.length} games`}
+          {loading ? "" : `${entries.length} games`}
         </div>
       </div>
 

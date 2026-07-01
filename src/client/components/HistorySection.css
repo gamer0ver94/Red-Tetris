@@ -13,13 +13,13 @@
   overflow: auto;
 }
 
-
 .history-session-inner{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:12px;
   margin-bottom: 14px;
+  flex-wrap: wrap;
 }
 
 .history-session-inner h1{
@@ -27,6 +27,21 @@
   font-size: 18px;
   letter-spacing: 0.2px;
   color: rgba(220, 255, 245, 0.95);
+}
+
+.history-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.history-buttons {
+  display: flex;
+  gap: 8px;
 }
 
 .history-unselected{
@@ -48,5 +63,28 @@
 .history-selected{
   background: rgba(0, 200, 160, 0.18);
   border-color: rgba(0, 200, 160, 0.65);
+}
+
+.history-search-input {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(120, 255, 220, 0.25);
+  background: rgba(7, 10, 18, 0.5);
+  color: rgba(220, 255, 245, 0.95);
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  min-width: 200px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.history-search-input:focus {
+  border-color: rgba(120, 255, 220, 0.5);
+  box-shadow: 0 0 0 3px rgba(120, 255, 220, 0.1);
+}
+
+.history-search-input::placeholder {
+  color: rgba(220, 255, 245, 0.5);
+  font-style: italic;
 }
 

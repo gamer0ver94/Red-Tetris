@@ -5,6 +5,96 @@
     "score": 0,
     "is_hidden": true,
     "game_mode": "classic",
+    "total_time": "12774",
+    "end_date": "2026-07-01T12:26:36.780Z",
+    "lobby_id": "7378"
+  },
+  {
+    "username": "3",
+    "is_winner": true,
+    "score": 0,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "12774",
+    "end_date": "2026-07-01T12:26:36.780Z",
+    "lobby_id": "7378"
+  },
+  {
+    "username": "3",
+    "is_winner": true,
+    "score": 0,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "3363",
+    "end_date": "2026-07-01T12:26:06.473Z",
+    "lobby_id": "7378"
+  },
+  {
+    "username": "4",
+    "is_winner": false,
+    "score": 0,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "30462",
+    "end_date": "2026-07-01T12:25:45.544Z",
+    "lobby_id": "7378"
+  },
+  {
+    "username": "2",
+    "is_winner": false,
+    "score": 0,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "30462",
+    "end_date": "2026-07-01T12:25:45.544Z",
+    "lobby_id": "7378"
+  },
+  {
+    "username": "3",
+    "is_winner": true,
+    "score": 0,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "30462",
+    "end_date": "2026-07-01T12:25:45.544Z",
+    "lobby_id": "7378"
+  },
+  {
+    "username": "4",
+    "is_winner": false,
+    "score": -50,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "70660",
+    "end_date": "2026-07-01T12:24:45.090Z",
+    "lobby_id": "7378"
+  },
+  {
+    "username": "2",
+    "is_winner": false,
+    "score": 0,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "70660",
+    "end_date": "2026-07-01T12:24:45.090Z",
+    "lobby_id": "7378"
+  },
+  {
+    "username": "3",
+    "is_winner": true,
+    "score": 400,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "70660",
+    "end_date": "2026-07-01T12:24:45.090Z",
+    "lobby_id": "7378"
+  },
+  {
+    "username": "4",
+    "is_winner": false,
+    "score": 0,
+    "is_hidden": true,
+    "game_mode": "classic",
     "total_time": "21220",
     "end_date": "2026-07-01T12:15:02.734Z",
     "lobby_id": "5018"
