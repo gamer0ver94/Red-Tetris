@@ -1,28 +1,54 @@
-.score-card{
-    display:flex;
-    flex-direction: column;
-    width: 5%;
-    align-items: center;
-    justify-self: center;
-    color: rgba(220, 255, 245, 0.95);
-}
-.game-state{
-    display: flex;
-    flex-direction: column;
-    justify-self: center;
-    align-items: center;
-}
-.score-page{
-    display: flex;
-    justify-content: space-around;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
+.score-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 40px 20px;
+  color: rgba(220, 255, 245, 0.95);
 }
 
-.empty{
-    width: 40%;
+.score-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
-.card-container{
-    width: 40%;
+
+.game-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.game-state button {
+  padding: 12px 32px;
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  font-family: 'Press Start 2P', cursive;
+}
+
+.game-state button:hover {
+  background: #ff8787;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+}
+
+.empty {
+  display: none;
+}
+
+.card-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }

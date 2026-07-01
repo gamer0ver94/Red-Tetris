@@ -174,7 +174,6 @@ export default function LobbyPage() {
       }
     };
 
-    // ✅ FIXED safe onAny
     socket.onAny?.((event: string, ...args: any[]) => {
       console.log("SOCKET EVENT:", event, args);
     });
@@ -231,7 +230,7 @@ export default function LobbyPage() {
       )}
 
       <div className="logout-space">
-        <div>{gameIdFromSession}</div>
+        <div>Id Session: {gameIdFromSession}</div>
         <LogoutButton />
       </div>
     </div>

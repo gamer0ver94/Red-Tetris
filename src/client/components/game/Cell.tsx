@@ -1,3 +1,5 @@
+import "./Cell.css";
+
 type Props = {
   cell: '.' | 'X' | string;
 };
@@ -37,38 +39,20 @@ const PIECE_COLORS: Record<string, string> = {
 
 //YSEBBAN VERSION TO SEE H
 export default function GameCell({ cell }: Props) {
-
   const isHighlight = cell === 'H';
   const isEmpty = cell === '.';
-  let bg:string;
-  let border:string;
-  let boxShadow:string;
-  if(isEmpty){
-    bg = '#2a2a2a';
-    border = '1px solid #28282840';
-    boxShadow = 'inset 0 0 0 1px #ffffff08';
-  }
-  else if(isHighlight){
-    bg = '#303030';
-    border = '1px solid #ffffff59';
-    boxShadow = 'inset 0 0 0 1px #ffffff29, 0 0 8px #ffffff1a';
-
-  }
-  else{
-    bg = (PIECE_COLORS[cell] ?? 'cyan');
-    border = '1px solid #3c3c3c40';
-    boxShadow = `inset 0 0 0 1px #ffffff1a, 0 0 12px ${bg}22`;
+  
+  let cellClass = 'cell';
+  
+  if (isEmpty) {
+    cellClass += ' cell-empty';
+  } else if (isHighlight) {
+    cellClass += ' cell-highlight';
+  } else if (cell in PIECE_COLORS) {
+    cellClass += ` cell-${cell}`;
+  } else {
+    cellClass += ' cell-filled';
   }
 
-  return (
-    <div
-      style={{
-        width: '26px',
-        height: '26px',
-        backgroundColor: bg,
-        border,
-        boxShadow,
-      }}
-    />
-  );
+  return <div className={cellClass} />;
 }

@@ -4,11 +4,15 @@ import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
 import { setBoard } from "../store/gameSlice";
 import { socketContext } from "../socket/socketContext";
 import GameBoard from "../components/game/Board";
+import NextPieces from "../components/game/NextPieces";
 
 import { InputHandler } from "../components/game/InputHandler";
 import type { RenderPayload } from "../Types/RenderPayload";
 import { ROUTES } from "../Types/Routes";
 import { fetchData } from "../components/fetch/fetch";
+import LogoutButton from "../components/LogoutButton";
+import Logo from "../components/Logo";
+import "./GamePage.css";
 
 type OpponentEntry = RenderPayload["opponents"][string];
 
@@ -30,7 +34,7 @@ export default function GamePage() {
   const scoreRef = useRef(0);
   const onQuit = () => {
     socket.emit("lobby:leave");
-    goTo("/home");
+    goTo("/lobby");
   };
   useEffect(() => {
     if (!socket) return;
@@ -84,17 +88,8 @@ export default function GamePage() {
   }, [socket, dispatch, username]);
 
   return (
-    <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "flex-start",
-          gap: 24,
-          padding: 24,
-          flexWrap: "wrap",
-        }}
-      >
+    <div className="game-page">
+      <div className="game-layout">
         {(() => {
           const opponents = latestRender?.opponents ?? {};
 
@@ -103,70 +98,57 @@ export default function GamePage() {
               !!getOpponentBoard(opponent as OpponentEntry | undefined),
           );
 
-          const allUsernames = [
-            ...opponentEntries.map(([opponentUsername]) => opponentUsername),
-            username,
-          ];
+          const opponentUsernames = opponentEntries.map(
+            ([opponentUsername]) => opponentUsername
+          );
 
-          const centerIndex = Math.floor(allUsernames.length / 2);
-
-          const before = allUsernames.slice(0, centerIndex);
-          const after = allUsernames.slice(centerIndex + 1);
+          const midPoint = Math.floor(opponentUsernames.length / 2);
+          const leftOpponents = opponentUsernames.slice(0, midPoint);
+          const rightOpponents = opponentUsernames.slice(midPoint);
 
           return (
             <>
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 14 }}
-              >
-                {before.map((u) => {
-                  const opponent = opponents[u] as OpponentEntry | undefined;
-                  const board = getOpponentBoard(opponent);
-                  return (
-                    <div key={u} style={{ minWidth: 120 }}>
-                      <div>{u}</div>
-                      {board ? <GameBoard board={board} /> : null}
-                    </div>
-                  );
-                })}
+              <div className="game-header">
+                <h1>RedTetris</h1>
               </div>
 
-              <div>
-                {before.map((u) => {
-                  const opponent = opponents[u] as OpponentEntry | undefined;
-                  void opponent;
-                  return (
-                    <div key={u} style={{ minWidth: 420 }}>
-                      <div>{u}</div>
-                    </div>
-                  );
-                })}
-              </div>
+              <div className="game-board-container">
+                <div className="opponents-column">
+                  {leftOpponents.map((u) => {
+                    const opponent = opponents[u] as OpponentEntry | undefined;
+                    const board = getOpponentBoard(opponent);
+                    return (
+                      <div key={u} className="opponent-section">
+                        <h3>{u}</h3>
+                        {board ? <GameBoard board={board} /> : null}
+                      </div>
+                    );
+                  })}
+                </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 14,
-                  alignItems: "center",
-                }}
-              >
-                <div>{username}</div>
+              <div className="player-section">
+                <h2>{username}</h2>
+                <div className="player-info">
+                  <div className="score-display">
+                    Score: {latestRender?.self?.score ?? 0}
+                  </div>
+                  <NextPieces nextPieces={latestRender?.self?.next_piece_types ?? null} />
+                </div>
                 <GameBoard board={latestRender?.self?.board ?? null} />
               </div>
 
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 14 }}
-              >
-                {after.map((u) => {
-                  const opponent = opponents[u] as OpponentEntry | undefined;
-                  const board = getOpponentBoard(opponent);
-                  return (
-                    <div key={u} style={{ minWidth: 420 }}>
-                      <div>{u}</div>
-                      {board ? <GameBoard board={board} /> : null}
-                    </div>
-                  );
-                })}
+                <div className="opponents-column">
+                  {rightOpponents.map((u) => {
+                    const opponent = opponents[u] as OpponentEntry | undefined;
+                    const board = getOpponentBoard(opponent);
+                    return (
+                      <div key={u} className="opponent-section">
+                        <h3>{u}</h3>
+                        {board ? <GameBoard board={board} /> : null}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </>
           );
@@ -176,11 +158,14 @@ export default function GamePage() {
       {gameOutcome === null && <InputHandler />}
 
       {gameOutcome !== null && (
-        <div style={{ textAlign: "center", marginTop: 16 }}>
-          <div>{gameOutcome === "win" ? "YOU WIN" : "YOU LOSE"}</div>
+        <div className="game-outcome">
+          <h2>{gameOutcome === "win" ? "YOU WIN" : "YOU LOSE"}</h2>
         </div>
       )}
-      <button onClick={onQuit}>Quit</button>
+      <div className="game-controls">
+        <button onClick={onQuit}>Quit</button>
+        <LogoutButton />
+      </div>
     </div>
   );
 }
