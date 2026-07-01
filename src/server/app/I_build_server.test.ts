@@ -10,7 +10,7 @@ describe('build_server', () => {
 
   beforeAll(async() => {
     process.env.SESSION_KEY_BASE64 = Buffer.alloc(32, 1).toString('base64');
-    process.env.CLIENT_ORIGIN = 'http://localhost:1700';
+    process.env.CLIENT_ORIGIN = 'http://localhost:1800';
     app = await BUILD.build_server();
   });
 
@@ -40,7 +40,7 @@ describe('build_server', () => {
       expect(app.io).toBeDefined();
       const any_io = app.io as any;
       const orgin = any_io?._opts.cors?.orgin ?? any_io?.opts?.cors?.origin;
-      expect(orgin).toBe(process.env.CLIENT_ORIGIN ?? 'http://localhost:1700');
+      expect(orgin).toBe(process.env.CLIENT_ORIGIN ?? 'http://localhost:1800');
     });
 
     it('applies CORS for allowed origin', async () => {
@@ -48,11 +48,11 @@ describe('build_server', () => {
         method:'OPTIONS',
         url:'/auth/health',
         headers:{
-          origin: 'http://localhost:1700',
+          origin: 'http://localhost:1800',
           'access-control-request-method': 'GET',
         },
       });
-      expect(res.headers['access-control-allow-origin']).toBe('http://localhost:1700');
+      expect(res.headers['access-control-allow-origin']).toBe('http://localhost:1800');
     });
 
     it('register session cookie + csrf token', async () => {

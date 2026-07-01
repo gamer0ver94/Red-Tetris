@@ -62,7 +62,12 @@ export async function logout(
     
     if(!response.success)
         throw new AppError(response.code, 403);
-    
+    const leave_data = response.data.leave_data
+    if(leave_data?.new_owner && leave_data.new_owner_socket){
+        request.server.io
+        .to(leave_data.new_owner_socket)
+        .emit("lobby:new_owner")
+    }
     const socket_id = response.data.player_socket_id;
     if(socket_id && !socket_id.startsWith('pending_disconnect:'))
         request.server.io.sockets.sockets.get(socket_id)?.disconnect(true);

@@ -17,7 +17,13 @@ const start = async () => {
   }
 
   let listenHost = '0.0.0.0';
-  const protocol = (process.env.TLS_KEY_PATH && process.env.TLS_CERT_PATH) ? 'https' : 'http';
+  const hasTls = Boolean(
+    process.env.TLS_KEY_PATH &&
+    process.env.TLS_CERT_PATH &&
+    existsSync(process.env.TLS_KEY_PATH) &&
+    existsSync(process.env.TLS_CERT_PATH)
+  );
+  const protocol = hasTls ? 'https' : 'http';
 
   if (sessionManagerRaw) {
     const entry = sessionManagerRaw.split(',')[0] || '';
@@ -26,7 +32,7 @@ const start = async () => {
     const host = firstPart.split('.')[0];
 
     if (host) {
-      process.env.CLIENT_ORIGIN = `${protocol}://${host}:1700`;
+      process.env.CLIENT_ORIGIN = `${protocol}://${host}:1800`;
       listenHost = '0.0.0.0';
       console.log('Detected SESSION_MANAGER host:', host);
       console.log('Set CLIENT_ORIGIN to', process.env.CLIENT_ORIGIN);

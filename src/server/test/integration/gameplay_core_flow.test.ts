@@ -3,11 +3,11 @@ import type { FastifyInstance } from 'fastify';
 
 import { build_server } from '../../app/build_server.js';
 import { Piece } from '../../models/piece_model.js';
-import { tick_board } from '../../services/game_core_services.js';
+import { apply_clear_rewards, tick_board } from '../../services/game_core_services.js';
 import { stop_game_loop } from '../../services/game_loop_services.js';
-import * as test_sockets from '../helpers/socket_helpers.test.js';
-import * as test_game from '../helpers/game_helpers.test.js';
-import * as test_types from '../types.test.js';
+import * as test_sockets from '../helpers/test.socket_helpers.js';
+import * as test_game from '../helpers/test.game_helpers.js';
+import * as test_types from '../test.types.js';
 import type { BoardCell, BoardType } from '../../types/game_types.js';
 import type { ActiveGame } from '../../models/active_game_model.js';
 import type { PlayerInGame } from '../../models/player_in_game_model.js';
@@ -35,6 +35,20 @@ describe('game core flow', () => {
 
             expect_non_empty_board(render.self.board, game_id, host, app);
             expect_same_board(render.self.board, game_id, host, app);
+        }
+        finally{
+            test_sockets.close_socket_client(host_socket);
+        }
+    });
+
+    it('classic render includes lock highlight', async() => {
+        const {user:host, socket:host_socket} = await test_game.register_player('solo_highlight', app, baseUrl);
+
+        try{
+            await test_game.create_and_start_game(app, host, host_socket, 'classic', []);
+            const render = await test_sockets.receive_socket_as(host_socket, 'game:render');
+
+            expect(count_cells(render.self.board, (cell) => cell === 'H')).toBeGreaterThan(0);
         }
         finally{
             test_sockets.close_socket_client(host_socket);
@@ -96,8 +110,8 @@ describe('game core flow', () => {
         }
     });
 
-    //simulate fake board and fake lines for u1 ? 
-    it('line clear update board/lines/score', async() => {
+    //simulate fake board and fake lines for u1 ?
+    it('line clear starts clear phase', async() => {
         const {user:host, socket:host_socket} = await test_game.register_player('solo', app, baseUrl);
 
         try{
@@ -118,9 +132,11 @@ describe('game core flow', () => {
             );
 
             expect(tick_res.success).toBe(true);
-            expect(player.get_lines()).toBe(1);
-            expect(player.get_score()).toBe(100);
-            expect(row_is_empty(player.get_board().get_board()[0])).toBe(true);
+            expect(player.is_clear_phase_active()).toBe(true);
+            expect(player.get_clear_phase()).toMatchObject({
+                cleared_lines: 1,
+                cleared_garbage: 0,
+            });
         } finally {
             test_sockets.close_socket_client(host_socket);
         }
@@ -156,6 +172,7 @@ describe('game core flow', () => {
             );
 
             expect(tick_res.success).toBe(true);
+            complete_clear_phase(active_game, host_player);
             expect(host_player.get_lines()).toBe(2);
             expect_new_garbage_on_board(opponent_before, opponent_player.get_board().get_board());
             expect(opponent_player.get_score()).toBe(-50);
@@ -230,7 +247,7 @@ function expect_same_board(
     const player = get_active_player(app, game_id, user);
     const expected = build_visible_board(player);
 
-    expect(user_board).toEqual(expected);
+    expect(strip_lock_highlight(user_board)).toEqual(expected);
 }
 
 
@@ -308,10 +325,6 @@ function fill_row_except(
         grid[y][x] = hole_set.has(x) ? '.' : cell;
 }
 
-function row_is_empty(row:BoardCell[]): boolean {
-    return row.every((cell) => cell === '.');
-}
-
 async function wait_until(
     predicate:() => boolean,
     timeout_ms = 1500,
@@ -348,6 +361,24 @@ function build_visible_board(player:PlayerInGame): BoardType {
 
 function clone_board(board:BoardType): BoardType {
     return board.map((row) => [...row]);
+}
+
+function strip_lock_highlight(board:BoardType): BoardType {
+    return board.map((row) =>
+        row.map((cell) => cell === 'H' ? '.' as BoardCell : cell),
+    );
+}
+
+function complete_clear_phase(active_game:ActiveGame, player:PlayerInGame): void {
+    const phase = player.get_clear_phase();
+
+    expect(phase).not.toBeNull();
+    if(!phase)
+        throw new Error('Expected clear phase');
+
+    player.get_board().set_board(phase.final_board);
+    player.unset_clear_phase();
+    apply_clear_rewards(active_game, player, phase.cleared_lines, phase.cleared_garbage);
 }
 
 function count_cells(

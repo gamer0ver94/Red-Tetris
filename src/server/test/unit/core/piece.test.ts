@@ -7,7 +7,7 @@ import {
     move_piece,
     rotate_piece,
 } from '../../../core/piece.js';
-import { expect_function_pure } from '../../helpers/expect_helpers.test.js';
+import { expect_function_pure } from '../../helpers/test.expect_helpers.js';
 
 describe('core: piece', () => {
     it('identifies piece cells and excludes empty, garbage, and ghost cells', () => {

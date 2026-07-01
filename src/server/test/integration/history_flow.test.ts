@@ -1,24 +1,34 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 
 import { build_server } from '../../app/build_server.js';
-import { register_user, unique_username, inject_as } from '../helpers/auth_helpers.test.js';
-import type { TestAuthUser } from '../types.test.js';
+import { register_user, unique_username, inject_as } from '../helpers/test.auth_helpers.js';
+import type { TestAuthUser } from '../test.types.js';
 import type { HistoryEntry } from '../../types/history_types.js';
 
 describe('integration: history flow', () => {
     let app: FastifyInstance;
     let user: TestAuthUser;
+    let history_dir: string;
 
     beforeAll(async () => {
         process.env.SESSION_KEY_BASE64 = Buffer.alloc(32, 1).toString('base64');
         process.env.CLIENT_ORIGIN = 'http://localhost:1700';
+        history_dir = mkdtempSync(join(tmpdir(), 'red-tetris-history-'));
+        const history_path = join(history_dir, 'test.history.json');
+        process.env.HISTORY_PATH = history_path;
+        writeFileSync(history_path, `${JSON.stringify(history_entries(), null, 2)}\n`, 'utf8');
         app = await build_server();
         user = await register_user(app, 'history_user');
     });
 
     afterAll(async () => {
         await app.close();
+        delete process.env.HISTORY_PATH;
+        rmSync(history_dir, { recursive: true, force: true });
     });
 
     describe('/me', () => {
@@ -259,4 +269,49 @@ function expect_is_sorted_by_date(entries: HistoryEntry[], order: 'asc' | 'desc'
         else
             expect(previous).toBeLessThanOrEqual(current);
     }
+}
+
+function history_entries(): HistoryEntry[] {
+    return [
+        {
+            username: 'history_user',
+            is_winner: true,
+            score: 500,
+            is_hidden: false,
+            game_mode: 'battle',
+            total_time: '5000',
+            end_date: '2026-01-04T00:00:00.000Z',
+            lobby_id: 'history-lobby-4',
+        },
+        {
+            username: 'history_user',
+            is_winner: false,
+            score: 200,
+            is_hidden: false,
+            game_mode: 'classic',
+            total_time: '4000',
+            end_date: '2026-01-03T00:00:00.000Z',
+            lobby_id: 'history-lobby-3',
+        },
+        {
+            username: 'other_user',
+            is_winner: true,
+            score: 300,
+            is_hidden: false,
+            game_mode: 'battle',
+            total_time: '3000',
+            end_date: '2026-01-02T00:00:00.000Z',
+            lobby_id: 'history-lobby-2',
+        },
+        {
+            username: 'hidden_user',
+            is_winner: false,
+            score: 1000,
+            is_hidden: true,
+            game_mode: 'classic',
+            total_time: '2000',
+            end_date: '2026-01-01T00:00:00.000Z',
+            lobby_id: 'history-lobby-1',
+        },
+    ];
 }

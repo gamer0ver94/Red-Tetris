@@ -1,9 +1,9 @@
 import { GameOptions } from "../../types/game_options_types.js";
 import type { BoardType } from '../../types/game_types.js';
 
-import * as test_types from "../types.test.js";
-import * as test_sockets from "../helpers/socket_helpers.test.js";
-import * as test_auth from "../helpers/auth_helpers.test.js";
+import * as test_types from "../test.types.js";
+import * as test_sockets from "./test.socket_helpers.js";
+import * as test_auth from "./test.auth_helpers.js";
 
 
 import type { FastifyInstance } from 'fastify';

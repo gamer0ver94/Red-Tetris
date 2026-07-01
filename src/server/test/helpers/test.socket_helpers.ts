@@ -6,7 +6,7 @@ import type {
     ClientToServerEvents,
     ServerToClientEvents,
 } from '../../types/socket_event_types.js';
-import type { TestAuthUser, TestSocketClient } from '../types.test.js';
+import type { TestAuthUser, TestSocketClient } from '../test.types.js';
 
 type FirstArg<F> = F extends (arg: infer A, ...rest: any[]) => any ? A : void;
 

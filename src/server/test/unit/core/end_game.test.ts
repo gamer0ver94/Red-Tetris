@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { evaluate_end_game } from '../../../core/end_game.js';
 import type { EndGamePlayerState } from '../../../types/game_types.js';
-import { expect_function_pure } from '../../helpers/expect_helpers.test.js';
+import { expect_function_pure } from '../../helpers/test.expect_helpers.js';
 
 describe('core: end_game', () => {
     it('treats a single dead player as a loser with no winners', () => {

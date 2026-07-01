@@ -16,10 +16,10 @@ export const CLASSIC_OPTS:GameOptions = {
     },
     gravity:{
         tickMs: 650,
-        lockDelayMs:100,
-        maxLock:15,
+        lockDelayMs:30,
+        maxLock:1,
         softDropMultiplier:0.3,
-        fallAfterClear:true,
+        fallAfterClear:false,
         speedOnLock:true,
     },
     garbage:{

@@ -8,7 +8,7 @@ import {
     place_piece,
 } from '../../../core/board.js';
 import { create_piece_state } from '../../../core/piece.js';
-import { expect_function_pure } from '../../helpers/expect_helpers.test.js';
+import { expect_function_pure } from '../../helpers/test.expect_helpers.js';
 import type { BoardType } from '../../../types/game_types.js';
 
 describe('core: board', () => {

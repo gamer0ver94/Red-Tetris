@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 
 import { build_server } from '../../app/build_server.js';
-import { inject_as, register_user, unique_username } from '../helpers/auth_helpers.test.js';
+import { inject_as, register_user, unique_username } from '../helpers/test.auth_helpers.js';
 import {
     close_socket_client,
     close_socket_server,
@@ -10,7 +10,7 @@ import {
     register_socket_client,
     register_ready_socket_client,
     start_socket_server,
-} from '../helpers/socket_helpers.test.js';
+} from '../helpers/test.socket_helpers.js';
 import { gameStatusType, playerStatusType } from '../../types/status_types.js';
 
 describe('integration: socket session flow', () => {

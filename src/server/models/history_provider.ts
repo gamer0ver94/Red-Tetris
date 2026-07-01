@@ -3,9 +3,12 @@ import type { HistoryEntry } from "../types/history_types.js";
 
 export class HistoryProvider{
 
-    private static readonly path:string = '/app/history.json';
     private static readonly default_start = 0;
     private static readonly default_end = 10;
+
+    private static get path(): string {
+        return process.env.HISTORY_PATH ?? '/app/history.json';
+    }
 
 
     public static read_history():HistoryEntry[]{

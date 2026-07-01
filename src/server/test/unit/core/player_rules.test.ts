@@ -6,7 +6,7 @@ import {
     can_reset_lock_delay,
     resolve_hold_swap,
  } from "../../../core/player_rules.js";
-import { expect_function_pure } from "../../helpers/expect_helpers.test.js";
+import { expect_function_pure } from "../../helpers/test.expect_helpers.js";
 
 
 import { describe, expect, it } from 'vitest';

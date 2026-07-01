@@ -46,15 +46,14 @@ export const build_server = async () => {
         const host = firstPart.split('.')[0];
 
         if (host) {
-            process.env.CLIENT_ORIGIN = `http${hasTls ? 's' : ''}://${host}:1700`;
+            process.env.CLIENT_ORIGIN = `http${hasTls ? 's' : ''}://${host}:1800`;
             console.log('Detected SESSION_MANAGER host:', host);
             console.log('Set CLIENT_ORIGIN to', process.env.CLIENT_ORIGIN);
         }
     }
 
-    let clientOrigin = process.env.CLIENT_ORIGIN;
-    if (!process.env.CLIENT_ORIGIN)
-      clientOrigin = "http://localhost:1700"
+    const clientOrigin = process.env.CLIENT_ORIGIN
+      ?? `http${hasTls ? 's' : ''}://localhost:1800`;
     console.log('Set  clientOrigin to', clientOrigin);
   
   //cors and secure cookie init 
@@ -74,6 +73,9 @@ export const build_server = async () => {
 
   //HTTP routes init
   await register_routes(fastify);
+
+  //Client static bundle init
+  await init_client_app(fastify);
 
   //Sockets init
   const io = register_sockets(
@@ -174,6 +176,75 @@ export async function init_async_api(fastify: FastifyInstance) :
   }
 
   return {root, prefix, registered:true};
+}
+
+export async function init_client_app(fastify: FastifyInstance):
+Promise<{root:string|null, registered:boolean}> {
+
+  const root = resolve_client_dist_root();
+  if (!root) {
+    fastify.log.warn('Client bundle not found; frontend routes are disabled');
+    return {root:null, registered:false};
+  }
+
+  const index_path = join(root, 'index.html');
+  const bundle_path = join(root, 'bundle.js');
+
+  fastify.get('/', async (_request, reply) => {
+    return send_client_file(reply, index_path, 'text/html');
+  });
+
+  fastify.get('/bundle.js', async (_request, reply) => {
+    return send_client_file(reply, bundle_path, 'application/javascript');
+  });
+
+  fastify.get('/*', async (request, reply) => {
+    const path = request.url.split('?')[0] ?? '/';
+    if (is_backend_path(path))
+      return reply.code(404).send({
+        success:false,
+        code:'ROUTE_NOT_FOUND',
+        message:'Route not found',
+      });
+    return send_client_file(reply, index_path, 'text/html');
+  });
+
+  return {root, registered:true};
+}
+
+function resolve_client_dist_root():string|null {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  const candidates = [
+    process.env.CLIENT_DIST_PATH,
+    join(process.cwd(), 'public'),
+    join(process.cwd(), 'src/client/dist'),
+    join(__dirname, '../../client/dist'),
+  ].filter((path): path is string => Boolean(path));
+
+  for (const root of candidates) {
+    if (existsSync(join(root, 'index.html')) && existsSync(join(root, 'bundle.js')))
+      return root;
+  }
+  return null;
+}
+
+function is_backend_path(path:string):boolean {
+  if (path === '/game')
+    return false;
+  return [
+    '/auth',
+    '/game',
+    '/history',
+    '/docs',
+    '/socket.io',
+  ].some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+}
+
+function send_client_file(reply: FastifyReply, path:string, content_type:string) {
+  return reply
+    .type(content_type)
+    .send(readFileSync(path));
 }
 
 async function init_error_handler(fastify:FastifyInstance){

@@ -175,7 +175,7 @@ async function leave_lobby_event(
     await helpers.change_player_status(io, response.data.status, sid, store.get_player_store());
 
     if(response.data.winner_ids.length > 0 || response.data.loser_ids.length > 0){
-        await emit_win_lose(io, store, response.data.winner_ids, response.data.loser_ids);
+        await emit_win_lose(io, store, response.data.winner_ids, response.data.loser_ids, response.data.new_entries);
         await emit_history_updates(io, store, response.data.new_entries,);
     }
 

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "../hooks/reduxHooks";
 import { fetchData } from "../components/fetch/fetch";
 
-import type { HistoryEntry } from "../../server/types/history_types";
+import type { HistoryEntry } from "../Types/HistoryEntry";
 import "./HistoriyCard.css";
 
 type HistoryScope = "me" | "all";

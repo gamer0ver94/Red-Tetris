@@ -11,6 +11,7 @@ const defaultOptions: GameOptions = {
     height: 10,
     invisible: true,
     revealOnClearMs: 15,
+    showLockHighlight:false,
   },
   pieces: {
     randomSequence: true,

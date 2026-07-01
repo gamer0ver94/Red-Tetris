@@ -9,7 +9,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html'],
       reportOnFailure: true,
-      exclude: ['node_modules/**', 'docs/**', 'coverage/**', 'dist/**'],
+      exclude: ['node_modules/**', 'docs/**', 'coverage/**', 'dist/**', 'test/**', '**/*.test.ts', 'index.ts'],
       thresholds: {
         perFile: true,
         lines: 70,

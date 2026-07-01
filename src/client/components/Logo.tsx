@@ -4,7 +4,7 @@ type Props = {
     text:string;
     imagePath:string;
 }
-export default function Logo({ text, imagePath }: Props) {
+export default function Logo({ imagePath }: Props) {
   return (
       <img className="slogan neon" src={imagePath} alt="" />
   );

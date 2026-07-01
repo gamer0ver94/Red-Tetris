@@ -183,7 +183,12 @@ async function socket_disconnect(io: TypedIoServer, sid:string, store:Store, soc
         if (active_socket_ids.get(sid) === socket_id)
             active_socket_ids.delete(sid);
 
-        auth_services.logout(sid, store, true);
+        const logout_res = auth_services.logout(sid, store, true);
+        if(!logout_res.success)
+          return;
+        const leave_data = logout_res.data.leave_data;
+        if(leave_data?.new_owner && leave_data.new_owner_socket)
+          await io.to(leave_data.new_owner_socket).emit("lobby:new_owner");
     }, 30000));
 }
 

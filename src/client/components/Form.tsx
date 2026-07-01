@@ -19,7 +19,7 @@ export default function Form() {
       username: input,
     };
     const data = await fetchData(config.register, payload, "POST");
-    if (data.username) {
+    if (data?.username) {
       dispatch(setUsername(data.username));
       dispatch(setCsrfToken(data.csrf_token));
       goTo(ROUTES.HOME);

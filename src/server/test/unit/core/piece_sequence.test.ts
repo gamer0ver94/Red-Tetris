@@ -6,7 +6,7 @@ import {
     advance_piece_sequence,
     RandomInt
 } from '../../../core/piece_sequence.js';
-import { expect_function_pure } from "../../helpers/expect_helpers.test.js";
+import { expect_function_pure } from "../../helpers/test.expect_helpers.js";
 
 import { describe, expect, it } from 'vitest';
 

@@ -1,5 +1,8 @@
 SHELL := /bin/bash
 COMPOSE := docker compose
+TEST_HISTORY_FILE ?= test.history.json
+TEST_HISTORY_PATH ?= /tmp/red-tetris-test.history.json
+UNSET_HISTORY := env -u HISTORY_PATH
 
 .PHONY: up \
         build \
@@ -10,14 +13,37 @@ COMPOSE := docker compose
         clean \
         re \
         session-key \
+        ensure-history \
+        ensure-test-history \
         client-build \
         client-clean \
+        test \
         test-server \
         test-server-watch \
         test-server-coverage \
+        test-client \
+        test-client-watch \
+        test-client-coverage \
+        test-coverage \
 
 session-key:
 	@echo "SESSION_KEY_BASE64=$$(openssl rand -base64 32)";
+
+ensure-history:
+	@if [ ! -f history.json ]; then \
+		printf '[]\n' > history.json; \
+		echo "Created history.json"; \
+	fi; \
+	chmod a+rw history.json || true; \
+	echo "history.json set to read/write";
+
+ensure-test-history:
+	@if [ ! -f "$(TEST_HISTORY_FILE)" ]; then \
+		printf '[]\n' > "$(TEST_HISTORY_FILE)"; \
+		echo "Created $(TEST_HISTORY_FILE)"; \
+	fi; \
+	chmod a+rw "$(TEST_HISTORY_FILE)" || true; \
+	echo "$(TEST_HISTORY_FILE) set to read/write";
 
 up:
 	@if [ -n "$(SESSION_MANAGER)" ]; then \
@@ -25,20 +51,16 @@ up:
 		echo "Wrote SESSION_MANAGER to .env"; \
 	else \
 		echo "SESSION_MANAGER not set"; \
-	fi; \
-	if [ ! -f history.json ]; then \
-		printf '[]\n' > history.json; \
-		echo "Created history.json"; \
-	fi; \
-	chmod a+rw history.json || true; \
-	echo "history.json set to read/write"; \
-	$(COMPOSE) up server client
+	fi;
+	$(MAKE) ensure-history ensure-test-history client-build
+	$(UNSET_HISTORY) $(COMPOSE) up server
 
 build:
-	$(COMPOSE) build server client
+	$(UNSET_HISTORY) $(COMPOSE) build server client
 
 deploy:
-	$(COMPOSE) up --build server client
+	$(MAKE) ensure-history ensure-test-history client-build
+	$(UNSET_HISTORY) $(COMPOSE) up --build server
 
 asyncapi:
 	$(COMPOSE) --profile docs run --rm docs-builder
@@ -47,28 +69,44 @@ down:
 	$(COMPOSE) down
 
 logs:
-	$(COMPOSE) logs -f --tail=100 server client
+	$(COMPOSE) logs -f --tail=100 server
 
 clean:
-	$(COMPOSE) down -v --remove-orphans
+	$(UNSET_HISTORY) $(COMPOSE) down -v --remove-orphans
 	docker builder prune -f
 
 re: clean up
 
 client-build:
-	npm run build:client
+	$(COMPOSE) run --rm client sh -lc "npm run build"
 
 client-clean:
 	rm -rf src/client/dist
 
+test: test-server test-client
+
 test-server:
-	docker compose run --rm server sh -lc "npm run test"
+	$(MAKE) ensure-test-history
+	$(COMPOSE) run --rm -e HISTORY_PATH=$${HISTORY_PATH:-$(TEST_HISTORY_PATH)} server sh -lc "npm run test"
 
 test-server-watch:
-	docker compose run --rm server sh -lc "npm run test:watch"
+	$(MAKE) ensure-test-history
+	$(COMPOSE) run --rm -e HISTORY_PATH=$${HISTORY_PATH:-$(TEST_HISTORY_PATH)} server sh -lc "npm run test:watch"
 
 test-server-coverage:
-	docker compose run --rm server sh -lc "npm run test:coverage"
+	$(MAKE) ensure-test-history
+	$(COMPOSE) run --rm -e HISTORY_PATH=$${HISTORY_PATH:-$(TEST_HISTORY_PATH)} server sh -lc "npm run test:coverage"
+
+test-client:
+	$(COMPOSE) run --rm client sh -lc "npm run test"
+
+test-client-watch:
+	$(COMPOSE) run --rm client sh -lc "npm run test -- --watch"
+
+test-client-coverage:
+	$(COMPOSE) run --rm client sh -lc "npm run test"
+
+test-coverage: test-server-coverage test-client-coverage
 
 tetris:
 	bash ./tetris-cli.sh

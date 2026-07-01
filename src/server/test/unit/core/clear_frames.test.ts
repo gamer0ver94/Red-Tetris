@@ -9,7 +9,7 @@ import {
     get_current_phase_frame,
     is_clear_phase_done,
 } from '../../../core/clear_frames.js';
-import { expect_function_pure } from '../../helpers/expect_helpers.test.js';
+import { expect_function_pure } from '../../helpers/test.expect_helpers.js';
 import type { BoardType } from '../../../types/game_types.js';
 
 describe('core: clear_frames', () => {

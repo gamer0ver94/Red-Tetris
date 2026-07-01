@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAppSelector } from '../../../hooks/reduxHooks';
 import { fetchData } from '../../fetch/fetch';
-import type { HistoryEntry } from '../../../../server/types/history_types';
+import type { HistoryEntry } from '../../../Types/HistoryEntry';
 
 import './PlayerScoreCard.css';
 
@@ -85,15 +85,6 @@ export default function PlayerScoreCard({ finishScore }: Props) {
     return entries.find((e) => e.username === username) ?? null;
   }, [entries, username]);
 
-  const rank = useMemo(() => {
-    if (!entries.length) return 1;
-    const uniqueScores = Array.from(new Set(entries.map((e) => e.score))).sort((a, b) => b - a);
-    const idx = uniqueScores.findIndex((s) => s === finishScore);
-    if (idx !== -1) return idx + 1;
-    const betterCount = uniqueScores.filter((s) => s > finishScore).length;
-    return betterCount + 1;
-  }, [entries, finishScore]);
-
   return (
     <div className="playerscorecard neon">
       <div className="playerscorecard__header">
@@ -139,4 +130,3 @@ export default function PlayerScoreCard({ finishScore }: Props) {
     </div>
   );
 }
-

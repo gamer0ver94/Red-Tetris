@@ -1,7 +1,7 @@
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import { expect } from 'vitest';
 
-import type { TestAuthUser } from '../types.test.js';
+import type { TestAuthUser } from '../test.types.js';
 
 
 let index = 0

@@ -7,6 +7,7 @@ import type { FastifyRequest } from 'fastify';
 import { randomBytes, randomUUID } from 'node:crypto'
 import { leave_game } from "./game_lobby_services.ts";
 import { CodeType, ModelResult, LogoutData, LeaveGameData, PlayerData } from "../types/error_code_types.js";
+import { playerStatusType } from "../types/status_types.js";
 
 
 // Looks if user is in memory by secret id
@@ -90,8 +91,17 @@ export function logout(
     const player = player_res.data
 
     let leave_data:LeaveGameData|null = null;
+
+    
     const lobby_res = store.get_lobby_store().get_lobby_by_player_id(player.get_player_id());
     if(lobby_res.success){
+        const active_game_res = store.get_active_game_store().get_active_game_by_lobby_id(lobby_res.data.get_lobby_id());
+        if(active_game_res.success){
+            const active_leave_res = leave_game(player.get_sid(), store);
+            if(!active_leave_res.success)
+                return active_leave_res
+            player.set_player_status(active_leave_res.data.status);
+        }
         const leave_res = leave_game(player.get_sid(), store);
         if (!leave_res.success)
             return leave_res;

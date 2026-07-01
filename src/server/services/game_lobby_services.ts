@@ -145,7 +145,7 @@ export function leave_game(sid: string, store: Store):ModelResult<LeaveGameData,
         return lobby_res;
     const lobby = lobby_res.data;
 
-    if(lobby.get_game_status() === gameStatusType.waiting)
+    if(lobby.get_game_status() === gameStatusType.waiting || player.get_player_status() === playerStatusType.waiting)
         return leave_game_waiting(player, lobby, store);
 
     if (lobby.get_game_status() === gameStatusType.started)
@@ -223,6 +223,7 @@ function leave_game_started(player: Player, lobby: Lobby, store: Store):ModelRes
     const player_id = player.get_player_id();
     const lobby_id = lobby.get_lobby_id();
     const leaver_name = player.get_username();
+    const new_owner = player_id === lobby.get_owner_id();
 
     const socket_res = store.get_all_sockets_by_lobby_id(lobby_id);
     if(!socket_res.success)
@@ -269,7 +270,7 @@ function leave_game_started(player: Player, lobby: Lobby, store: Store):ModelRes
                     deleted:ended_match,
                     stopped_loop,
                     leaver_name,
-                    new_owner:false,
+                    new_owner,
                     winner_ids:[],
                     loser_ids:[],
                     socket_ids: socket_ids_res.success ? socket_ids_res.data : [],
@@ -289,7 +290,7 @@ function leave_game_started(player: Player, lobby: Lobby, store: Store):ModelRes
             stopped_loop:finish_res.data.stopped_loop,
             leaver_name,
             socket_ids:finish_res.data.socket_ids,
-            new_owner:false,
+            new_owner,
             winner_ids,
             loser_ids,
             status:playerStatusType.waiting,
@@ -356,6 +357,7 @@ export function extract_player_in_lobby_status(lobby_id:string, store:Store)
         }
         return {success:true, data:{players, owner_name, all_ready:ready_res.data}}
 }
+
 
 
 function generate_unique_lobby_id(lobby_store: LobbyStore) : string{

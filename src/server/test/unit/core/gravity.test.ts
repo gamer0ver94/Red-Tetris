@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { apply_gravity_cell, is_empty_cell } from '../../../core/gravity.js';
-import { expect_function_pure } from '../../helpers/expect_helpers.test.js';
+import { expect_function_pure } from '../../helpers/test.expect_helpers.js';
 import type { BoardType } from '../../../types/game_types.js';
 
 describe('core: gravity', () => {

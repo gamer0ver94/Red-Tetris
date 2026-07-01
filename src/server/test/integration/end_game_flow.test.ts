@@ -5,9 +5,9 @@ import { build_server } from '../../app/build_server.js';
 import { CLASSIC_OPTS } from '../../types/pre_made_options.js';
 import type { GameOptions } from '../../types/game_options_types.js';
 import { gameStatusType, playerStatusType } from '../../types/status_types.js';
-import * as test_sockets from '../helpers/socket_helpers.test.js';
-import * as test_game from '../helpers/game_helpers.test.js';
-import * as test_types from '../types.test.js';
+import * as test_sockets from '../helpers/test.socket_helpers.js';
+import * as test_game from '../helpers/test.game_helpers.js';
+import * as test_types from '../test.types.js';
 
 describe('integration: end game flow', () => {
     let baseUrl: string;

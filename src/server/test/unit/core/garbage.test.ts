@@ -6,7 +6,7 @@ import {
     resolve_garbage_send_back,
     resolve_garbage_to_send,
 } from '../../../core/garbage.js';
-import { expect_function_pure } from '../../helpers/expect_helpers.test.js';
+import { expect_function_pure } from '../../helpers/test.expect_helpers.js';
 import type { BoardType } from '../../../types/game_types.js';
 
 describe('core: garbage', () => {

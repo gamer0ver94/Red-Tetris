@@ -7,7 +7,7 @@ import {
     build_highest_board,
 } from '../../../core/render.js';
 import { BoardType } from "../../../types/game_types.js";
-import { expect_function_pure } from '../../helpers/expect_helpers.test.js';
+import { expect_function_pure } from '../../helpers/test.expect_helpers.js';
 
 describe('core: render', () =>{
 it('build_visible_board keeps locked cells when no piece exists', () => {

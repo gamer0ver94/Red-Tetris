@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { expect_function_pure } from '../../helpers/expect_helpers.test.js';
+import { expect_function_pure } from '../../helpers/test.expect_helpers.js';
 import {
     get_kicks,
     get_prev_rotation,

@@ -75,10 +75,32 @@ describe('HistoryProvider', () => {
 
         expect(HistoryProvider.add_entry(newer)).toBe(true);
         expect(fs_mocks.writeFileSync).toHaveBeenCalledWith(
-            '/app/history.json',
+            get_expected_history_path(),
             `${JSON.stringify([newer, older], null, 2)}\n`,
             'utf8',
         );
+    });
+
+    it('uses the default history path when no override is configured', () => {
+        const history_path = process.env.HISTORY_PATH;
+        delete process.env.HISTORY_PATH;
+
+        try {
+            fs_mocks.existsSync.mockReturnValue(true);
+            fs_mocks.readFileSync.mockReturnValue(JSON.stringify([]));
+            fs_mocks.writeFileSync.mockImplementation(() => undefined);
+
+            expect(HistoryProvider.add_entry(create_entry())).toBe(true);
+            expect(fs_mocks.writeFileSync).toHaveBeenCalledWith(
+                '/app/history.json',
+                expect.any(String),
+                'utf8',
+            );
+        }
+        finally {
+            if(history_path !== undefined)
+                process.env.HISTORY_PATH = history_path;
+        }
     });
 
     it('returns false when writing history fails', () => {
@@ -194,6 +216,10 @@ describe('HistoryProvider', () => {
 function mock_history(entries: HistoryEntry[]): void {
     fs_mocks.existsSync.mockReturnValue(true);
     fs_mocks.readFileSync.mockReturnValue(JSON.stringify(entries));
+}
+
+function get_expected_history_path(): string {
+    return process.env.HISTORY_PATH ?? '/app/history.json';
 }
 
 function create_entry(overrides: Partial<HistoryEntry> = {}): HistoryEntry {

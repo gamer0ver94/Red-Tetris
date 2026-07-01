@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { create_empty_board } from '../../../core/board.js';
 import { clear_lines, get_full_lines_indexes } from '../../../core/line_clear.js';
-import { expect_function_pure } from '../../helpers/expect_helpers.test.js';
+import { expect_function_pure } from '../../helpers/test.expect_helpers.js';
 import type { BoardType } from '../../../types/game_types.js';
 
 describe('core: line_clear', () => {

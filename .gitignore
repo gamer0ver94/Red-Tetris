@@ -6,3 +6,4 @@ coverage/
 .tmp/
 logs/
 history.json
+test.history.json

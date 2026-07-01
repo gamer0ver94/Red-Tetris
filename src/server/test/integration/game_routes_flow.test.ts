@@ -1,9 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { FastifyInstance } from 'fastify';
 
-import { register_user, unique_username, inject_as } from '../helpers/auth_helpers.test.js';
+import { register_user, unique_username, inject_as } from '../helpers/test.auth_helpers.js';
 import { build_server } from '../../app/build_server.js';
-import type { TestAuthUser } from '../types.test.js';
+import type { TestAuthUser } from '../test.types.js';
 import { gameStatusType, playerStatusType } from '../../types/status_types.js';
 
 describe('integration: game routes flow', () => {
