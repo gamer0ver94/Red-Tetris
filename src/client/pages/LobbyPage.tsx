@@ -113,6 +113,13 @@ export default function LobbyPage() {
   useEffect(() => {
     if (!socket) return;
 
+    // JOIN SOCKET BRIDGE START
+    // HTTP /game/join only validates access; this socket event performs the lobby join.
+    if (gameIdFromSession) {
+      socket.emit("lobby:join", { game_id: gameIdFromSession });
+    }
+    //JOIN SOCKET BRIDGE END
+
     dispatch(playerJoined({ username }));
 
     const onPlayerJoinUpdate = (payload: any) => {

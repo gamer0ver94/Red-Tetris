@@ -16,8 +16,8 @@ export default function HistorySection() {
       {
         key: 'all',
         who: 'all' as const,
-        title: 'Top scores (All Matches)',
-        list: 'score' as const,
+        title: 'Most Recent (All Matches)',
+        list: 'date' as const,
       },
     ],
     []
