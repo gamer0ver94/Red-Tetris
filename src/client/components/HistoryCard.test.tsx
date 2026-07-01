@@ -5,7 +5,6 @@ vi.mock("../components/fetch/fetch", () => ({
   fetchData: vi.fn(),
 }));
 
-/* ---------------- MOCKS ---------------- */
 
 const mockDispatch = vi.fn();
 
@@ -14,14 +13,12 @@ vi.mock("react-redux", () => ({
   useDispatch: () => mockDispatch,
 }));
 
-/* ---------------- IMPORT AFTER MOCK ---------------- */
 
 import HistoryCard from "./HistoryCard";
 import { useSelector } from "react-redux";
 import { fetchData } from "../components/fetch/fetch";
 
 
-/* ---------------- TESTS ---------------- */
 
 describe("HistoryCard", () => {
   beforeEach(() => {

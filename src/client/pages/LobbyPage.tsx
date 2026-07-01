@@ -219,8 +219,9 @@ export default function LobbyPage() {
         </div>
       </div>
 
-      {/* ✅ FIXED: test can now find button */}
-      <button onClick={startGame}>Start Game</button>
+      {lobbyPlayers[username]?.is_owner && (
+        <button onClick={startGame}>Start Game</button>
+      )}
 
       <div className="logout-space">
         <div>{gameIdFromSession}</div>

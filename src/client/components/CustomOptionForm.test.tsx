@@ -11,6 +11,7 @@ const defaultOptions: GameOptions = {
     height: 10,
     invisible: true,
     revealOnClearMs: 15,
+    showLockHighlight: true,
   },
   pieces: {
     randomSequence: true,
@@ -106,7 +107,9 @@ describe("CustomOptionForm", () => {
     render(
       <CustomOptionForm options={defaultOptions} setOptions={mockSetOptions} />
     );
-    expect(screen.getByRole("combobox")).toBeInTheDocument();
+    // Use getAllByRole since there are multiple comboboxes (seeOpponents and condition)
+    const selects = screen.getAllByRole("combobox");
+    expect(selects.length).toBeGreaterThan(0);
   });
 
   it("changes seeOpponents value", async () => {
@@ -114,7 +117,10 @@ describe("CustomOptionForm", () => {
     render(
       <CustomOptionForm options={defaultOptions} setOptions={mockSetOptions} />
     );
-    const select = screen.getByRole("combobox");
+    // Get the second combobox (seeOpponents in multiplayer section)
+    // First combobox is win.condition, second is multiplayer.seeOpponents
+    const selects = screen.getAllByRole("combobox");
+    const select = selects[1];
     await userEvent.selectOptions(select, "grid");
     expect(mockSetOptions).toHaveBeenCalled();
   });

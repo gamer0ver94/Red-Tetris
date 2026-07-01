@@ -1,7 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 
-/* ---------------- MOCK CHILD COMPONENT ---------------- */
 
 vi.mock("./HistoryCard", () => ({
   default: ({ scope, title }: any) => (
@@ -11,7 +10,6 @@ vi.mock("./HistoryCard", () => ({
   ),
 }));
 
-/* ---------------- IMPORT AFTER MOCK ---------------- */
 
 import HistorySection from "./HistorySection";
 

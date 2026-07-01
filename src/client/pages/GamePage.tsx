@@ -8,6 +8,7 @@ import GameBoard from "../components/game/Board";
 import { InputHandler } from "../components/game/InputHandler";
 import type { RenderPayload } from "../Types/RenderPayload";
 import { ROUTES } from "../Types/Routes";
+import { fetchData } from "../components/fetch/fetch";
 
 type OpponentEntry = RenderPayload["opponents"][string];
 
@@ -27,8 +28,10 @@ export default function GamePage() {
   const [latestRender, setLatestRender] = useState<RenderPayload | null>(null);
   const [gameOutcome, setGameOutcome] = useState<"win" | "lose" | null>(null);
   const scoreRef = useRef(0);
-
-
+  const onQuit = () => {
+    socket.emit("lobby:leave");
+    goTo("/home");
+  };
   useEffect(() => {
     if (!socket) return;
 
@@ -46,7 +49,7 @@ export default function GamePage() {
 
       goTo(ROUTES.SCORE, {
         state: {
-          score: scoreRef.current, // ✅ always correct
+          score: scoreRef.current,
           result: "win",
           matchHistory: ["win vs A", "lose vs B"],
         },
@@ -58,7 +61,7 @@ export default function GamePage() {
 
       goTo(ROUTES.SCORE, {
         state: {
-          score: scoreRef.current, // ✅ always correct
+          score: scoreRef.current,
           result: "lose",
           matchHistory: ["win vs A", "lose vs B"],
         },
@@ -130,7 +133,7 @@ export default function GamePage() {
               <div>
                 {before.map((u) => {
                   const opponent = opponents[u] as OpponentEntry | undefined;
-                  void opponent; // board not used in this column
+                  void opponent;
                   return (
                     <div key={u} style={{ minWidth: 420 }}>
                       <div>{u}</div>
@@ -177,6 +180,7 @@ export default function GamePage() {
           <div>{gameOutcome === "win" ? "YOU WIN" : "YOU LOSE"}</div>
         </div>
       )}
+      <button onClick={onQuit}>Quit</button>
     </div>
   );
 }

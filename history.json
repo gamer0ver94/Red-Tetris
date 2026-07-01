@@ -1,5 +1,15 @@
 [
   {
+    "username": "Duarte",
+    "is_winner": false,
+    "score": 400,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "47937",
+    "end_date": "2026-07-01T09:01:53.545Z",
+    "lobby_id": "d4c4"
+  },
+  {
     "username": "fsaf",
     "is_winner": false,
     "score": 0,

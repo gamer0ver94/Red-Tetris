@@ -2,7 +2,6 @@ import { render, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import React from "react";
 
-/* ---------------- HOISTED SOCKET MOCK ---------------- */
 
 const socketMock = vi.hoisted(() => ({
   on: vi.fn(),
@@ -11,7 +10,6 @@ const socketMock = vi.hoisted(() => ({
   connected: false,
 }));
 
-/* ---------------- SOCKET CONTEXT MOCK (VITE SAFE) ---------------- */
 
 vi.mock("../socket/socketContext", async () => {
   const React = await import("react");
@@ -21,7 +19,6 @@ vi.mock("../socket/socketContext", async () => {
   };
 });
 
-/* ---------------- REDUX MOCK ---------------- */
 
 vi.mock("../hooks/reduxHooks", () => ({
   useAppDispatch: () => vi.fn(),
@@ -31,7 +28,6 @@ vi.mock("../hooks/reduxHooks", () => ({
     }),
 }));
 
-/* ---------------- ROUTER MOCK ---------------- */
 
 const navigateMock = vi.fn();
 
@@ -39,7 +35,6 @@ vi.mock("react-router-dom", () => ({
   useNavigate: () => navigateMock,
 }));
 
-/* ---------------- CHILD COMPONENT MOCKS ---------------- */
 
 vi.mock("../components/game/Board", () => ({
   default: () => <div data-testid="board" />,
@@ -49,11 +44,9 @@ vi.mock("../components/game/InputHandler", () => ({
   InputHandler: () => <div data-testid="input" />,
 }));
 
-/* ---------------- IMPORT COMPONENT (AFTER MOCKS) ---------------- */
 
 import GamePage from "./GamePage";
 
-/* ---------------- TESTS ---------------- */
 
 describe("GamePage", () => {
   beforeEach(() => {
