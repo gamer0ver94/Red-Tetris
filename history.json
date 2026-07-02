@@ -1,5 +1,25 @@
 [
   {
+    "username": "Duarte",
+    "is_winner": false,
+    "score": 1000,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "109466",
+    "end_date": "2026-07-02T11:54:16.063Z",
+    "lobby_id": "cfce"
+  },
+  {
+    "username": "43",
+    "is_winner": true,
+    "score": 1450,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "109466",
+    "end_date": "2026-07-02T11:54:16.063Z",
+    "lobby_id": "cfce"
+  },
+  {
     "username": "ysebban",
     "is_winner": false,
     "score": 1500,

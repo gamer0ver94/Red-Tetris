@@ -49,6 +49,40 @@ export type GameOptions = {
   };
 };
 
+type NumberRange = {
+    min?:number,
+    max?:number,
+    step?:number
+};
+
+const NUMBER_RANGES:Partial<{
+    [Section in keyof GameOptions]: Partial<
+        Record<keyof GameOptions[Section], NumberRange|undefined>
+    >;
+}> = {
+    grid:{
+        width: {min: 4, max: 30, step: 1},
+        height: {min: 10, max: 40, step: 1},
+        revealOnClearMs: {min: 0, max: 1000, step: 10},
+    },
+    pieces:{
+        nextPreviewCount: {min: 0, max: 7, step: 1},
+    },
+    gravity:{
+        tickMs: {min: 150, max: 2000, step: 50},
+        lockDelayMs: {min: 0, max: 1000, step: 10},
+        maxLock: {min: 0, max: 20, step: 1},
+        softDropMultiplier: {min: 0.1, max: 1, step: 0.05},
+    },
+    garbage:{
+        ratio: {min: 0, max: 5, step: 0.1}, 
+    },
+    win:{
+        limit: {min: 0, max: 10000, step: 1}
+    },
+    multiplayer:{}
+};
+
 type Props = {
   options: GameOptions;
   setOptions: React.Dispatch<React.SetStateAction<GameOptions>>;
@@ -68,10 +102,9 @@ export default function CustomOptionForm({
             <div key={sectionKey} className="section">
               <h3>{sectionKey}</h3>
 
-              {(Object.keys(
-                sectionValue
-              ) as (keyof typeof sectionValue)[]).map((fieldKey) => {
-                const fieldValue = sectionValue[fieldKey];
+              {(Object.keys(sectionValue) as string[]).map((fieldKey) => {
+                const fieldValue = sectionValue[fieldKey as keyof typeof sectionValue];
+                const range = (NUMBER_RANGES[sectionKey as keyof typeof NUMBER_RANGES] as Record<string, NumberRange> | undefined)?.[fieldKey];
                 return (
                   <div key={fieldKey} className="field">
                     <label>{fieldKey}</label>
@@ -94,6 +127,9 @@ export default function CustomOptionForm({
                     {typeof fieldValue === "number" && (
                       <input
                         type="number"
+                        min={range?.min}
+                        max={range?.max}
+                        step={range?.step}
                         value={fieldValue}
                         onChange={(e) => {
                           setOptions((prev) => ({
