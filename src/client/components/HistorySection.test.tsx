@@ -30,7 +30,7 @@ describe("HistorySection", () => {
     fireEvent.click(screen.getByText("All Histories"));
 
     expect(screen.getByTestId("history-card")).toHaveTextContent(
-      "all - Top scores (All Matches)"
+      "all - Most Recent (All Matches)"
     );
   });
 
@@ -58,5 +58,17 @@ describe("HistorySection", () => {
 
     expect(allBtn.className).toContain("history-selected");
     expect(meBtn.className).not.toContain("history-selected");
+  });
+
+  it("renders search input", () => {
+    render(<HistorySection />);
+    expect(screen.getByPlaceholderText("Filter by player name...")).toBeInTheDocument();
+  });
+
+  it("updates search input value", () => {
+    render(<HistorySection />);
+    const searchInput = screen.getByPlaceholderText("Filter by player name...") as HTMLInputElement;
+    fireEvent.change(searchInput, { target: { value: "Alice" } });
+    expect(searchInput.value).toBe("Alice");
   });
 });

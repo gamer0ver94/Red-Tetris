@@ -124,4 +124,16 @@ describe("CustomOptionForm", () => {
     await userEvent.selectOptions(select, "grid");
     expect(mockSetOptions).toHaveBeenCalled();
   });
+
+  it("changes win condition value", async () => {
+    const mockSetOptions = vi.fn();
+    render(
+      <CustomOptionForm options={defaultOptions} setOptions={mockSetOptions} />
+    );
+    // Get the first combobox (win.condition)
+    const selects = screen.getAllByRole("combobox");
+    const select = selects[0];
+    await userEvent.selectOptions(select, "score");
+    expect(mockSetOptions).toHaveBeenCalled();
+  });
 });

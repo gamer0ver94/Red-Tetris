@@ -1,14 +1,12 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-
 import LogoutButton from "./LogoutButton";
 
-const mockFetchData = vi.hoisted(() => vi.fn());
-
 vi.mock("./fetch/fetch", () => ({
-  fetchData: mockFetchData,
+  fetchData: vi.fn(),
 }));
+
+import { fetchData } from "./fetch/fetch";
 
 describe("LogoutButton", () => {
   beforeEach(() => {
@@ -21,22 +19,52 @@ describe("LogoutButton", () => {
   });
 
   it("calls fetchData on click", async () => {
-    mockFetchData.mockResolvedValue(null);
+    (fetchData as any).mockResolvedValue(null);
     render(<LogoutButton />);
-    await userEvent.click(screen.getByRole("button", { name: /logout/i }));
-    expect(mockFetchData).toHaveBeenCalledWith("/auth/logout", null, "GET");
+    
+    const button = screen.getByRole("button", { name: /logout/i });
+    button.click();
+    
+    expect(fetchData).toHaveBeenCalledWith("/auth/logout", null, "GET");
   });
 
-  it("redirects to home on logout", async () => {
+  it("redirects to home page on logout when fetchData returns null", async () => {
+    (fetchData as any).mockResolvedValue(null);
     const originalLocation = window.location;
-    delete (window as any).location;
-    window.location = { ...originalLocation, href: "" } as any;
-
-    mockFetchData.mockResolvedValue(null);
+    const mockLocation = { ...originalLocation, href: "" };
+    Object.defineProperty(window, "location", { value: mockLocation, writable: true, configurable: true });
+    
     render(<LogoutButton />);
-    await userEvent.click(screen.getByRole("button", { name: /logout/i }));
-    expect(window.location.href).toBe("/");
+    
+    const button = screen.getByRole("button", { name: /logout/i });
+    button.click();
+    
+    // Wait for async operation
+    await new Promise(resolve => setTimeout(resolve, 0));
+    
+    expect(mockLocation.href).toBe("/");
+    
+    // Restore original location
+    Object.defineProperty(window, "location", { value: originalLocation, writable: true, configurable: true });
+  });
 
-    window.location = originalLocation;
+  it("redirects to home page on logout when fetchData returns data", async () => {
+    (fetchData as any).mockResolvedValue({ success: true });
+    const originalLocation = window.location;
+    const mockLocation = { ...originalLocation, href: "" };
+    Object.defineProperty(window, "location", { value: mockLocation, writable: true, configurable: true });
+    
+    render(<LogoutButton />);
+    
+    const button = screen.getByRole("button", { name: /logout/i });
+    button.click();
+    
+    // Wait for async operation
+    await new Promise(resolve => setTimeout(resolve, 0));
+    
+    expect(mockLocation.href).toBe("/");
+    
+    // Restore original location
+    Object.defineProperty(window, "location", { value: originalLocation, writable: true, configurable: true });
   });
 });
