@@ -86,6 +86,6 @@ export async function get_join(request:FastifyRequest<{Params: {game_id:string, 
         username: user_res.data.username,
         csrf_token: user_res.data.csrf_token,
         game_status: game.get_game_status(),
-        is_host: game.get_owner_id() === user_res.data.player_id,
+        is_host: game.get_owner_id() === user_res.data.player_id
     });
 }

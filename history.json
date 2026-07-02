@@ -1,5 +1,15 @@
 [
   {
+    "username": "ysebban",
+    "is_winner": false,
+    "score": 1500,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "91788",
+    "end_date": "2026-07-02T09:27:32.549Z",
+    "lobby_id": "b850"
+  },
+  {
     "username": "4",
     "is_winner": false,
     "score": 0,
