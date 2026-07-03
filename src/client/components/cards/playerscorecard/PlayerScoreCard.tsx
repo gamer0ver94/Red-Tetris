@@ -7,6 +7,7 @@ import './PlayerScoreCard.css';
 
 type Props = {
   finishScore: number | null;
+  result:"win" | "lose";
 };
 
 type RankedEntry = {
@@ -19,7 +20,7 @@ function getTopScore(entries: RankedEntry[]): number {
   return Math.max(...entries.map((e) => e.score));
 }
 
-export default function PlayerScoreCard({ finishScore }: Props) {
+export default function PlayerScoreCard({ finishScore, result }: Props) {
   const username = useAppSelector((s) => s.user.username) ?? '';
   const hasScore = finishScore !== null;
 
@@ -96,13 +97,15 @@ export default function PlayerScoreCard({ finishScore }: Props) {
 
   return (
     <div className="playerscorecard neon">
-      {hasScore ? (
         <div className="playerscorecard__header">
+          { hasScore ??(
           <div className={`playerscorecard__record ${isRecord ? 'is-record' : ''}`}>
             {isRecord ? 'RECORD!' : 'Not a record'}
           </div>
+          )}
+          {result === "win" ? "Winner": "You lost ..."}
         </div>
-      ) : null}
+
 
       {hasScore ? (
         <div className="playerscorecard__score">

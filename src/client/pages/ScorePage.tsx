@@ -13,7 +13,7 @@ export default function ScorePage() {
   const goTo = useNavigate();
   const location = useLocation();
 
-  const { score } = (location.state as ScorePageProps) || {
+  const { score, result } = (location.state as ScorePageProps) || {
     score: null,
     result: "lose",
     matchHistory: [],
@@ -22,7 +22,7 @@ export default function ScorePage() {
   return (
     <div className="score-page neon">
       <div>
-        <PlayerScoreCard finishScore={score} />
+        <PlayerScoreCard finishScore={score} result={result} />
       </div>
       <div className="game-state">
         <GameBoard />

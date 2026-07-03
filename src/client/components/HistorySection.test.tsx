@@ -60,7 +60,6 @@ describe("HistorySection", () => {
     expect(meBtn.className).not.toContain("history-selected");
   });
 
-<<<<<<< HEAD
   it("switches all-history list when clicking list buttons", () => {
     render(<HistorySection />);
 
@@ -75,7 +74,6 @@ describe("HistorySection", () => {
     expect(screen.getByTestId("history-card")).toHaveTextContent(
       "all - win - Winning Matches"
     );
-=======
   it("renders search input", () => {
     render(<HistorySection />);
     expect(screen.getByPlaceholderText("Filter by player name...")).toBeInTheDocument();
@@ -86,6 +84,5 @@ describe("HistorySection", () => {
     const searchInput = screen.getByPlaceholderText("Filter by player name...") as HTMLInputElement;
     fireEvent.change(searchInput, { target: { value: "Alice" } });
     expect(searchInput.value).toBe("Alice");
->>>>>>> origin/final_frontend
   });
 });
