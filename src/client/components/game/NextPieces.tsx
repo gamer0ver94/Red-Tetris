@@ -44,11 +44,15 @@ const PIECE_SHAPES: Record<string, string[][]> = {
   ],
 };
 
+const EMPTY_PIECE_SHAPE:string[][] = [
+  ['.', '.'],
+  ['.', '.'],
+];
+
 export default function NextPieces({ nextPieces }: Props) {
   if (!nextPieces || nextPieces.length === 0) {
     return null;
   }
-
   return (
     <div className="next-pieces">
       <p className="next-pieces-label">Next Pieces</p>
@@ -76,6 +80,29 @@ export default function NextPieces({ nextPieces }: Props) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+export function PiecePreview({pieceType} : {pieceType:string | null}){
+  const shape = pieceType ? PIECE_SHAPES[pieceType] : EMPTY_PIECE_SHAPE
+    return (
+    <div className="next-piece-board">
+      {shape?.map((row, rowIndex) => (
+        <div key={rowIndex} className="next-piece-row">
+          {row.map((cell, colIndex) => (
+            <div
+              key={colIndex}
+              className={`next-piece-cell ${cell !== '.' ? 'next-piece-cell-filled' : ''}`}
+              style={
+                cell !== '.' && PIECE_COLORS[cell]
+                  ? { backgroundColor: PIECE_COLORS[cell] }
+                  : undefined
+              }
+            />
+          ))}
+        </div>
+      ))}
     </div>
   );
 }

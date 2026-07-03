@@ -1,5 +1,65 @@
 [
   {
+    "username": "rer",
+    "is_winner": false,
+    "score": 900,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "89341",
+    "end_date": "2026-07-03T09:22:05.251Z",
+    "lobby_id": "fa3f"
+  },
+  {
+    "username": "e",
+    "is_winner": false,
+    "score": 100,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "30422",
+    "end_date": "2026-07-03T09:15:46.887Z",
+    "lobby_id": "abc8"
+  },
+  {
+    "username": "ds",
+    "is_winner": false,
+    "score": 1000,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "112549",
+    "end_date": "2026-07-03T09:12:09.309Z",
+    "lobby_id": "a7d8"
+  },
+  {
+    "username": "re",
+    "is_winner": false,
+    "score": 600,
+    "is_hidden": true,
+    "game_mode": "custom",
+    "total_time": "85163",
+    "end_date": "2026-07-03T09:08:26.190Z",
+    "lobby_id": "0813"
+  },
+  {
+    "username": "re",
+    "is_winner": false,
+    "score": 300,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "109322",
+    "end_date": "2026-07-03T09:06:06.611Z",
+    "lobby_id": "2783"
+  },
+  {
+    "username": "re",
+    "is_winner": false,
+    "score": 1500,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "149921",
+    "end_date": "2026-07-03T08:38:04.201Z",
+    "lobby_id": "095f"
+  },
+  {
     "username": "1",
     "is_winner": false,
     "score": 300,
@@ -8,6 +68,36 @@
     "total_time": "89228",
     "end_date": "2026-07-01T13:10:31.601Z",
     "lobby_id": "ad2b"
+  },
+  {
+    "username": "Duarte",
+    "is_winner": false,
+    "score": 1000,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "109466",
+    "end_date": "2026-07-02T11:54:16.063Z",
+    "lobby_id": "cfce"
+  },
+  {
+    "username": "43",
+    "is_winner": true,
+    "score": 1450,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "109466",
+    "end_date": "2026-07-02T11:54:16.063Z",
+    "lobby_id": "cfce"
+  },
+  {
+    "username": "ysebban",
+    "is_winner": false,
+    "score": 1500,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "91788",
+    "end_date": "2026-07-02T09:27:32.549Z",
+    "lobby_id": "b850"
   },
   {
     "username": "4",

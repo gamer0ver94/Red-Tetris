@@ -35,6 +35,7 @@ export interface ClientToServerEvents {
     'lobby:ready': () => void;
     'lobby:start': () => void;
     'lobby:leave': () => void;
+    'lobby:update': () => void;
 
     //Game actions
     'game:left:press':() => void;

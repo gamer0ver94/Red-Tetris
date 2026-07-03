@@ -36,6 +36,13 @@ export async function socket_game_lobby(
         await ready_lobby_event(io, socket, sid, store);
     });
 
+    socket.on('lobby:update', async() => {
+        const list = extract_status_list(sid, store);
+        if(!list)
+            return await socket.emit('lobby:update:error', {reason: 'Error while extracting list'});
+        await io.to(socket.id).emit('lobby:update:success', list);
+    });
+
     socket.on('history:watch', async(data) => {
         if(!data)
             return;

@@ -40,7 +40,7 @@ describe("ScorePage", () => {
   it("uses default state when location.state is missing (branch coverage)", () => {
     renderWithState(undefined);
 
-    expect(screen.getByTestId("score-card")).toHaveTextContent("0");
+    expect(screen.getByTestId("score-card")).toBeEmptyDOMElement();
   });
 
   it("navigates back to lobby on button click", () => {
@@ -52,4 +52,3 @@ describe("ScorePage", () => {
     expect(screen.getByText("Lobby Page")).toBeInTheDocument();
   });
 });
-

@@ -12,7 +12,7 @@ import { stop_game_loop } from './game_loop_services.js'
 import { MAPPED_OPTS, type GameMode } from '../types/pre_made_options.js'
 import { GameOptions } from '../types/game_options_types.js'
 import { CodeType, LeaveGameData, JoinLobbyData, ModelResult, StartGameData } from '../types/error_code_types.js'
-import { gameStatusType, PlayerInLobbyStatus, PlayerStatus, playerStatusType } from '../types/status_types.ts'
+import { gameStatusType, playerStatusType } from '../types/status_types.ts'
 import { LobbyPlayerState, LobbyReadyPayload } from '../types/socket_event_types.js'
 import { evaluate_active_end_game, finish_active_game } from './game_end_services.js'
 
@@ -98,7 +98,7 @@ export function create_game(
     store:Store,
     user_sid: string,
     game_mode: string,
-    game_opts?:GameOptions,
+    provided_opts?:GameOptions,
 ):ModelResult<string, CodeType>{
     const player_data_res = find_me(user_sid, store.get_player_store());
     if(!player_data_res.success)
@@ -107,10 +107,7 @@ export function create_game(
     const owner_id = player_data_res.data.player_id!;
 
     const lobby_id = generate_unique_lobby_id(store.get_lobby_store());
-    if(!game_opts)
-        game_opts = resolve_opts_from_mode(game_mode);
-    if(!game_opts)
-        game_opts = MAPPED_OPTS['classic'];
+    const game_opts = normalize_opts(provided_opts ?? resolve_opts_from_mode(game_mode) ?? MAPPED_OPTS.classic)
     const lobby = new Lobby(
         lobby_id,
         owner_id,
@@ -378,4 +375,18 @@ function resolve_opts_from_mode(mode:string){
     if(!is_game_mode(mode))
         return undefined;
     return MAPPED_OPTS[mode];
+}
+
+function normalize_opts(opts:GameOptions):GameOptions{
+    return{
+        ...opts,
+        win:{
+            ...opts.win,
+            limit:opts.win.limit === 0 ? null : opts.win.limit,
+        },
+        multiplayer:{
+            ...opts.multiplayer,
+            maxPlayers: opts.multiplayer.maxPlayers === 0 ? null : opts.multiplayer.maxPlayers,
+        },
+    };
 }

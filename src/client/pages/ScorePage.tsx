@@ -4,7 +4,7 @@ import "./ScorePage.css";
 import PlayerScoreCard from "../components/cards/playerscorecard/PlayerScoreCard";
 
 type ScorePageProps = {
-  score: number;
+  score: number | null;
   result: "win" | "lose";
   matchHistory: string[];
 };
@@ -14,7 +14,7 @@ export default function ScorePage() {
   const location = useLocation();
 
   const { score } = (location.state as ScorePageProps) || {
-    score: 0,
+    score: null,
     result: "lose",
     matchHistory: [],
   };

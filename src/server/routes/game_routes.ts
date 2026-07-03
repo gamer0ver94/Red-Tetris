@@ -112,7 +112,7 @@ export const game_routes = async (fastify: FastifyInstance) => {
                         enabled: { type: 'boolean' },
                         maxPlayers: {
                         anyOf: [
-                            { type: 'integer', minimum: 1 },
+                            { type: 'integer', minimum: 0 },
                             { type: 'null' },
                         ],
                         },

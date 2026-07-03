@@ -1,29 +1,31 @@
 import { useMemo, useState } from 'react';
 import './HistorySection.css';
 import HistoryCard from "./HistoryCard"
+
+type HistoryList = 'date' | 'score' | 'win' | 'lose';
+
+const LIST_OPTIONS: { list: HistoryList; label: string; title: string }[] = [
+  { list: 'date', label: 'Recent', title: 'Most Recent (All Matches)' },
+  { list: 'score', label: 'Top Scores', title: 'Top Scores (All Matches)' },
+  { list: 'win', label: 'Wins', title: 'Winning Matches' },
+  { list: 'lose', label: 'Losses', title: 'Losing Matches' },
+];
+
 export default function HistorySection() {
   const [who, setWho] = useState<'me' | 'all'>('me');
+  const [list, setList] = useState<HistoryList>('date');
   const [searchName, setSearchName] = useState('');
 
-  const cards = useMemo(
-    () => [
-      {
-        key: 'me',
-        who: 'me' as const,
-        title: 'My Matches',
-        list: 'score' as const,
-      },
-      {
-        key: 'all',
-        who: 'all' as const,
-        title: 'Most Recent (All Matches)',
-        list: 'date' as const,
-      },
-    ],
-    []
+  const activeList = useMemo(
+    () => LIST_OPTIONS.find((option) => option.list === list) ?? LIST_OPTIONS[0],
+    [list],
   );
 
-  const active = who === 'me' ? cards[0] : cards[1];
+  const title = searchName
+    ? `Matches for "${searchName}"`
+    : who === 'me'
+      ? 'My Matches'
+      : activeList.title;
 
   return (
     <div className="history-session">
@@ -42,11 +44,29 @@ export default function HistorySection() {
             </button>
             <button
               className={`history-unselected ${who === 'all' ? 'history-selected' : ''}`}
-              onClick={() => setWho('all')}
+              onClick={() => {
+                setWho('all');
+                setList('date');
+              }}
               type="button"
             >
               All Histories
             </button>
+          </div>
+          <div className='history-buttons'>
+            {LIST_OPTIONS.map((option) => (
+              <button
+                key={option.list}
+                className={`history-unselected ${who === 'all' && list === option.list ? 'history-selected' : ''}`}
+                onClick={() => {
+                  setWho('all');
+                  setList(option.list);
+                }}
+                type="button"
+              >
+                {option.label}
+              </button>
+            ))}
           </div>
           <input
             type="text"
@@ -58,9 +78,9 @@ export default function HistorySection() {
         </div>
       </div>
       <HistoryCard 
-        scope={active.who} 
-        list={active.list} 
-        title={active.title} 
+        scope={who} 
+        list={list} 
+        title={title} 
         start={0} 
         end={10}
         username={searchName || undefined}
@@ -68,4 +88,3 @@ export default function HistorySection() {
     </div>
   );
 }
-

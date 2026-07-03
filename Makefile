@@ -3,6 +3,7 @@ COMPOSE := docker compose
 TEST_HISTORY_FILE ?= test.history.json
 TEST_HISTORY_PATH ?= /tmp/red-tetris-test.history.json
 UNSET_HISTORY := env -u HISTORY_PATH
+export SESSION_MANAGER
 
 .PHONY: up \
         build \
@@ -13,6 +14,7 @@ UNSET_HISTORY := env -u HISTORY_PATH
         clean \
         re \
         session-key \
+        sync-session-manager \
         ensure-history \
         ensure-test-history \
         client-build \
@@ -28,6 +30,22 @@ UNSET_HISTORY := env -u HISTORY_PATH
 
 session-key:
 	@echo "SESSION_KEY_BASE64=$$(openssl rand -base64 32)";
+
+sync-session-manager:
+	@set -e; \
+	tmp_file="$$(mktemp .env.XXXXXX)"; \
+	if [ -f .env ]; then \
+		sed '/^SESSION_MANAGER=/d' .env > "$$tmp_file"; \
+	else \
+		: > "$$tmp_file"; \
+	fi; \
+	mv "$$tmp_file" .env; \
+	if [ -n "$$SESSION_MANAGER" ]; then \
+		printf '%s\n' "SESSION_MANAGER=$$SESSION_MANAGER" >> .env; \
+		echo "Updated SESSION_MANAGER in .env"; \
+	else \
+		echo "SESSION_MANAGER not set; removed SESSION_MANAGER from .env"; \
+	fi
 
 ensure-history:
 	@if [ ! -f history.json ]; then \
@@ -45,20 +63,14 @@ ensure-test-history:
 	chmod a+rw "$(TEST_HISTORY_FILE)" || true; \
 	echo "$(TEST_HISTORY_FILE) set to read/write";
 
-up:
-	@if [ -n "$(SESSION_MANAGER)" ]; then \
-		echo "SESSION_MANAGER=$(SESSION_MANAGER)" >> .env; \
-		echo "Wrote SESSION_MANAGER to .env"; \
-	else \
-		echo "SESSION_MANAGER not set"; \
-	fi;
+up: sync-session-manager
 	$(MAKE) ensure-history ensure-test-history client-build
 	$(UNSET_HISTORY) $(COMPOSE) up server
 
 build:
 	$(UNSET_HISTORY) $(COMPOSE) build server client
 
-deploy:
+deploy: sync-session-manager
 	$(MAKE) ensure-history ensure-test-history client-build
 	$(UNSET_HISTORY) $(COMPOSE) up --build server
 
@@ -78,7 +90,7 @@ clean:
 re: clean up
 
 client-build:
-	$(COMPOSE) run --rm client sh -lc "npm run build"
+	$(COMPOSE) run --rm client sh -lc "npm install && npm run build"
 
 client-clean:
 	rm -rf src/client/dist
@@ -98,13 +110,13 @@ test-server-coverage:
 	$(COMPOSE) run --rm -e HISTORY_PATH=$${HISTORY_PATH:-$(TEST_HISTORY_PATH)} server sh -lc "npm run test:coverage"
 
 test-client:
-	$(COMPOSE) run --rm client sh -lc "npm run test"
+	$(COMPOSE) run --rm client sh -lc "npm install && npm run test"
 
 test-client-watch:
-	$(COMPOSE) run --rm client sh -lc "npm run test -- --watch"
+	$(COMPOSE) run --rm client sh -lc "npm install && npm run test -- --watch"
 
 test-client-coverage:
-	$(COMPOSE) run --rm client sh -lc "npm run test"
+	$(COMPOSE) run --rm client sh -lc "npm install && npm run test"
 
 test-coverage: test-server-coverage test-client-coverage
 

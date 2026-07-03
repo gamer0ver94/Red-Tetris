@@ -3,9 +3,9 @@ import { describe, it, expect, vi } from "vitest";
 
 
 vi.mock("./HistoryCard", () => ({
-  default: ({ scope, title }: any) => (
+  default: ({ scope, list, title }: any) => (
     <div data-testid="history-card">
-      {scope} - {title}
+      {scope} - {list} - {title}
     </div>
   ),
 }));
@@ -20,7 +20,7 @@ describe("HistorySection", () => {
     expect(screen.getByText("Match History")).toBeInTheDocument();
 
     expect(screen.getByTestId("history-card")).toHaveTextContent(
-      "me - My Matches"
+      "me - date - My Matches"
     );
   });
 
@@ -30,7 +30,7 @@ describe("HistorySection", () => {
     fireEvent.click(screen.getByText("All Histories"));
 
     expect(screen.getByTestId("history-card")).toHaveTextContent(
-      "all - Top scores (All Matches)"
+      "all - date - Most Recent (All Matches)"
     );
   });
 
@@ -41,7 +41,7 @@ describe("HistorySection", () => {
     fireEvent.click(screen.getByText("My History"));
 
     expect(screen.getByTestId("history-card")).toHaveTextContent(
-      "me - My Matches"
+      "me - date - My Matches"
     );
   });
 
@@ -58,5 +58,21 @@ describe("HistorySection", () => {
 
     expect(allBtn.className).toContain("history-selected");
     expect(meBtn.className).not.toContain("history-selected");
+  });
+
+  it("switches all-history list when clicking list buttons", () => {
+    render(<HistorySection />);
+
+    fireEvent.click(screen.getByText("Top Scores"));
+
+    expect(screen.getByTestId("history-card")).toHaveTextContent(
+      "all - score - Top Scores (All Matches)"
+    );
+
+    fireEvent.click(screen.getByText("Wins"));
+
+    expect(screen.getByTestId("history-card")).toHaveTextContent(
+      "all - win - Winning Matches"
+    );
   });
 });

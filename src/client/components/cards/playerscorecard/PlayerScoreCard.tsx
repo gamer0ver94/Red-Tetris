@@ -6,7 +6,7 @@ import type { HistoryEntry } from '../../../Types/HistoryEntry';
 import './PlayerScoreCard.css';
 
 type Props = {
-  finishScore: number;
+  finishScore: number | null;
 };
 
 type RankedEntry = {
@@ -21,6 +21,7 @@ function getTopScore(entries: RankedEntry[]): number {
 
 export default function PlayerScoreCard({ finishScore }: Props) {
   const username = useAppSelector((s) => s.user.username) ?? '';
+  const hasScore = finishScore !== null;
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
@@ -30,6 +31,13 @@ export default function PlayerScoreCard({ finishScore }: Props) {
     let cancelled = false;
 
     async function run() {
+      if (!hasScore) {
+        setEntries([]);
+        setLoading(false);
+        setError('');
+        return;
+      }
+
       setLoading(true);
       setError('');
       try {
@@ -71,11 +79,12 @@ export default function PlayerScoreCard({ finishScore }: Props) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [hasScore]);
 
   const topScore = useMemo(() => getTopScore(entries), [entries]);
 
   const isRecord = useMemo(() => {
+    if (finishScore === null) return false;
     if (!entries.length) return true;
     return finishScore >= topScore;
   }, [finishScore, entries.length, topScore]);
@@ -87,23 +96,27 @@ export default function PlayerScoreCard({ finishScore }: Props) {
 
   return (
     <div className="playerscorecard neon">
-      <div className="playerscorecard__header">
-        <div className={`playerscorecard__record ${isRecord ? 'is-record' : ''}`}>
-          {isRecord ? 'RECORD!' : 'Not a record'}
+      {hasScore ? (
+        <div className="playerscorecard__header">
+          <div className={`playerscorecard__record ${isRecord ? 'is-record' : ''}`}>
+            {isRecord ? 'RECORD!' : 'Not a record'}
+          </div>
         </div>
-      </div>
+      ) : null}
 
-      <div className="playerscorecard__score">
-        <div>
-          <div className="playerscorecard__label">Your finish score</div>
-          <div className="playerscorecard__value">{finishScore}</div>
+      {hasScore ? (
+        <div className="playerscorecard__score">
+          <div>
+            <div className="playerscorecard__label">Your finish score</div>
+            <div className="playerscorecard__value">{finishScore}</div>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       {loading ? <div className="playerscorecard__status">Loading...</div> : null}
       {error ? <div className="playerscorecard__status playerscorecard__status--error">{error}</div> : null}
 
-      {!loading && !error ? (
+      {hasScore && !loading && !error ? (
         <div className="playerscorecard__list">
           <div className="playerscorecard__list-title">Top scores</div>
           <div className="playerscorecard__rows">

@@ -3,7 +3,7 @@ import { BoardType } from './game_types.ts';
 export type RenderPayload = {
   self:{
     board:BoardType;
-    hold_piece_type:null|string;
+    hold_piece_type?:null|string;
     next_piece_types:string[]|null;
     score:number|null;
   }

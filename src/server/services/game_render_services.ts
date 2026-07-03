@@ -44,9 +44,11 @@ export function build_render_payload(active_game:ActiveGame, player_id:string, s
     return {success:true, data:{
             self:{
                 board:render_board,
-                hold_piece_type:self_res.data.get_hold_piece(),
                 next_piece_types,
-                score
+                score,
+                ...(active_game.get_config().can_hold()
+                ? {hold_piece_type: self_res.data.get_hold_piece()}
+                : {}),
             },
             opponents:  build_opponent_payload(active_game, player_id, store),
         },

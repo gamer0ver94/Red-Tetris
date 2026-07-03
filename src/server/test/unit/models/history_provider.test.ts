@@ -201,14 +201,7 @@ describe('HistoryProvider', () => {
         ]);
         expect(HistoryProvider.search_username_in_history('', 0, 5)).toEqual([]);
         expect(HistoryProvider.search_username_in_history('ali', 0, 1)).toEqual([
-            {
-                username: 'alice',
-                entries: [entries[0]],
-            },
-            {
-                username: 'alicia',
-                entries: [entries[1]],
-            },
+            entries[0],
         ]);
     });
 });

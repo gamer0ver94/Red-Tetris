@@ -139,28 +139,16 @@ export class HistoryProvider{
         query:string,
         start = this.default_start,
         end = this.default_end,
-    ):UsernameSearchHistoryData[]{
-
-        const grouped = new Map<string, HistoryEntry[]>();
+    ):HistoryEntry[]{
 
         if(query.length == 0)
             return [];
 
-        for(const entry of this.read_history()){
-            const username = entry.username;
-
-            if(!username.includes(query))
-                continue;
-            const entries = grouped.get(username) ?? [];
-            entries.push(entry);
-            grouped.set(username, entries);
-        }
-        return [...grouped.entries()]
-            .sort(([a] , [b]) => a.localeCompare(b))
-            .map(([username, entries]) => ({
-                username,
-                entries: this.slice_history(entries, start, end),
-            }));
+        return this.slice_history(
+            this.read_history().filter((entry) => entry.username.includes(query)),
+            start,
+            end,
+        );
     }
 
     private static is_history_entry(value:unknown):value is HistoryEntry{
@@ -181,8 +169,3 @@ export class HistoryProvider{
         );
     }
 }
-
-export type UsernameSearchHistoryData = {
-    username:string;
-    entries:HistoryEntry[];
-};

@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "../hooks/reduxHooks";
 import { setBoard } from "../store/gameSlice";
 import { socketContext } from "../socket/socketContext";
 import GameBoard from "../components/game/Board";
-import NextPieces from "../components/game/NextPieces";
+import NextPieces, { PiecePreview } from "../components/game/NextPieces";
 
 import { InputHandler } from "../components/game/InputHandler";
 import type { RenderPayload } from "../Types/RenderPayload";
@@ -31,7 +31,7 @@ export default function GamePage() {
 
   const [latestRender, setLatestRender] = useState<RenderPayload | null>(null);
   const [gameOutcome, setGameOutcome] = useState<"win" | "lose" | null>(null);
-  const scoreRef = useRef(0);
+  const scoreRef = useRef<number | null>(null);
   const onQuit = () => {
     socket.emit("lobby:leave");
     goTo("/lobby");
@@ -43,9 +43,7 @@ export default function GamePage() {
       dispatch(setBoard(payload.self.board));
       setLatestRender(payload);
 
-      const newScore = payload.self?.score ?? 0;
-
-      scoreRef.current = newScore;
+      scoreRef.current = payload.self.score;
     };
 
     const onWin = () => {
@@ -129,11 +127,23 @@ export default function GamePage() {
               <div className="player-section">
                 <h2>{username}</h2>
                 <div className="player-info">
-                  <div className="score-display">
-                    Score: {latestRender?.self?.score ?? 0}
-                  </div>
+                  {latestRender?.self?.score !== null && latestRender?.self?.score !== undefined ? (
+                    <div className="score-display">
+                      Score: {latestRender.self.score}
+                    </div>
+                  ) : null}
                   <NextPieces nextPieces={latestRender?.self?.next_piece_types ?? null} />
                 </div>
+                {latestRender?.self?.hold_piece_type !== undefined && (
+                  <div className="next-pieces">
+                    <p className="next-pieces-label">Hold</p>
+                    <div className="next-pieces-container">
+                      <div className="next-piece">
+                        <PiecePreview pieceType={latestRender.self.hold_piece_type} />
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <GameBoard board={latestRender?.self?.board ?? null} />
               </div>
 

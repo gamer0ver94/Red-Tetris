@@ -120,8 +120,9 @@ export default function HistoryCard({
                 {e.is_winner ? "WIN" : "LOSE"}
               </span>
             </div>
-
-            <div className="card-history-score">Score: {e.score}</div>
+            {!e.is_hidden ? (
+              <div className="card-history-score">Score: {e.score}</div>
+            ) : null}
             <div className="card-history">
               <div>Mode: {e.game_mode}</div>
               <div>Time: {e.total_time}</div>
