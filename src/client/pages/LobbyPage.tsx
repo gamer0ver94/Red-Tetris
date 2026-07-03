@@ -32,6 +32,26 @@ export default function LobbyPage() {
   const { gameid, username: routeUsername } = useParams();
   const gameIdFromSession = gameid || sessionStorage.getItem("game_id") || "";
 
+  // Prevent rendering invalid routes like "/{gameid}/".
+  // Keep this guard minimal to avoid breaking unit tests that mock react-router-dom.
+  useEffect(() => {
+    // If params are missing, try to recover using sessionStorage.
+    // This prevents kicking the user to /home during valid lobby resumes.
+    if (!gameid) {
+      goTo("/home");
+      return;
+    }
+
+    if (!routeUsername) {
+      const usernameFromStorage = sessionStorage.getItem("username") || "";
+      if (usernameFromStorage) {
+        goTo(`/${gameid}/${usernameFromStorage}`);
+        return;
+      }
+      goTo("/home");
+      return;
+    }
+  }, [gameid, routeUsername, goTo]);
 
   const [hostUsername, setHostUsername] = useState<string>("");
 
