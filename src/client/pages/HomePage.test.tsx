@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import HomePage from "../pages/HomePage";
 import { socket } from "../socket/socket";
+import { fetchDataJson } from "../components/fetch/fetch";
 
 vi.mock("../socket/socket", () => ({
   socket: {
@@ -105,5 +106,47 @@ describe("HomePage", () => {
     fireEvent.click(btn);
 
     expect(input).toBeInTheDocument();
+  });
+
+  it("shows error when create lobby fails", async () => {
+    // Override the mock for this specific test
+    const originalMock = vi.mocked(fetchDataJson);
+    (fetchDataJson as any).mockResolvedValueOnce({
+      ok: false,
+      text: () => Promise.resolve("Error"),
+    });
+
+    renderPage();
+
+    const btn = screen.getByRole("button", { name: /create/i });
+    fireEvent.click(btn);
+
+    await waitFor(() => {
+      expect(screen.getByText("Failed to Join Game")).toBeInTheDocument();
+    });
+    
+    // Restore mock
+    vi.mocked(fetchDataJson).mockReset();
+  });
+
+  it("shows error when game ID is empty on join", async () => {
+    renderPage();
+
+    const btn = screen.getByRole("button", { name: /join/i });
+    fireEvent.click(btn);
+
+    await waitFor(() => {
+      expect(screen.getByText("Please enter a valid game ID.")).toBeInTheDocument();
+    });
+  });
+
+  it("switches to custom mode and shows options", async () => {
+    renderPage();
+
+    const select = screen.getByRole("combobox");
+    fireEvent.change(select, { target: { value: "custom" } });
+
+    // CustomOptionForm should be rendered with grid section
+    expect(screen.getByRole("heading", { name: "grid" })).toBeInTheDocument();
   });
 });

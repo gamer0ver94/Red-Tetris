@@ -102,7 +102,7 @@ describe("LobbyPage - extra coverage", () => {
     });
   });
 
-  it("does not start game when user is not owner", async () => {
+  it("does not show start game button when user is not owner", async () => {
     render(<LobbyPage />);
 
     const joinHandler = (socket.on as any).mock.calls.find(
@@ -119,8 +119,9 @@ describe("LobbyPage - extra coverage", () => {
       });
     });
 
-    fireEventClickStart();
-
+    // Start Game button should not exist for non-owner
+    expect(screen.queryByRole("button", { name: /start game/i })).not.toBeInTheDocument();
+    
     expect(socket.emit).not.toHaveBeenCalledWith("lobby:start");
   });
 
