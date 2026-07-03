@@ -137,7 +137,6 @@ export default function LobbyPage() {
         return;
       }
 
-      // HTTP /game/join only validates access; this socket event performs the lobby join.
       socket.emit("lobby:join", { game_id: gameid });
     }
 
@@ -151,7 +150,6 @@ export default function LobbyPage() {
   useEffect(() => {
     if (!socket) return;
 
-    // socket event is handled in validateAndJoin (this effect just wires lobby socket listeners)
 
     dispatch(playerJoined({ username }));
 
@@ -215,11 +213,19 @@ export default function LobbyPage() {
     });
 
     socket.on("lobby:start:success", onLobbyStarted);
+
+    socket.on("lobby:update", (payload: any) => {
+      if (payload?.players) {
+        onPlayerJoinUpdate(payload);
+      }
+    });
+
     socket.on("lobby:join:update", onPlayerJoinUpdate);
     socket.on("lobby:leave:update", onPlayerLeave);
     socket.on("lobby:new_owner", onNewOwner);
     socket.on("session:resume", onSessionResume);
     socket.on("lobby:ready:update", onPlayerReadyUpdate);
+
 
     return () => {
       socket.off("lobby:start:success", onLobbyStarted);
@@ -227,12 +233,13 @@ export default function LobbyPage() {
       socket.off("lobby:leave:update", onPlayerLeave);
       socket.off("session:resume", onSessionResume);
       socket.off("lobby:ready:update", onPlayerReadyUpdate);
+      socket.off("lobby:update");
 
       socket.offAny?.();
+
     };
   }, [socket]);
 
-  // keep component render independent from param validation
   return (
 
     <div className="lobby-container">
