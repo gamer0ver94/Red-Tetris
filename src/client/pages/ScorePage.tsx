@@ -26,7 +26,7 @@ export default function ScorePage() {
       </div>
       <div className="game-state">
         <GameBoard />
-        <button onClick={() => goTo("/lobby")}>Return to Lobby</button>
+        <button onClick={() => goTo(`/${sessionStorage.getItem("game_id") || ""}/${""}`)}>Return to Lobby</button>
       </div>
       <div className="empty"></div>
     </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "../hooks/reduxHooks";
 import { socketContext } from "../socket/socketContext";
 import PlayerCard from "../components/cards/PlayerCard";
@@ -29,7 +29,9 @@ export default function LobbyPage() {
 
   const socket = useContext(socketContext);
 
-  const gameIdFromSession = sessionStorage.getItem("game_id") || "";
+  const { gameid, username: routeUsername } = useParams();
+  const gameIdFromSession = gameid || sessionStorage.getItem("game_id") || "";
+
 
   const [hostUsername, setHostUsername] = useState<string>("");
 
@@ -43,6 +45,7 @@ export default function LobbyPage() {
 
   const leaveLobby = () => {
     socket.emit("lobby:leave");
+    sessionStorage.removeItem("game_id");
     goTo("/home");
   };
 
@@ -113,14 +116,47 @@ export default function LobbyPage() {
   useEffect(() => {
     if (!socket) return;
 
-    // JOIN SOCKET BRIDGE START
-    // HTTP /game/join only validates access; this socket event performs the lobby join.
-    if (gameIdFromSession) {
-      socket.emit("lobby:join", { game_id: gameIdFromSession });
+    let isCancelled = false;
+
+    async function validateAndJoin() {
+      // Validate URL params against server before joining socket lobby
+      if (!gameid || !routeUsername) {
+        socket.emit("lobby:leave");
+        goTo("/home");
+        return;
+      }
+
+      const url = config.joinLobby + "/" + gameid + "/" + routeUsername;
+      const res = await fetchData(url, null, "GET");
+
+      if (isCancelled) return;
+
+      if (!res?.success) {
+        socket.emit("lobby:leave");
+        goTo("/home");
+        return;
+      }
+
+      // HTTP /game/join only validates access; this socket event performs the lobby join.
+      socket.emit("lobby:join", { game_id: gameid });
     }
-    //JOIN SOCKET BRIDGE END
+
+    validateAndJoin();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [socket, gameid, routeUsername, goTo]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    // socket event is handled in validateAndJoin (this effect just wires lobby socket listeners)
 
     dispatch(playerJoined({ username }));
+
+
+
 
     const onPlayerJoinUpdate = (payload: any) => {
       setHostUsername(payload.owner_name);
@@ -159,7 +195,7 @@ export default function LobbyPage() {
 
       if (leaverUsername === username) {
         sessionStorage.removeItem("game_id");
-        goTo("/");
+        goTo(`/${gameIdFromSession}/${routeUsername || username}`);
       }
     };
 
@@ -196,7 +232,9 @@ export default function LobbyPage() {
     };
   }, [socket]);
 
+  // keep component render independent from param validation
   return (
+
     <div className="lobby-container">
       <h1>Lobby</h1>
 

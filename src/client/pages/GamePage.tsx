@@ -34,7 +34,8 @@ export default function GamePage() {
   const scoreRef = useRef(0);
   const onQuit = () => {
     socket.emit("lobby:leave");
-    goTo("/lobby");
+    goTo(`/${sessionStorage.getItem("game_id") || ""}/${username}`);
+
   };
   useEffect(() => {
     if (!socket) return;

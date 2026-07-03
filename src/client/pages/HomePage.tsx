@@ -97,7 +97,7 @@ export default function HomePage() {
     if (data?.success && data?.game_id) {
       setHostUsername(username ? username : "");
       sessionStorage.setItem("game_id", data.game_id);
-      goTo(ROUTES.LOBBY);
+      goTo(`/${data.game_id}/${username || ""}`);
     }
   }
 
@@ -117,17 +117,13 @@ export default function HomePage() {
 
     const res = await fetchData(url, null, "GET");
 
-    if (!res.success) {
-      setError("Failed to Join Game, server error.");
-      return;
-    }
-
     if (res?.success) {
       dispatch(setCsrfToken(res.csrf_token));
       if (res?.game_id) sessionStorage.setItem("game_id", res.game_id);
-      goTo(ROUTES.LOBBY);
+      goTo(`/${res.game_id}/${username || ""}`);
+      return;
     } else {
-      setError("Failed to Join Game");
+      setError("Failed to Join Game, server error.");
     }
   }
 
