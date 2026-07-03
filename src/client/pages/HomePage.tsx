@@ -5,7 +5,7 @@ import { fetchData, fetchDataJson } from "../components/fetch/fetch";
 import { setCsrfToken, setUsername } from "../store/userSlice";
 import { socket } from "../socket/socket";
 import LogoutButton from "../components/LogoutButton";
-import { ROUTES } from "../Types/Routes";
+// import { ROUTES } from "../Types/Routes";
 import "./HomePage.css";
 import logo from "../assets/tetris_logo.png";
 import Logo from "../components/Logo";

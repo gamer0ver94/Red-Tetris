@@ -31,7 +31,8 @@ export default function ScorePage() {
         <button
           onClick={() => {
             socket.emit("lobby:update");
-            socket.emit("lobby:join:update", { owner_name: undefined, players: [] });
+            // this event will not do anything server send this
+            // socket.emit("lobby:join:update", { owner_name: undefined, players: [] });
             goTo(`/${sessionStorage.getItem("game_id") || ""}/${""}`);
 
           }}
