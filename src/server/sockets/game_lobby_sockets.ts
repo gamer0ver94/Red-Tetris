@@ -79,6 +79,7 @@ export async function join_lobby_event(
         const list = extract_status_list(sid,store);
         if(!list)
             return await socket.emit('lobby:join:error', {reason: 'Error while extracting list'});
+        
         if(response.data.socket_ids.length > 0){
             for (const sock of response.data.socket_ids)
                 await io.to(sock).emit('lobby:join:update', list );

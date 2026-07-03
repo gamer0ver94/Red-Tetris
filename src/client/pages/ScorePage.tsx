@@ -2,6 +2,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import GameBoard from "../components/game/Board";
 import "./ScorePage.css";
 import PlayerScoreCard from "../components/cards/playerscorecard/PlayerScoreCard";
+import { socket } from "../socket/socket";
+
 
 type ScorePageProps = {
   score: number | null;
@@ -26,8 +28,18 @@ export default function ScorePage() {
       </div>
       <div className="game-state">
         <GameBoard />
-        <button onClick={() => goTo("/lobby")}>Return to Lobby</button>
+        <button
+          onClick={() => {
+            socket.emit("lobby:update");
+            socket.emit("lobby:join:update", { owner_name: undefined, players: [] });
+            goTo(`/${sessionStorage.getItem("game_id") || ""}/${""}`);
+
+          }}
+        >
+          Return to Lobby
+        </button>
       </div>
+
       <div className="empty"></div>
     </div>
   );
