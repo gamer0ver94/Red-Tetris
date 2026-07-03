@@ -1,5 +1,15 @@
 [
   {
+    "username": "1",
+    "is_winner": false,
+    "score": 300,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "89228",
+    "end_date": "2026-07-01T13:10:31.601Z",
+    "lobby_id": "ad2b"
+  },
+  {
     "username": "4",
     "is_winner": false,
     "score": 0,
