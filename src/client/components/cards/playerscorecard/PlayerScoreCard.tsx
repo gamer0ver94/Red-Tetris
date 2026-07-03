@@ -98,11 +98,11 @@ export default function PlayerScoreCard({ finishScore, result }: Props) {
   return (
     <div className="playerscorecard neon">
         <div className="playerscorecard__header">
-          { hasScore ??(
+          { hasScore ?(
           <div className={`playerscorecard__record ${isRecord ? 'is-record' : ''}`}>
             {isRecord ? 'RECORD!' : 'Not a record'}
           </div>
-          )}
+          ): null}
           {result === "win" ? "Winner": "You lost ..."}
         </div>
 

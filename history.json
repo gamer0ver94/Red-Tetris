@@ -1,5 +1,35 @@
 [
   {
+    "username": "e",
+    "is_winner": true,
+    "score": 0,
+    "is_hidden": true,
+    "game_mode": "classic",
+    "total_time": "3393",
+    "end_date": "2026-07-03T13:14:40.966Z",
+    "lobby_id": "aabc"
+  },
+  {
+    "username": "testy",
+    "is_winner": true,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "19379",
+    "end_date": "2026-07-03T13:13:58.659Z",
+    "lobby_id": "6d98"
+  },
+  {
+    "username": "testy",
+    "is_winner": true,
+    "score": 0,
+    "is_hidden": false,
+    "game_mode": "custom",
+    "total_time": "4953",
+    "end_date": "2026-07-03T13:13:13.495Z",
+    "lobby_id": "6d98"
+  },
+  {
     "username": "we",
     "is_winner": false,
     "score": 200,
