@@ -12,7 +12,7 @@ import {
     close_socket_server,
 } from '../helpers/test.socket_helpers.js';
 import type { TestAuthUser, TestSocketClient } from '../test.types.js';
-import { gameStatusType, playerStatusType } from '../../types/status_types.js';
+import { gameStatusType } from '../../types/status_types.js';
 
 async function createGame(
     app: FastifyInstance,

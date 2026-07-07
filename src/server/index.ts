@@ -11,7 +11,8 @@ const start = async () => {
         const m = content.match(/SESSION_MANAGER=(.*)/);
         if (m) sessionManagerRaw = m[1].trim();
       }
-    } catch (e) {
+    } catch{
+      //Ignore missing SESSION_MANAGER env var
     }
   }
 

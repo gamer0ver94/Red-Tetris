@@ -40,7 +40,7 @@ describe('services: game_setup_services', () => {
     });
 
     it('returns add-player failures with the triggering player id', () => {
-        const { store, lobby } = create_lobby_with_players(['p1']);
+        const { lobby } = create_lobby_with_players(['p1']);
         const failing_store = {
             get_active_game_store: () => ({
                 add_active_game: () => ({ success: true, data: null }),

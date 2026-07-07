@@ -14,7 +14,9 @@ import { describe, expect, it } from 'vitest';
 describe('core: player_rules', () => {
     it('returns tickMs based on levels', () => {
         
-        let lock_count = 0, base_tick = 200;
+        let lock_count = 0;
+        const base_tick = 200;
+        
         const tick_0 = expect_function_pure(
             calculate_tick_ms,
             base_tick,

@@ -40,7 +40,7 @@ export class Store{
         if(!lobby_res.success)
             return lobby_res
 
-        let socket_ids:string[] = [];
+        const socket_ids:string[] = [];
         for(const player_id of lobby_res.data.get_player_ids()){
             const player_res = this.players.get_player_by_id(player_id);
             if (player_res.success)
@@ -55,7 +55,7 @@ export class Store{
         if(!lobby_res.success)
             return lobby_res;
 
-        let sids:string[] = [];
+        const sids:string[] = [];
         for(const player_id of lobby_res.data.get_player_ids()){
             const p_res = this.players.get_player_by_id(player_id);
             if(p_res.success)
@@ -70,7 +70,7 @@ export class Store{
         if(!lobby_res.success)
             return lobby_res;
 
-        let usernames:string[] = [];
+        const usernames:string[] = [];
         for(const player_id of lobby_res.data.get_player_ids()){
             const p_res = this.players.get_player_by_id(player_id);
             if(p_res.success)

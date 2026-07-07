@@ -1,5 +1,5 @@
 import { config } from "../../conf"
-export async function fetchData(route: string, object: any, method:string,) {
+export async function fetchData(route: string, object: unknown, method:string,) {
   const url = `${config.url}${route}`;
   console.log("test" + url)
     const options: RequestInit = {
@@ -21,7 +21,7 @@ export async function fetchData(route: string, object: any, method:string,) {
           const data = await res.json();
           return data;
     
-        } catch (err) {
+        } catch {
           return null;
         }
 }

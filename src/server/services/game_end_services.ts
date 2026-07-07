@@ -1,12 +1,12 @@
-import { Store } from "../stores/store.ts";
+import { Store } from "../stores/store.js";
 import { Lobby } from "../models/lobby_model.js"
 import { stop_game_loop } from "./game_loop_services.js";
-import { gameStatusType, playerStatusType } from "../types/status_types.js";
+import { gameStatusType} from "../types/status_types.js";
 import type { CodeType, ModelResult, FinishGameData } from "../types/error_code_types.js";
 import { ActiveGame } from "../models/active_game_model.js";
 import { HistoryProvider } from "../models/history_provider.js";
 import { HistoryEntry } from "../types/history_types.js";
-import { EndGameCondition, EndGamePlayerState, EndGameResult } from "../types/game_types.js";
+import { EndGamePlayerState, EndGameResult } from "../types/game_types.js";
 import { evaluate_end_game } from "../core/end_game.js";
 
 
@@ -81,7 +81,7 @@ function save_history_entries(
         ...loser_ids.map((player_id) => ({ player_id, is_winner:false})),
     ];
 
-    let new_entries:HistoryEntry[] = []; 
+    const new_entries:HistoryEntry[] = []; 
     for(const res of results){
         const p_res = store.get_player_store().get_player_by_id(res.player_id);
         const player_res = active_game.get_player(res.player_id)

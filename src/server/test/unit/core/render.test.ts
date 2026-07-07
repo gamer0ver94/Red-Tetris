@@ -6,7 +6,6 @@ import {
     build_empty_board,
     build_highest_board,
 } from '../../../core/render.js';
-import { BoardType } from "../../../types/game_types.js";
 import { expect_function_pure } from '../../helpers/test.expect_helpers.js';
 
 describe('core: render', () =>{

@@ -46,7 +46,7 @@ export type CodeType = keyof typeof codeType;
 
 export type ModelResult<T, Code extends CodeType = CodeType> =
   | { success: true; data: T }
-  | { success: false; code: Code; details?:any};
+  | { success: false; code: Code; details?:unknown};
 
 export type LeaveGameData = {
     deleted: boolean;

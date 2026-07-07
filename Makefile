@@ -11,6 +11,8 @@ export SESSION_MANAGER
         asyncapi \
         down \
         logs \
+        lint \
+		lint-server \
         clean \
         re \
         session-key \
@@ -83,6 +85,9 @@ down:
 logs:
 	$(COMPOSE) logs -f --tail=100 server
 
+lint:
+	$(COMPOSE) run --rm -w /repo -v .:/repo -v redtetris_root_node_modules:/repo/node_modules client sh -lc "npm install && npm run lint"
+
 clean:
 	$(UNSET_HISTORY) $(COMPOSE) down -v --remove-orphans
 	docker builder prune -f
@@ -105,7 +110,7 @@ test-server-watch:
 	$(MAKE) ensure-test-history
 	$(COMPOSE) run --rm -e HISTORY_PATH=$${HISTORY_PATH:-$(TEST_HISTORY_PATH)} server sh -lc "npm run test:watch"
 
-test-server-coverage:
+test-server-coverage:lint-server
 	$(MAKE) ensure-test-history
 	$(COMPOSE) run --rm -e HISTORY_PATH=$${HISTORY_PATH:-$(TEST_HISTORY_PATH)} server sh -lc "npm run test:coverage"
 
@@ -118,7 +123,7 @@ test-client-watch:
 test-client-coverage:
 	$(COMPOSE) run --rm client sh -lc "npm install && npm run test"
 
-test-coverage: test-server-coverage test-client-coverage
+test-coverage: lint test-server-coverage test-client-coverage
 
-tetris:
-	bash ./tetris-cli.sh
+lint-server:
+	$(COMPOSE) run --rm -w /repo -v .:/repo -v redtetris_root_node_modules:/repo/node_modules client sh -lc "npm install && npx eslint src/server"

@@ -1,13 +1,12 @@
-import { Board } from '../models/board_model.ts';
-import { Piece } from '../models/piece_model.ts';
+import { Board } from '../models/board_model.js';
+import { Piece } from '../models/piece_model.js';
 
 import { spawn_piece } from './game_core_services.js';
 import { Lobby } from '../models/lobby_model.js';
 import { ActiveGame } from '../models/active_game_model.js';
 import { Store } from '../stores/store.js';
-import { GameOptions } from '../types/game_options_types.ts';
 import { PlayerInGame } from '../models/player_in_game_model.js';
-import { CodeType, ModelResult, StartGameData } from '../types/error_code_types.js';
+import { CodeType, ModelResult } from '../types/error_code_types.js';
 import { ConfigProvider } from '../models/config_provider_model.js';
 //Prepares game when lobby is ready
 

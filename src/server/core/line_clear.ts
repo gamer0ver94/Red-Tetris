@@ -9,7 +9,7 @@ import { is_piece_cell } from "./piece.js";
 
 export function get_full_lines_indexes(board:BoardType):number[]{
 
-    let indexes:number[] = [];
+    const indexes:number[] = [];
 
     for (let y = 0; y < board.length; y += 1){
         const row = board[y];
@@ -49,7 +49,10 @@ export function clear_lines(
         filter((row, y) => {
             if(!indexes_to_clear.has(y))
                 return true;
-            row.includes("X") ? cleared_garbage += 1 : cleared_lines += 1;
+            if(row.includes("X"))
+                cleared_garbage += 1;
+            else
+                cleared_lines += 1;
             return false;
         }).map((row) => [...row]);
     //create empty rows to replace the erased one

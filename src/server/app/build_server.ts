@@ -1,4 +1,4 @@
-import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
+import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest, type FastifyHttpsOptions } from 'fastify';
 import cors from '@fastify/cors';
 import secureSession from '@fastify/secure-session';
 import swagger from '@fastify/swagger';
@@ -32,7 +32,7 @@ export const build_server = async () => {
         key: readFileSync(tlsKeyPath),
         cert: readFileSync(tlsCertPath),
     };
-    fastify = Fastify({ logger: true, https: httpsOptions as any });
+    fastify = Fastify({ logger: true, https: httpsOptions as FastifyHttpsOptions });
     console.log('Starting HTTPS server using', tlsKeyPath, tlsCertPath);
     } else {
     fastify = Fastify({ logger: true });

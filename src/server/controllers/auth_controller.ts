@@ -2,6 +2,7 @@ import type { FastifyReply, FastifyRequest } from 'fastify';
 
 import * as auth_services from '../services/auth_services.ts'
 import { AppError } from '../models/app_error_model.js';
+import { emit_history_updates, emit_win_lose } from '../sockets/game_lobby_sockets.ts';
 
 
 
@@ -67,6 +68,20 @@ export async function logout(
         request.server.io
         .to(leave_data.new_owner_socket)
         .emit("lobby:new_owner")
+    }
+    if(leave_data && (leave_data.winner_ids.length > 0 || leave_data.loser_ids.length > 0)){
+        await emit_win_lose(
+            request.server.io,
+            request.server.store,
+            leave_data.winner_ids,
+            leave_data.loser_ids,
+            leave_data.new_entries,
+        );
+        await emit_history_updates(
+            request.server.io,
+            request.server.store,
+            leave_data.new_entries,
+        );
     }
     const socket_id = response.data.player_socket_id;
     if(socket_id && !socket_id.startsWith('pending_disconnect:'))

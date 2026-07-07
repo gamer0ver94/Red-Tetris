@@ -1,9 +1,8 @@
-import { Board } from "./board_model.ts";
-import { PieceType } from "../types/game_types.ts";
-import { GameOptions } from "../types/game_options_types.ts";
+import { PieceType } from "../types/game_types.js";
+import { GameOptions } from "../types/game_options_types.js";
 import { ConfigProvider } from "./config_provider_model.js";
-import { PlayerInGame } from "./player_in_game_model.ts";
-import { PieceProvider } from "./piece_provider_model.ts";
+import { PlayerInGame } from "./player_in_game_model.js";
+import { PieceProvider } from "./piece_provider_model.js";
 import { ModelResult, CodeType } from "../types/error_code_types.js";
 
 export class ActiveGame{

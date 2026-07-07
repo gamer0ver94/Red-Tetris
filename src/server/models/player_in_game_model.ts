@@ -1,4 +1,3 @@
-import { Piece } from "./piece_model.js";
 import { Board } from "./board_model.js";
 import { PieceType } from "../types/game_types.js";
 import { ClearPhaseState } from "../types/render_types.js";

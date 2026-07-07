@@ -1,14 +1,11 @@
+import type { FastifyRequest } from 'fastify';
+import { randomBytes, randomUUID } from 'node:crypto'
+
+import { leave_game } from "./game_lobby_services.js";
+import { CodeType, ModelResult, LogoutData, LeaveGameData, PlayerData } from "../types/error_code_types.js";
 import { Player } from "../models/player_model.ts";
 import { PlayerStore } from "../stores/players_store.ts";
 import { Store } from "../stores/store.ts";
-import type { TypedIoServer } from "../types/socket_event_types.ts";
-import type { FastifyRequest } from 'fastify';
-
-import { randomBytes, randomUUID } from 'node:crypto'
-import { leave_game } from "./game_lobby_services.ts";
-import { CodeType, ModelResult, LogoutData, LeaveGameData, PlayerData } from "../types/error_code_types.js";
-import { playerStatusType } from "../types/status_types.js";
-
 
 // Looks if user is in memory by secret id
 export function find_me(sid: string, player_store: PlayerStore):ModelResult<PlayerData, CodeType>{
@@ -101,11 +98,13 @@ export function logout(
             if(!active_leave_res.success)
                 return active_leave_res
             player.set_player_status(active_leave_res.data.status);
+            leave_data = active_leave_res.data
         }
         const leave_res = leave_game(player.get_sid(), store);
         if (!leave_res.success)
             return leave_res;
-        leave_data = leave_res.data;
+        if(!leave_data)
+            leave_data = leave_res.data;
     }
     if(delete_user){
         const remove_res = store.get_player_store().remove_player(player);

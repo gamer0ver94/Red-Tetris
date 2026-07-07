@@ -3,13 +3,18 @@ import GameCell from './Cell';
 import "./Board.css"
 type BoardCell = '.' | 'X' | string;
 
+type BoardState = {
+  game?:{ board?: BoardCell[][] | null};
+  gameSlice?:{ board?:BoardCell[][] | null};
+};
+
 type Props = {
   board?: BoardCell[][] | null;
 };
 
 export default function GameBoard({ board: boardProp }: Props) {
   const boardFromStore = useSelector(
-    (state: any) => state.game?.board ?? state.gameSlice?.board ?? undefined
+    (state: BoardState) => state.game?.board ?? state.gameSlice?.board ?? undefined
   ) as BoardCell[][] | null;
 
   const board = (boardProp ?? boardFromStore) as BoardCell[][] | null;

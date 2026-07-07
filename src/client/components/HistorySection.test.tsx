@@ -74,6 +74,8 @@ describe("HistorySection", () => {
     expect(screen.getByTestId("history-card")).toHaveTextContent(
       "all - win - Winning Matches"
     );
+  });
+  
   it("renders search input", () => {
     render(<HistorySection />);
     expect(screen.getByPlaceholderText("Filter by player name...")).toBeInTheDocument();

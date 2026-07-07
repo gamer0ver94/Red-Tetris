@@ -1,18 +1,15 @@
 import {randomBytes} from 'node:crypto'
 
-import { Player } from '../models/player_model.ts'
-import { Store } from '../stores/store.ts'
+import { Player } from '../models/player_model.js'
+import { Store } from '../stores/store.js'
 import { LobbyStore } from '../stores/lobby_store.js'
 import { Lobby } from '../models/lobby_model.js'
-import { find_me } from './auth_services.ts'
-
+import { find_me } from './auth_services.js'
 import { setup_active_game } from './game_setup_services.js'
-import { stop_game_loop } from './game_loop_services.js'
-
 import { MAPPED_OPTS, type GameMode } from '../types/pre_made_options.js'
 import { GameOptions } from '../types/game_options_types.js'
 import { CodeType, LeaveGameData, JoinLobbyData, ModelResult, StartGameData } from '../types/error_code_types.js'
-import { gameStatusType, playerStatusType } from '../types/status_types.ts'
+import { gameStatusType, playerStatusType } from '../types/status_types.js'
 import { LobbyPlayerState, LobbyReadyPayload } from '../types/socket_event_types.js'
 import { evaluate_active_end_game, finish_active_game } from './game_end_services.js'
 
@@ -239,7 +236,7 @@ function leave_game_started(player: Player, lobby: Lobby, store: Store):ModelRes
     const remaing_ids = active_game.get_players_ids();
     const socket_ids_res = store.get_all_sockets_by_lobby_id(lobby_id);
     let ended_match = false;
-    let stopped_loop = false;
+    const stopped_loop = false;
     let winner_ids:string[] = [];
     let loser_ids:string[] = [];
 
@@ -334,14 +331,14 @@ export function extract_player_in_lobby_status(lobby_id:string, store:Store)
         if(!owner_res.success)
             return owner_res;
         const owner_name = owner_res.data.get_username();
-        const owner_id = owner_res.data.get_player_id();
+        //const owner_id = owner_res.data.get_player_id();
 
         const player_ids = lobby_res.data.get_player_ids();
         const ready_res = store.are_all_players_ready(owner_res.data.get_sid());
         if(!ready_res.success)
             return ready_res;
 
-        let players:LobbyPlayerState[] = [];
+        const players:LobbyPlayerState[] = [];
         
         for(const player_id of player_ids){
             const player_res = store.get_player_store().get_player_by_id(player_id);

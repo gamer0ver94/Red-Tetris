@@ -1,14 +1,12 @@
-import { Store } from "../stores/store.ts";
-import * as helpers from '../sockets/misc_sockets.ts'
-import * as lobby_services from '../services/game_lobby_services.ts'
-import { gameStatusType, playerStatusType } from "../types/status_types.ts";
-import type { SocketData, TypedIoServer, TypedSocket } from '../types/socket_event_types.ts';
+import { Store } from "../stores/store.js";
+import * as helpers from '../sockets/misc_sockets.js'
+import * as lobby_services from '../services/game_lobby_services.js'
+import { gameStatusType, playerStatusType } from "../types/status_types.js";
+import type { TypedIoServer, TypedSocket } from '../types/socket_event_types.ts';
 import { start_game_loop } from "../services/game_loop_services.js";
 import { build_render_payload } from "../services/game_render_services.js";
-import { codeType, FinishGameData } from "../types/error_code_types.js";
-import { change_player_status, change_game_status } from "../sockets/misc_sockets.ts";
-import {LobbyPlayerState, LobbyReadyPayload} from '../types/socket_event_types.ts';
-import { ModelResult, CodeType } from '../types/error_code_types.ts';
+import { codeType } from "../types/error_code_types.js";
+import { LobbyReadyPayload} from '../types/socket_event_types.js';
 import { finish_active_game } from "../services/game_end_services.js";
 import { HistoryEntry } from "../types/history_types.js";
 
@@ -156,8 +154,10 @@ async function start_lobby_event(
             if(!player.success)
                 continue;
             const payload = build_render_payload(game, player.data.get_player_id(), store);
-            if(payload.success)
+            if(payload.success){
                 await io.to(player.data.get_socket()).emit('game:render', payload.data);
+                // console.log("SENDING RENDER")
+            }
         }
     });
     if(!loop_res.success)
@@ -240,7 +240,7 @@ function extract_status_list(sid:string, store:Store):LobbyReadyPayload|null{
     return list_res.data;
 }
 
-async function emit_win_lose(
+export async function emit_win_lose(
     io:TypedIoServer,
     store:Store,
     winner_ids:string[],
@@ -253,7 +253,7 @@ async function emit_win_lose(
         if(!res.success)
             continue;
         await io.to(res.data.get_socket()).emit('game:win', new_entries);
-        await change_player_status(io, playerStatusType.waiting, res.data.get_sid(), store.get_player_store());
+        await helpers.change_player_status(io, playerStatusType.waiting, res.data.get_sid(), store.get_player_store());
     }
 
     for(const id of loser_ids){
@@ -261,11 +261,11 @@ async function emit_win_lose(
         if(!res.success)
             continue;
         await io.to(res.data.get_socket()).emit('game:lose', new_entries);
-        await change_player_status(io, playerStatusType.waiting, res.data.get_sid(), store.get_player_store());
+        await helpers.change_player_status(io, playerStatusType.waiting, res.data.get_sid(), store.get_player_store());
     }
 }
 
-async function emit_history_updates(
+export async function emit_history_updates(
     io:TypedIoServer,
     store:Store,
     new_entries:HistoryEntry[]

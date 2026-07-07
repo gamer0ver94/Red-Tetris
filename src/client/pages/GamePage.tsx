@@ -7,7 +7,7 @@ import GameBoard from "../components/game/Board";
 import NextPieces, { PiecePreview } from "../components/game/NextPieces";
 
 import { InputHandler } from "../components/game/InputHandler";
-import type { RenderPayload } from "../Types/RenderPayload";
+import type { OpponentRender, RenderPayload } from "../Types/RenderPayload";
 import { ROUTES } from "../Types/Routes";
 // import { fetchData } from "../components/fetch/fetch";
 import LogoutButton from "../components/LogoutButton";
@@ -18,7 +18,7 @@ type OpponentEntry = RenderPayload["opponents"][string];
 
 function getOpponentBoard(opponent: OpponentEntry | undefined | null) {
   if (!opponent) return null;
-  if ("board" in opponent) return (opponent as any).board ?? null;
+  if ("board" in opponent) return (opponent as OpponentRender).board ?? null;
   return null;
 }
 
